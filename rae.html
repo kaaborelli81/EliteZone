@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Efeito RAE — Projeto Atleta Elite</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bege:#F5F0E8;--bege-md:#EDE7D9;--bege-dk:#D6CDB8;--bege-xdk:#C2B8A5;
+  --tinta:#1C1C1C;--sub:#665E50;--fraco:#9A9080;--linha:#D6CDB8;
+  --lucas:#2C4A6E;--lucas-lt:#EBF0F7;--lucas-md:#C5D5E8;--lucas-dk:#1A3050;
+  --miguel:#2C5E3F;--miguel-lt:#EBF3EE;--miguel-md:#B8D9C4;--miguel-dk:#1A3D28;
+  --q1:#8B1A1A;--q1-lt:#FDF0F0;--q1-bd:#E8BCBC;
+  --q2:#5C3800;--q2-lt:#FBF3E6;--q2-bd:#E0C88A;
+  --q3:#1A4A7A;--q3-lt:#EFF5FC;--q3-bd:#B8D0E8;
+  --q4:#2C5E3F;--q4-lt:#EBF3EE;--q4-bd:#B8D9C4;
+  --early:#7A4A00;--early-lt:#FBF3E6;--early-bd:#E8D0A0;
+  --ontime:#2C4A6E;--ontime-lt:#EBF0F7;--ontime-bd:#C5D5E8;
+  --late:#8B1A1A;--late-lt:#FDF0F0;--late-bd:#E8BCBC;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:14px}
+body{background:var(--bege-md);font-family:'DM Sans',sans-serif;font-weight:400;color:var(--tinta);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--tinta);padding:10px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:50}
+.topbar-lbl{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.topbar-btns{display:flex;gap:8px;align-items:center}
+.btn{padding:6px 18px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:2px;cursor:pointer;border:none;transition:opacity .15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{opacity:.8}
+.btn-p{background:#fff;color:var(--tinta)}
+.btn-g{background:transparent;color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.2)}
+@media print{.topbar{display:none}.no-print{display:none!important}body{background:#fff}}
+
+/* ── FOLHA ── */
+.folha{width:794px;background:var(--bege);margin:32px auto 64px;box-shadow:0 2px 28px rgba(0,0,0,.13)}
+.inner{padding:54px 58px}
+@media(max-width:840px){.folha{width:100%;margin:0;box-shadow:none}.inner{padding:32px 24px}}
+
+/* ── HEADER ── */
+.doc-header{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:14px;border-bottom:1.5px solid var(--tinta);margin-bottom:44px}
+.doc-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--tinta)}
+.doc-date{font-size:11px;font-weight:300;color:var(--fraco)}
+
+/* ── HERO ── */
+.hero{margin-bottom:52px}
+.hero-titulo{font-family:'DM Serif Display',serif;font-size:38px;line-height:1.1;letter-spacing:-.5px;color:var(--tinta);margin-bottom:10px}
+.hero-titulo em{font-style:italic;color:var(--lucas)}
+.hero-sub{font-size:14px;font-weight:300;color:var(--sub);max-width:560px;line-height:1.7}
+
+/* ── EXPLICAÇÃO RAE ── */
+.explicacao{background:var(--bege-md);border-left:3px solid var(--bege-xdk);padding:20px 24px;margin-bottom:44px;border-radius:0 2px 2px 0}
+.explicacao p{font-size:13px;line-height:1.75;color:var(--sub)}
+.explicacao p+p{margin-top:10px}
+.explicacao strong{color:var(--tinta);font-weight:600}
+
+/* ── LINHA DO TEMPO QUARTIS ── */
+.quartis-wrap{margin-bottom:48px}
+.sec-titulo{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--fraco);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.sec-titulo::after{content:'';flex:1;height:1px;background:var(--linha)}
+.quartis-linha{display:flex;border-radius:3px;overflow:hidden;border:1px solid var(--bege-dk);margin-bottom:8px}
+.q-seg{flex:1;padding:12px 10px;text-align:center;position:relative}
+.q-seg.q1{background:var(--q1-lt);border-right:1px solid var(--bege-dk)}
+.q-seg.q2{background:var(--q2-lt);border-right:1px solid var(--bege-dk)}
+.q-seg.q3{background:var(--q3-lt);border-right:1px solid var(--bege-dk)}
+.q-seg.q4{background:var(--q4-lt)}
+.q-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+.q-seg.q1 .q-lbl{color:var(--q1)}
+.q-seg.q2 .q-lbl{color:var(--q2)}
+.q-seg.q3 .q-lbl{color:var(--q3)}
+.q-seg.q4 .q-lbl{color:var(--q4)}
+.q-meses{font-size:11px;font-weight:500;color:var(--tinta);margin-bottom:2px}
+.q-desc{font-size:10px;color:var(--sub)}
+.q-pin{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:600;letter-spacing:.5px;white-space:nowrap;padding:3px 8px;border-radius:10px}
+.q-pin.lucas{background:var(--lucas);color:#fff}
+.q-pin.miguel{background:var(--miguel);color:#fff}
+.q-pins-wrap{height:28px;position:relative;margin-bottom:8px}
+.q-corte{font-size:10px;color:var(--fraco);text-align:center}
+
+/* ── CARDS DOS ATLETAS ── */
+.atletas-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:48px}
+@media(max-width:600px){.atletas-grid{grid-template-columns:1fr}}
+.atleta-card{border:1px solid var(--linha);border-radius:3px;overflow:hidden}
+.atleta-card-header{padding:16px 20px 14px;border-bottom:1px solid var(--linha)}
+.atleta-card.lucas .atleta-card-header{background:var(--lucas-lt)}
+.atleta-card.miguel .atleta-card-header{background:var(--miguel-lt)}
+.ac-nome{font-size:16px;font-weight:600;letter-spacing:-.2px;margin-bottom:2px}
+.atleta-card.lucas .ac-nome{color:var(--lucas)}
+.atleta-card.miguel .ac-nome{color:var(--miguel)}
+.ac-meta{font-size:11px;font-weight:300;color:var(--fraco)}
+.atleta-card-body{padding:18px 20px;background:var(--bege)}
+.ac-row{display:flex;gap:12px;margin-bottom:14px}
+.ac-stat{flex:1}
+.ac-stat-val{font-size:22px;font-weight:600;line-height:1;margin-bottom:3px}
+.ac-stat-lbl{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco)}
+.ac-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:.5px;margin-bottom:12px}
+.badge-q1{background:var(--q1-lt);color:var(--q1);border:1px solid var(--q1-bd)}
+.badge-q2{background:var(--q2-lt);color:var(--q2);border:1px solid var(--q2-bd)}
+.badge-q3{background:var(--q3-lt);color:var(--q3);border:1px solid var(--q3-bd)}
+.badge-q4{background:var(--q4-lt);color:var(--q4);border:1px solid var(--q4-bd)}
+.badge-early{background:var(--early-lt);color:var(--early);border:1px solid var(--early-bd)}
+.badge-ontime{background:var(--ontime-lt);color:var(--ontime);border:1px solid var(--ontime-bd)}
+.badge-late{background:var(--late-lt);color:var(--late);border:1px solid var(--late-bd)}
+.ac-narrativa{font-size:12px;line-height:1.75;color:var(--sub)}
+.ac-separador{height:1px;background:var(--linha);margin:12px 0}
+.ac-destaque{font-size:12px;font-weight:600;color:var(--tinta);padding:10px 14px;background:var(--bege-md);border-radius:2px;line-height:1.6}
+
+/* ── DUPLO EFEITO ── */
+.duplo-efeito{background:var(--late-lt);border:1px solid var(--late-bd);border-radius:2px;padding:16px 20px;margin-bottom:48px}
+.de-titulo{font-weight:600;color:var(--late);font-size:13px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.de-corpo{font-size:12px;color:#5C1010;line-height:1.75}
+
+/* ── O QUE FAZER ── */
+.oque-fazer{margin-bottom:48px}
+.oque-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.oque-grid{grid-template-columns:1fr}}
+.oque-card{border:1px solid var(--linha);border-radius:3px;padding:18px 20px;background:var(--bege)}
+.oque-card-titulo{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.oque-card-titulo span{font-size:16px}
+.oque-item{font-size:12px;line-height:1.7;color:var(--sub);padding-left:12px;position:relative;margin-bottom:4px}
+.oque-item::before{content:'–';position:absolute;left:0;color:var(--bege-xdk)}
+
+/* ── COMPARATIVO INTERNACIONAL ── */
+.internacional{margin-bottom:48px}
+.int-table{width:100%;border-collapse:collapse}
+.int-table th{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco);text-align:left;padding:7px 12px;border-bottom:1px solid var(--linha)}
+.int-table td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--bege-md);color:var(--tinta);vertical-align:top}
+.int-table tr:last-child td{border-bottom:none}
+.int-table .hoje{background:var(--bege-md);font-weight:500}
+.int-pais{font-weight:600}
+.int-q{display:inline-flex;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:600}
+
+/* ── GLOSSÁRIO ── */
+.glossario{margin-bottom:48px}
+.glos-item{display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--bege-md)}
+.glos-item:last-child{border-bottom:none}
+.glos-termo{font-size:11px;font-weight:600;color:var(--tinta);min-width:130px;padding-top:1px}
+.glos-def{font-size:12px;color:var(--sub);line-height:1.6}
+
+/* ── CONFIGURAR ── */
+.config-section{background:var(--bege-md);border:1px solid var(--bege-dk);border-radius:3px;padding:20px 24px;margin-bottom:32px}
+.config-titulo{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco);margin-bottom:14px}
+.config-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.config-field{display:flex;flex-direction:column;gap:5px}
+.config-field label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--sub)}
+.config-field input,.config-field select{padding:8px 12px;border:1px solid var(--bege-dk);border-radius:2px;background:var(--bege);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--tinta);outline:none}
+.config-field input:focus,.config-field select:focus{border-color:var(--lucas)}
+.btn-calcular{padding:9px 22px;background:var(--tinta);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.5px;border:none;border-radius:2px;cursor:pointer;transition:opacity .15s}
+.btn-calcular:hover{opacity:.75}
+
+/* ── FOOTER ── */
+.doc-footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--linha);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ft{font-size:10px;color:var(--fraco);font-weight:300}
+.ftag{font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--bege-xdk)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-lbl">Projeto Atleta Elite · Efeito RAE</span>
+  <div class="topbar-btns">
+    <a href="relatorio_medico.html" class="btn btn-g">← Relatório Médico</a>
+    <a href="index.html" class="btn btn-g">Home</a>
+    <button class="btn btn-p" onclick="window.print()">⎙ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="folha">
+<div class="inner">
+
+  <div class="doc-header">
+    <span class="doc-title">Projeto Atleta Elite · Efeito RAE</span>
+    <span class="doc-date" id="docDate"></span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-titulo">O calendário decide <em>quem joga</em><br>antes do treino começar.</div>
+    <div class="hero-sub">
+      Crianças nascidas no início do ano de corte competem com até 11 meses de vantagem maturacional.
+      Isso é o Efeito RAE — e saber onde seu filho está nessa escala muda como você conversa com treinadores e selecionadores.
+    </div>
+  </div>
+
+  <!-- EXPLICAÇÃO -->
+  <div class="explicacao">
+    <p>
+      <strong>O que é o Relative Age Effect (RAE)?</strong> Em categorias de base organizadas por ano de nascimento,
+      crianças nascidas em janeiro têm até 12 meses de desenvolvimento físico a mais do que as nascidas em dezembro.
+      Essa diferença — que some completamente na vida adulta — é enorme na adolescência: 5–8 cm de altura, músculos
+      mais desenvolvidos, coordenação mais madura.
+    </p>
+    <p>
+      Resultado: <strong>atletas do Q1 (Jan–Mar) são convocados desproporcionalmente</strong> para seleções e times de elite,
+      não porque são mais talentosos, mas porque parecem mais prontos. Estudos em 14 países mostram que até <strong>40% dos
+      atletas de base profissional nasceram no Q1</strong>, quando matematicamente deveriam ser 25%.
+    </p>
+    <p>
+      A solução não é ignorar o RAE — é <strong>nomeá-lo, quantificá-lo e usá-lo como argumento</strong>
+      nas conversas com treinadores, selecionadores e escolinhas.
+    </p>
+  </div>
+
+  <!-- CONFIGURAR (para uso personalizado) -->
+  <div class="config-section no-print">
+    <div class="config-titulo">⚙ Configurar cálculo personalizado</div>
+    <div class="config-row">
+      <div class="config-field">
+        <label>Data de corte</label>
+        <select id="cfgCorte">
+          <option value="01-01" selected>01 de Janeiro (Brasil, maioria)</option>
+          <option value="08-01">01 de Agosto (Espanha, CBF sub-categorias)</option>
+          <option value="09-01">01 de Setembro (Inglaterra)</option>
+        </select>
+      </div>
+      <div class="config-field">
+        <label>Bone age Lucas (anos)</label>
+        <input type="number" id="cfgBoneLucas" placeholder="ex: 14.2" step="0.1" min="8" max="18" value="13.8">
+      </div>
+      <div class="config-field">
+        <label>Bone age Miguel (anos)</label>
+        <input type="number" id="cfgBoneMiguel" placeholder="ex: 12.5" step="0.1" min="8" max="18">
+      </div>
+      <button class="btn-calcular" onclick="calcularRAE()">Recalcular</button>
+    </div>
+  </div>
+
+  <!-- LINHA DO TEMPO -->
+  <div class="quartis-wrap">
+    <div class="sec-titulo">Distribuição por quartil — ano civil</div>
+    <div class="quartis-linha">
+      <div class="q-seg q1">
+        <div class="q-lbl">Q1 · Vantagem alta</div>
+        <div class="q-meses">Jan – Mar</div>
+        <div class="q-desc">Mais velho do grupo</div>
+      </div>
+      <div class="q-seg q2">
+        <div class="q-lbl">Q2 · Vantagem moderada</div>
+        <div class="q-meses">Abr – Jun</div>
+        <div class="q-desc">Acima da média etária</div>
+      </div>
+      <div class="q-seg q3">
+        <div class="q-lbl">Q3 · Desvantagem moderada</div>
+        <div class="q-meses">Jul – Set</div>
+        <div class="q-desc">Abaixo da média etária</div>
+      </div>
+      <div class="q-seg q4">
+        <div class="q-lbl">Q4 · Desvantagem alta</div>
+        <div class="q-meses">Out – Dez</div>
+        <div class="q-desc">Mais novo do grupo</div>
+      </div>
+    </div>
+    <div class="q-pins-wrap" id="pinWrap"></div>
+    <div class="q-corte" id="corteLabel">Data de corte: 01/01 — padrão futebol brasileiro</div>
+  </div>
+
+  <!-- ATLETAS -->
+  <div class="sec-titulo">Posição dos atletas</div>
+  <div class="atletas-grid" id="atletasGrid"></div>
+
+  <!-- DUPLO EFEITO (condicional) -->
+  <div class="duplo-efeito" id="duploEfeitoBox" style="display:none">
+    <div class="de-titulo"><span>⚠</span> Duplo Efeito RAE identificado</div>
+    <div class="de-corpo" id="duploEfeitoTexto"></div>
+  </div>
+
+  <!-- O QUE FAZER -->
+  <div class="oque-fazer">
+    <div class="sec-titulo">O que fazer com essa informação</div>
+    <div class="oque-grid">
+      <div class="oque-card">
+        <div class="oque-card-titulo"><span>🗣</span> Com o treinador</div>
+        <div class="oque-item">Apresente este documento antes de qualquer conversa sobre "nível" ou "prontidão" do atleta</div>
+        <div class="oque-item">Pergunte: "Como você ajusta a avaliação para atletas do Q3 e Q4?"</div>
+        <div class="oque-item">Treinadores que não conhecem RAE tendem a confundir maturação com talento — o documento educa sem confrontar</div>
+        <div class="oque-item">Peça que o atleta seja avaliado por potencial relativo à sua maturação biológica, não à média do grupo</div>
+      </div>
+      <div class="oque-card">
+        <div class="oque-card-titulo"><span>🏫</span> Com a escolinha / seleção</div>
+        <div class="oque-item">Em peneiras, mencione proativamente o quartil RAE e a bone age disponível</div>
+        <div class="oque-item">Selecione categorias onde o atleta compete com pares maturacionais, não apenas cronológicos</div>
+        <div class="oque-item">Pesquise se a escolinha usa bio-banding — metodologia adotada pelo Manchester City Academy e La Fábrica</div>
+        <div class="oque-item">Um atleta Q3/Q4 que performar bem contra Q1/Q2 demonstra talento superior — argumento para seleção</div>
+      </div>
+      <div class="oque-card">
+        <div class="oque-card-titulo"><span>🧠</span> Com o atleta</div>
+        <div class="oque-item">Explique em linguagem simples: "Você compete contra crianças mais velhas — isso é mais difícil, não é fraqueza"</div>
+        <div class="oque-item">Reforce que o crescimento ainda vai acontecer — e que a janela de desenvolvimento está aberta</div>
+        <div class="oque-item">Nunca use o RAE como desculpa — use como contexto para manter confiança e motivação</div>
+      </div>
+      <div class="oque-card">
+        <div class="oque-card-titulo"><span>📊</span> No longo prazo</div>
+        <div class="oque-item">Atletas Q3/Q4 que persistem costumam ter mentalidade mais resiliente — vantagem invisível no profissional</div>
+        <div class="oque-item">Quando o crescimento equiparar os pares, o atleta Q4 frequentemente supera os Q1 que eram mais "prontos"</div>
+        <div class="oque-item">Medir bone age a cada 12–18 meses permite acompanhar quando o gap maturacional fecha</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO INTERNACIONAL -->
+  <div class="internacional">
+    <div class="sec-titulo">Como diferentes federações usam a data de corte</div>
+    <table class="int-table">
+      <thead>
+        <tr>
+          <th>País / Liga</th>
+          <th>Data de corte</th>
+          <th>Lucas (12/05)</th>
+          <th>Miguel (13/09)</th>
+          <th>Observação</th>
+        </tr>
+      </thead>
+      <tbody id="intTableBody"></tbody>
+    </table>
+    <p style="font-size:10px;color:var(--fraco);margin-top:10px">
+      Mudar de uma federação com corte em Janeiro para outra com corte em Agosto ou Setembro pode inverter completamente o quartil RAE do atleta. Isso é relevante para intercâmbios, peneiras internacionais e competições UEFA.
+    </p>
+  </div>
+
+  <!-- GLOSSÁRIO -->
+  <div class="glossario">
+    <div class="sec-titulo">Glossário</div>
+    <div class="glos-item">
+      <div class="glos-termo">Efeito RAE</div>
+      <div class="glos-def">Relative Age Effect — viés sistemático na seleção de atletas jovens causado pela diferença de idade dentro de um mesmo grupo de competição.</div>
+    </div>
+    <div class="glos-item">
+      <div class="glos-termo">Quartil (Q1–Q4)</div>
+      <div class="glos-def">Divisão do ano de corte em quatro trimestres. Q1 = mais velho do grupo, Q4 = mais novo. Cada quartil representa 25% dos nascimentos possíveis.</div>
+    </div>
+    <div class="glos-item">
+      <div class="glos-termo">Bone Age (Idade Óssea)</div>
+      <div class="glos-def">Estimativa da maturação biológica via raio-X das mãos e punhos. Pode divergir da idade cronológica em até 2–3 anos. Early maturer: bone age > cronológica. Late maturer: bone age < cronológica.</div>
+    </div>
+    <div class="glos-item">
+      <div class="glos-termo">Bio-banding</div>
+      <div class="glos-def">Metodologia de agrupamento de atletas por maturação biológica (não por ano de nascimento). Usada por Manchester City Academy, Ajax, La Fábrica. Neutraliza o RAE nas avaliações.</div>
+    </div>
+    <div class="glos-item">
+      <div class="glos-termo">PHV (Peak Height Velocity)</div>
+      <div class="glos-def">Pico de velocidade de crescimento em altura. Período de maior ganho de estatura — tipicamente 1–2 anos antes do fechamento das placas epifisárias.</div>
+    </div>
+    <div class="glos-item">
+      <div class="glos-termo">Duplo Efeito RAE</div>
+      <div class="glos-def">Quando o atleta é Q3 ou Q4 (cronologicamente mais novo) E late maturer (biologicamente menos desenvolvido). O penalizamento é composto — o atleta pode estar sendo subestimado por dois fatores simultâneos.</div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="ft">Gerado automaticamente pelo sistema interno · Não substitui avaliação esportiva especializada</div>
+    <div class="ftag">Confidencial</div>
+  </div>
+
+</div><!-- /inner -->
+</div><!-- /folha -->
+
+<script>
+// ── DADOS DOS ATLETAS (lidos do localStorage + defaults) ──────────────────────
+const ATLETAS = [
+  {
+    id: 'lucas',
+    nome: 'Lucas',
+    cc: 'lucas',
+    dob: '2012-05-12',
+    posicao: 'Meio / Ponta Esquerda',
+    modalidade: 'Fut7 e Futsal',
+    boneAgePadrao: 13.8,   // on-time confirmado (Apêndice 10)
+    boneAgeSource: 'RX Jan/2026 — estimado por radiologista'
+  },
+  {
+    id: 'miguel',
+    nome: 'Miguel',
+    cc: 'miguel',
+    dob: '2013-09-13',
+    posicao: 'Goleiro',
+    modalidade: 'Fut7',
+    boneAgePadrao: null,   // ainda sem RX
+    boneAgeSource: null
+  }
+];
+
+const CORTES = [
+  { value: '01-01', label: '01 de Janeiro', paises: 'Brasil (CBF), Alemanha, França, Itália, Portugal' },
+  { value: '08-01', label: '01 de Agosto',  paises: 'Espanha (RFEF), sub-categorias CBF em alguns estados' },
+  { value: '09-01', label: '01 de Setembro',paises: 'Inglaterra (FA), Países Baixos' }
+];
+
+const INT_DATA = [
+  { pais: 'Brasil (CBF)', corte: '01-01', hoje: true },
+  { pais: 'Espanha (RFEF)', corte: '08-01', hoje: false },
+  { pais: 'Inglaterra (FA)', corte: '09-01', hoje: false },
+  { pais: 'Alemanha (DFB)', corte: '01-01', hoje: false },
+  { pais: 'França (FFF)', corte: '01-01', hoje: false },
+];
+
+// ── UTILITÁRIOS ──────────────────────────────────────────────────────────────
+function idadeAnos(dobStr, ref) {
+  const dob = new Date(dobStr);
+  const r = ref || new Date();
+  let y = r.getFullYear() - dob.getFullYear();
+  if (r.getMonth() < dob.getMonth() || (r.getMonth() === dob.getMonth() && r.getDate() < dob.getDate())) y--;
+  return y;
+}
+
+function idadeDecimal(dobStr, ref) {
+  const dob = new Date(dobStr);
+  const r = ref || new Date();
+  return (r - dob) / (365.25 * 24 * 3600 * 1000);
+}
+
+function calcQuartil(dobStr, corte) {
+  // corte = 'MM-DD' — data de início do ano de competição
+  const dob = new Date(dobStr);
+  const [cMes, cDia] = corte.split('-').map(Number);
+  const mesNasc = dob.getMonth() + 1; // 1–12
+  const diaNasc = dob.getDate();
+
+  // Offset em meses a partir da data de corte
+  let offset = (mesNasc - cMes + 12) % 12;
+  // Ajuste de dia: se nasceu antes do dia do corte dentro do mesmo mês de corte
+  if (mesNasc === cMes && diaNasc < cDia) offset = 11;
+  if (mesNasc === cMes && diaNasc >= cDia) offset = 0;
+
+  if (offset < 3) return 1;
+  if (offset < 6) return 2;
+  if (offset < 9) return 3;
+  return 4;
+}
+
+function mesesNoCorte(dobStr, corte) {
+  const dob = new Date(dobStr);
+  const [cMes] = corte.split('-').map(Number);
+  const mesNasc = dob.getMonth() + 1;
+  let offset = (mesNasc - cMes + 12) % 12;
+  return offset; // 0–11 meses após o corte
+}
+
+function classMatural(boneAge, idCrono) {
+  if (boneAge == null) return null;
+  const diff = boneAge - idCrono;
+  if (diff > 1.0) return 'early';
+  if (diff < -1.0) return 'late';
+  return 'ontime';
+}
+
+function fmtD(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function quartilLabel(q) {
+  return ['', 'Q1', 'Q2', 'Q3', 'Q4'][q];
+}
+function quartilBadgeClass(q) {
+  return ['', 'badge-q1', 'badge-q2', 'badge-q3', 'badge-q4'][q];
+}
+function quartilDescricao(q) {
+  const d = [
+    '',
+    'Vantagem cronológica alta — entre os mais velhos da categoria',
+    'Vantagem cronológica moderada — acima da média etária do grupo',
+    'Desvantagem cronológica moderada — abaixo da média etária do grupo',
+    'Desvantagem cronológica alta — entre os mais novos da categoria'
+  ];
+  return d[q];
+}
+
+function maturalLabel(m) {
+  if (m === 'early') return 'Early maturer (maturação adiantada)';
+  if (m === 'late') return 'Late maturer (maturação atrasada)';
+  if (m === 'ontime') return 'On-time (maturação dentro da média)';
+  return null;
+}
+function maturalBadgeClass(m) {
+  if (m === 'early') return 'badge-early';
+  if (m === 'late') return 'badge-late';
+  return 'badge-ontime';
+}
+
+// ── NARRATIVA POR ATLETA ──────────────────────────────────────────────────────
+function narrativaAtleta(atleta, q, mat, corte) {
+  const nome = atleta.nome;
+  const posQ = q <= 2 ? 'está na metade superior' : 'está na metade inferior';
+  const vantagem = q === 1 ? 'forte vantagem' : q === 2 ? 'vantagem moderada' : q === 3 ? 'desvantagem moderada' : 'desvantagem acentuada';
+
+  let texto = `${nome} nasceu em ${fmtD(atleta.dob)} e ${posQ} do calendário de corte — Quartil ${q}, com ${vantagem} cronológica em relação à média do grupo.`;
+
+  if (mat === 'ontime') {
+    texto += ` A bone age confirma maturação on-time: o desenvolvimento biológico corresponde à faixa esperada para a idade. `;
+    if (q <= 2) {
+      texto += `Isso significa que a vantagem observada em campo é real e consistente com a posição no calendário.`;
+    } else {
+      texto += `O desempenho atual é genuíno — não é compensado por maturação adiantada. O que você vê em campo é talento, não calendário.`;
+    }
+  } else if (mat === 'early') {
+    texto += ` A bone age indica maturação adiantada (early maturer): biologicamente, ${nome} está à frente de atletas com a mesma idade cronológica. `;
+    texto += `A vantagem percebida em campo pode ser maior do que o quartil RAE sugere isoladamente.`;
+  } else if (mat === 'late') {
+    texto += ` A bone age indica maturação atrasada (late maturer): biologicamente, ${nome} está atrás de atletas com a mesma idade cronológica. `;
+    texto += `Isso compõe com o quartil RAE e gera um duplo penalizamento que pode levar treinadores a subestimar o atleta.`;
+  } else {
+    texto += ` Bone age não disponível — o cruzamento maturacional será atualizado após o próximo RX de mãos e punhos.`;
+    if (q >= 3) {
+      texto += ` Mesmo sem bone age, a posição Q${q} já justifica contexto RAE nas conversas com treinadores.`;
+    }
+  }
+
+  return texto;
+}
+
+function destaqueAtleta(atleta, q, mat) {
+  if (q <= 2 && (mat === 'ontime' || mat == null)) {
+    return `O desempenho de ${atleta.nome} não é inflado por calendário. Avaliações positivas refletem talento real.`;
+  }
+  if (q >= 3 && mat === 'ontime') {
+    return `${atleta.nome} compete em desvantagem cronológica sem compensação maturacional. Performance acima da média do grupo indica talento superior ao aparente.`;
+  }
+  if (q >= 3 && mat === 'late') {
+    return `Duplo efeito RAE identificado. ${atleta.nome} deve ser avaliado por potencial relativo, não por comparação direta com o grupo.`;
+  }
+  if (mat === 'early' && q <= 2) {
+    return `Vantagem composta (calendário + maturação adiantada). Atenção: parte da performance atual pode ser maturacional — monitorar após equalização.`;
+  }
+  return `Acompanhar evolução conforme a bone age se iguala à média do grupo nos próximos 12–18 meses.`;
+}
+
+// ── RENDER PRINCIPAL ──────────────────────────────────────────────────────────
+function calcularRAE() {
+  const corte = document.getElementById('cfgCorte').value;
+  const boneInputLucas = parseFloat(document.getElementById('cfgBoneLucas').value);
+  const boneInputMiguel = parseFloat(document.getElementById('cfgBoneMiguel').value);
+  const hoje = new Date();
+
+  // Atualizar label corte
+  const corteInfo = CORTES.find(c => c.value === corte);
+  document.getElementById('corteLabel').textContent =
+    `Data de corte: ${corteInfo.label} — ${corteInfo.paises}`;
+
+  // ── PINS na timeline ──
+  const pinWrap = document.getElementById('pinWrap');
+  pinWrap.innerHTML = '';
+  ATLETAS.forEach(a => {
+    const q = calcQuartil(a.dob, corte);
+    const offset = mesesNoCorte(a.dob, corte); // 0–11
+    const pct = (offset / 12) * 100;
+    const pin = document.createElement('div');
+    pin.className = `q-pin ${a.cc}`;
+    pin.style.cssText = `position:absolute;bottom:0;left:${pct}%;transform:translateX(-50%)`;
+    pin.textContent = `${a.nome} · Q${q}`;
+    pinWrap.appendChild(pin);
+  });
+
+  // ── CARDS DOS ATLETAS ──
+  const grid = document.getElementById('atletasGrid');
+  grid.innerHTML = '';
+
+  let duploEfeitoAtletas = [];
+
+  ATLETAS.forEach((atleta, idx) => {
+    const q = calcQuartil(atleta.dob, corte);
+    const idCrono = idadeDecimal(atleta.dob);
+    const boneInput = idx === 0 ? boneInputLucas : boneInputMiguel;
+    const boneAge = !isNaN(boneInput) ? boneInput : atleta.boneAgePadrao;
+    const mat = classMatural(boneAge, idCrono);
+    const anos = idadeAnos(atleta.dob);
+
+    if (q >= 3 && mat === 'late') duploEfeitoAtletas.push(atleta.nome);
+
+    const boneAgeStr = boneAge != null
+      ? `${boneAge.toFixed(1)}a`
+      : '—';
+    const boneAgeSource = idx === 0
+      ? (atleta.boneAgeSource || 'Não disponível')
+      : (boneAge != null ? 'Inserido manualmente' : 'Não disponível — aguarda RX');
+
+    const difBone = boneAge != null ? (boneAge - idCrono).toFixed(1) : null;
+    const difStr = difBone != null ? (difBone > 0 ? `+${difBone}a` : `${difBone}a`) : '—';
+
+    const card = document.createElement('div');
+    card.className = `atleta-card ${atleta.cc}`;
+    card.innerHTML = `
+      <div class="atleta-card-header">
+        <div class="ac-nome">${atleta.nome}</div>
+        <div class="ac-meta">${atleta.posicao} · ${atleta.modalidade} · ${anos} anos · ${fmtD(atleta.dob)}</div>
+      </div>
+      <div class="atleta-card-body">
+        <div class="ac-row">
+          <div class="ac-stat">
+            <div class="ac-stat-val" style="color:var(--${atleta.cc})">${quartilLabel(q)}</div>
+            <div class="ac-stat-lbl">Quartil RAE</div>
+          </div>
+          <div class="ac-stat">
+            <div class="ac-stat-val">${boneAgeStr}</div>
+            <div class="ac-stat-lbl">Bone Age</div>
+          </div>
+          <div class="ac-stat">
+            <div class="ac-stat-val" style="color:${difBone==null?'var(--fraco)':parseFloat(difBone)>0.5?'var(--early)':parseFloat(difBone)<-0.5?'var(--late)':'var(--ontime)'}">${difStr}</div>
+            <div class="ac-stat-lbl">Δ Biológico</div>
+          </div>
+        </div>
+        <span class="ac-badge ${quartilBadgeClass(q)}">${quartilLabel(q)} — ${q <= 2 ? 'Vantagem' : 'Desvantagem'} cronológica</span>
+        ${mat != null ? `<span class="ac-badge ${maturalBadgeClass(mat)}" style="margin-left:6px">${maturalLabel(mat)}</span>` : ''}
+        <div class="ac-separador"></div>
+        <div class="ac-narrativa">${narrativaAtleta(atleta, q, mat, corte)}</div>
+        <div class="ac-separador"></div>
+        <div class="ac-destaque">→ ${destaqueAtleta(atleta, q, mat)}</div>
+        ${boneAge == null ? `<div style="font-size:10px;color:var(--fraco);margin-top:10px">⚠ Bone age não disponível — ${boneAgeSource}</div>` : `<div style="font-size:10px;color:var(--fraco);margin-top:10px">Bone age: ${boneAgeSource}</div>`}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // ── DUPLO EFEITO ──
+  const box = document.getElementById('duploEfeitoBox');
+  const txt = document.getElementById('duploEfeitoTexto');
+  if (duploEfeitoAtletas.length > 0) {
+    box.style.display = 'block';
+    txt.textContent = `${duploEfeitoAtletas.join(' e ')} apresentam duplo efeito RAE: desvantagem cronológica (Q3 ou Q4) combinada com maturação biológica atrasada (late maturer). O penalizamento é composto — esses atletas podem estar sendo sistematicamente subestimados em peneiras e avaliações. Ao apresentar este documento a treinadores, enfatize que a diferença de desempenho atual em relação ao grupo pode ser inteiramente explicada por fatores de calendário e maturação — não por capacidade ou talento.`;
+  } else {
+    box.style.display = 'none';
+  }
+
+  // ── TABELA INTERNACIONAL ──
+  const tbody = document.getElementById('intTableBody');
+  tbody.innerHTML = '';
+  INT_DATA.forEach(row => {
+    const tr = document.createElement('tr');
+    if (row.hoje) tr.className = 'hoje';
+    const qLucas = calcQuartil(ATLETAS[0].dob, row.corte);
+    const qMiguel = calcQuartil(ATLETAS[1].dob, row.corte);
+    const cls = (q) => ['','badge-q1','badge-q2','badge-q3','badge-q4'][q];
+    tr.innerHTML = `
+      <td><span class="int-pais">${row.pais}</span>${row.hoje ? ' <span style="font-size:9px;color:var(--fraco)">(atual)</span>' : ''}</td>
+      <td>${row.corte.split('-').reverse().join('/')}</td>
+      <td><span class="int-q ${cls(qLucas)}" style="padding:2px 8px;border-radius:2px;font-size:10px;font-weight:700">Q${qLucas}</span></td>
+      <td><span class="int-q ${cls(qMiguel)}" style="padding:2px 8px;border-radius:2px;font-size:10px;font-weight:700">Q${qMiguel}</span></td>
+      <td style="font-size:11px;color:var(--sub)">${row.paises||''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('docDate').textContent =
+  new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+// Pre-preencher bone age do biometria_v2 se disponível
+try {
+  const bio = JSON.parse(localStorage.getItem('biometria_v2') || '[]');
+  const lucasBio = bio.find(b => b.name === 'Lucas');
+  if (lucasBio && lucasBio.exames) {
+    const rxExame = lucasBio.exames.find(e =>
+      e.source === 'agente_ia' && e.name && e.name.toLowerCase().includes('bone')
+    );
+    if (rxExame && rxExame.value) {
+      document.getElementById('cfgBoneLucas').value = parseFloat(rxExame.value).toFixed(1);
+    }
+  }
+} catch(e) { /* sem dados */ }
+
+calcularRAE();
+</script>
+</body>
+</html>

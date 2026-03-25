@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Treino — Lucas & Miguel</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:#060b12;--bg-card:#0c1520;--bg-card2:#0f1a27;
+  --border:rgba(0,255,200,0.10);--text-primary:#e8f4f8;
+  --text-secondary:#7a9bb5;--text-dim:#3a5268;
+  --scanline:rgba(0,255,200,0.06);
+  --lucas:#3b9eff;--lucas-dim:rgba(59,158,255,0.12);
+  --lucas-border:rgba(59,158,255,0.25);
+  --lucas-glow:0 0 24px rgba(59,158,255,0.30);
+  --lucas-deep:#0a1628;
+  --miguel:#00e87a;--miguel-dim:rgba(0,232,122,0.10);
+  --miguel-border:rgba(0,232,122,0.25);
+  --miguel-glow:0 0 24px rgba(0,232,122,0.28);
+  --miguel-deep:#071a0f;
+  --accent:#3b9eff;--accent-dim:rgba(59,158,255,0.12);
+  --accent-border:rgba(59,158,255,0.25);
+  --accent-glow:0 0 24px rgba(59,158,255,0.30);
+  --accent-deep:#0a1628;
+  --tatico:#ff9800;--tatico-dim:rgba(255,152,0,0.10);--tatico-border:rgba(255,152,0,0.30);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-deep);color:var(--text-primary);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,255,200,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,0.018) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;z-index:0;}
+.scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--scanline),transparent);animation:scan 9s linear infinite;pointer-events:none;z-index:100;}
+@keyframes scan{0%{transform:translateY(-2px)}100%{transform:translateY(100vh)}}
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
+#page-home{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;}
+#page-home.active{display:flex;}
+.home-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;text-align:center;}
+.home-title{font-family:'Rajdhani',sans-serif;font-size:clamp(36px,8vw,72px);font-weight:700;letter-spacing:-1px;line-height:1;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#3b9eff 0%,#00e87a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.home-sub{font-size:13px;color:var(--text-secondary);text-align:center;margin-bottom:64px;letter-spacing:0.5px;}
+.home-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:28px;text-align:center;}
+.players-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:520px;}
+.player-btn{position:relative;overflow:hidden;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:36px 24px;cursor:pointer;transition:all 0.25s ease;text-align:center;text-decoration:none;display:block;}
+.player-btn.lucas{border-top:3px solid var(--lucas);}
+.player-btn.miguel{border-top:3px solid var(--miguel);}
+.player-btn:hover{transform:translateY(-3px);}
+.player-btn.lucas:hover{background:var(--lucas-deep);box-shadow:var(--lucas-glow);border-color:var(--lucas-border);}
+.player-btn.miguel:hover{background:var(--miguel-deep);box-shadow:var(--miguel-glow);border-color:var(--miguel-border);}
+.player-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:100%;background:linear-gradient(180deg,currentColor 0%,transparent 100%);opacity:0;transition:opacity 0.25s;}
+.player-btn.lucas{color:rgba(59,158,255,0.04);}
+.player-btn.miguel{color:rgba(0,232,122,0.04);}
+.player-btn:hover::before{opacity:1;}
+.player-emoji{font-size:32px;margin-bottom:16px;display:block;}
+.player-name{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:6px;}
+.player-btn.lucas .player-name{color:var(--lucas);}
+.player-btn.miguel .player-name{color:var(--miguel);}
+.player-role{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);}
+#page-training{display:none;min-height:100vh;}
+#page-training.active{display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(6,11,18,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--accent-border);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;transition:border-color 0.3s;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.back-btn{background:none;border:1px solid var(--accent-border);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;padding:6px 10px;border-radius:2px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+.back-btn:hover{background:var(--accent-dim);}
+.topbar-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);transition:color 0.3s;}
+.topbar-day{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-secondary);padding:4px 8px;border:1px solid var(--border);border-radius:2px;}
+.training-layout{display:flex;flex:1;min-height:0;}
+.sidebar{width:200px;min-width:200px;background:var(--bg-card);border-right:1px solid var(--accent-border);padding:24px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;transition:border-color 0.3s;flex-shrink:0;}
+.sidebar-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:0 20px 16px;}
+.day-btn{display:flex;align-items:center;gap:10px;width:100%;padding:14px 20px;background:none;border:none;cursor:pointer;transition:all 0.2s;text-align:left;position:relative;}
+.day-btn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);opacity:0;transition:opacity 0.2s;}
+.day-btn:hover{background:var(--accent-dim);}
+.day-btn.active{background:var(--accent-dim);}
+.day-btn.active::before{opacity:1;}
+.day-btn-number{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1px;min-width:18px;}
+.day-btn.active .day-btn-number{color:var(--accent);}
+.day-btn-label{font-size:13px;font-weight:400;color:var(--text-secondary);transition:color 0.2s;}
+.day-btn:hover .day-btn-label,.day-btn.active .day-btn-label{color:var(--text-primary);}
+.day-btn-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:0;margin-left:auto;transition:opacity 0.2s;}
+.day-btn.active .day-btn-dot{opacity:1;}
+.day-btn.domingo .day-btn-label{color:var(--text-dim);}
+.day-btn.domingo .day-btn-number{color:var(--text-dim);opacity:0.5;}
+.main-content{flex:1;overflow-y:auto;padding:32px 28px 60px;max-width:800px;}
+.day-header{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--accent-border);}
+.day-tema{font-family:'Rajdhani',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:700;letter-spacing:-0.5px;color:var(--accent);margin-bottom:6px;}
+.day-foco{font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;}
+.day-foco::before{content:'//';font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);opacity:0.5;}
+.aquecimento-block{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent);padding:16px 20px;margin-bottom:28px;border-radius:2px;}
+.aquecimento-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);opacity:0.7;margin-bottom:8px;}
+.aquecimento-text{font-size:13px;color:var(--text-secondary);line-height:1.6;}
+.exercises-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;}
+.exercise-card{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden;transition:all 0.2s ease;}
+.exercise-card:hover{border-color:var(--accent-border);box-shadow:var(--accent-glow);}
+/* CARD TÁTICO — borda laranja */
+.exercise-card.tatico{border-left:3px solid var(--tatico);}
+.exercise-card.tatico:hover{border-color:var(--tatico-border);box-shadow:0 0 18px rgba(255,152,0,0.20);}
+.exercise-card.tatico .exercise-num{background:rgba(255,152,0,0.12);color:var(--tatico);border-right-color:var(--tatico-border);}
+.exercise-card.tatico .exercise-volume{color:var(--tatico);}
+.tatico-badge{display:inline-flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tatico);background:rgba(255,152,0,0.10);border:1px solid rgba(255,152,0,0.25);padding:2px 7px;border-radius:2px;margin-bottom:6px;}
+.exercise-header{display:flex;align-items:center;gap:0;cursor:pointer;user-select:none;}
+.exercise-num{width:44px;min-width:44px;height:60px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent);border-right:1px solid var(--accent-border);transition:background 0.2s;flex-shrink:0;}
+.exercise-title-block{flex:1;padding:14px 16px;}
+.exercise-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-primary);margin-bottom:4px;}
+.exercise-volume{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.5px;color:var(--accent);}
+.exercise-chevron{padding:0 16px;color:var(--text-dim);font-size:12px;transition:transform 0.2s;flex-shrink:0;}
+.exercise-card.open .exercise-chevron{transform:rotate(180deg);}
+.exercise-body{display:none;padding:0 16px 20px 16px;border-top:1px solid var(--border);}
+.exercise-card.open .exercise-body{display:block;}
+.exercise-instructions{padding:16px 0 0;}
+.instruction-line{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px;color:var(--text-secondary);line-height:1.6;}
+.instruction-line::before{content:'→';color:var(--accent);opacity:0.6;font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:3px;flex-shrink:0;}
+.exercise-tip{margin-top:14px;padding:10px 14px;background:rgba(0,0,0,0.3);border-left:2px solid var(--accent);border-radius:2px;}
+.exercise-tip-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);opacity:0.7;margin-bottom:4px;}
+.exercise-tip-text{font-size:12px;color:var(--text-secondary);font-style:italic;line-height:1.5;}
+.video-block{display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px 14px;background:var(--bg-card2);border:1px solid var(--accent-border);border-radius:4px;flex-wrap:wrap;}
+.video-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-right:auto;width:100%;margin-bottom:8px;}
+.video-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#060b12;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:3px;text-decoration:none;border:none;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+.video-btn:hover{opacity:0.88;transform:scale(1.02);}
+.video-btn svg{width:14px;height:14px;fill:currentColor;}
+.video-timestamp{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--accent);padding:6px 10px;border:1px solid var(--accent-border);border-radius:2px;}
+.qr-container{display:flex;flex-direction:column;align-items:center;margin-left:auto;}
+.qr-img{width:72px;height:72px;background:white;padding:4px;border-radius:2px;display:flex;align-items:center;justify-content:center;}
+.qr-img img{width:100%;height:100%;}
+.qr-label{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-top:4px;text-align:center;}
+.finalizacao-block{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:18px 20px;margin-top:24px;}
+.finalizacao-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+.finalizacao-text{font-size:13px;color:var(--text-secondary);line-height:1.6;}
+.dica-block{margin-top:16px;padding:16px 20px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:4px;font-size:13.5px;color:var(--text-primary);line-height:1.6;font-weight:500;}
+
+/* FILMAR BUTTON — sempre visível abaixo do header do card */
+.filmar-block{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(230,92,0,0.05);border-top:1px solid rgba(230,92,0,0.15);flex-wrap:wrap;}
+.btn-filmar{display:inline-flex;align-items:center;gap:6px;background:#E65C00;color:white;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;border-radius:3px;border:none;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+.btn-filmar:hover{background:#FF6D00;}
+.btn-concluir{display:inline-flex;align-items:center;gap:6px;background:transparent;color:#4CAF50;border:1px solid #4CAF50;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:3px;cursor:pointer;transition:all 0.2s;}
+.btn-concluir:hover{background:rgba(76,175,80,0.10);}
+.btn-concluir.done{background:rgba(76,175,80,0.12);border-color:#4CAF50;}
+.upload-progress{margin-top:0;background:rgba(0,0,0,0.4);border-radius:3px;height:3px;overflow:hidden;display:none;width:100%;}
+.upload-bar{height:100%;background:#E65C00;border-radius:3px;transition:width 0.3s;width:0%;}
+.upload-status{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#E65C00;margin-top:2px;display:none;width:100%;}
+
+/* concluido state */
+.exercise-card.concluido{border-color:rgba(76,175,80,0.35);}
+.exercise-card.concluido .exercise-num{background:rgba(76,175,80,0.12);color:#4CAF50;}
+
+.sidebar-toggle{display:none;background:none;border:1px solid var(--accent-border);color:var(--accent);padding:6px 10px;border-radius:2px;cursor:pointer;font-size:16px;}
+@media(max-width:640px){
+  .players-grid{grid-template-columns:1fr;max-width:280px;}
+  .player-btn{padding:28px 20px;}
+  .sidebar{position:fixed;left:0;top:56px;bottom:0;z-index:40;transform:translateX(-100%);transition:transform 0.28s ease;width:220px;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-toggle{display:flex;align-items:center;}
+  .main-content{padding:24px 16px 60px;}
+  .training-layout{flex-direction:column;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:39;}
+  .sidebar-overlay.show{display:block;}
+  .topbar{padding:0 14px;}
+  .video-block{flex-direction:column;align-items:flex-start;}
+  .qr-container{margin-left:0;}
+}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<div id="page-home" class="page active">
+  <div class="home-eyebrow">⚽ programa de treino 2026</div>
+  <h1 class="home-title">Treino</h1>
+  <p class="home-sub">Seleciona quem vai treinar hoje</p>
+  <div class="home-label">// escolha o jogador</div>
+  <div class="players-grid">
+    <button class="player-btn lucas" onclick="selectPlayer('lucas')">
+      <span class="player-emoji">⚡</span>
+      <span class="player-name">Lucas</span>
+      <span class="player-role">13 anos · meio-campo</span>
+    </button>
+    <button class="player-btn miguel" onclick="selectPlayer('miguel')">
+      <span class="player-emoji">🧤</span>
+      <span class="player-name">Miguel</span>
+      <span class="player-role">12 anos · goleiro</span>
+    </button>
+  </div>
+  <div style="margin-top:40px;display:flex;gap:12px;flex-wrap:wrap;">
+    <a href="painel_motor.html" style="display:inline-flex;align-items:center;gap:10px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;border-radius:4px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(0,255,200,0.3)';this.style.color='#e8f4f8'" onmouseout="this.style.borderColor='rgba(0,255,200,0.10)';this.style.color='var(--text-secondary)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Painel do Pai
+    </a>
+    <a href="rae.html" style="display:inline-flex;align-items:center;gap:10px;background:var(--bg-card);border:1px solid rgba(0,180,255,0.18);color:var(--text-secondary);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;border-radius:4px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(0,180,255,0.4)';this.style.color='#e8f4f8'" onmouseout="this.style.borderColor='rgba(0,180,255,0.18)';this.style.color='var(--text-secondary)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Efeito RAE
+    </a>
+  </div>
+</div>
+
+<div id="page-training" class="page">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="goHome()">← Voltar</button>
+      <span class="topbar-name" id="topbar-name">Lucas</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="topbar-day" id="topbar-day">Segunda</span>
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    </div>
+  </div>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="training-layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-label">// dias da semana</div>
+      <button class="day-btn" onclick="selectDay(0)"><span class="day-btn-number">01</span><span class="day-btn-label">Segunda</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(1)"><span class="day-btn-number">02</span><span class="day-btn-label">Terça</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(2)"><span class="day-btn-number">03</span><span class="day-btn-label">Quarta</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(3)"><span class="day-btn-number">04</span><span class="day-btn-label">Quinta</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(4)"><span class="day-btn-number">05</span><span class="day-btn-label">Sexta</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(5)"><span class="day-btn-number">06</span><span class="day-btn-label">Sábado</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn domingo" onclick="selectDay(6)"><span class="day-btn-number">07</span><span class="day-btn-label">Domingo</span><span class="day-btn-dot"></span></button>
+    </nav>
+    <main class="main-content" id="main-content"></main>
+  </div>
+</div>
+
+<input type="file" id="file-input" accept="video/*">
+
+<script>
+function yt(id,t){return`https://www.youtube.com/watch?v=${id}&t=${t}s`;}
+function qrUrl(url){return`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;}
+const V1="56vnjRkRuAQ",V2="cTQPT-S6W_Q",V3="-tKLzr5_nbc",V4="w6aTAnXnfm8";
+
+// Estado persistido
+let estado={};
+try{estado=JSON.parse(localStorage.getItem('treino-estado')||'{}');}catch(e){}
+function salvarEstado(){try{localStorage.setItem('treino-estado',JSON.stringify(estado));}catch(e){}}
+
+// Semana relativa ao início do projeto (Marco 2026)
+function getSemanaLabel(){
+  const inicio=new Date('2026-03-01');
+  const hoje=new Date();
+  const diff=Math.floor((hoje-inicio)/(7*24*60*60*1000));
+  const semNum=Math.max(1,diff+1);
+  const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return `S${semNum} ${meses[hoje.getMonth()]}/${hoje.getFullYear().toString().slice(2)}`;
+}
+
+const LUCAS=[
+  { // SEGUNDA — Pliometria + Ball Feeling + Scanning
+    tema:"⚡ Pliometria + Ball Feeling",
+    foco:"Explosão de pernas + toque de bola + scanning (novo)",
+    aquecimento:"5 min: polichinelos + skipping (joelhos altos) 3×15s + rotação de quadril",
+    exercicios:[
+      {id:"s1", nome:"Step A-Skip", volume:"3 séries × 30s | Descanso: 30s",
+        instrucoes:["Em pé, levanta o joelho direito até a altura do quadril enquanto salta levemente no pé esquerdo.","Troca de perna em ritmo constante, sem parar.","Braços dobrados a 90° e se movem junto — direito sobe com joelho esquerdo."],
+        dica:"Cotovelo a 90°, joelho sobe até o quadril", url:yt(V1,1), ts:"V1 → 0:01"},
+      {id:"s2", nome:"High Knees", volume:"3 séries × 15s | Descanso: 30s",
+        instrucoes:["Corrida no lugar levantando os joelhos o mais alto possível.","Mantém o tronco ereto — não incline para frente.","Quanto mais rápido você alterna as pernas, melhor o treino."],
+        dica:"Tronco ereto, braços em movimento — não desce um joelho antes de subir o outro", url:yt(V1,17), ts:"V1 → 0:17"},
+      {id:"s3", nome:"Speed Skaters", volume:"3 séries × 10s cada perna | Descanso: 40s",
+        instrucoes:["Salte lateralmente do pé direito para o pé esquerdo como um patinador.","Ao aterrissar, dobra levemente o joelho e leva o outro pé atrás do corpo.","Foca em distância lateral — quanto mais longe o salto, melhor."],
+        dica:"Aterrissa suave — joelho dobrado, não trava a perna", url:yt(V1,25), ts:"V1 → 0:25"},
+      {id:"s4", nome:"In-Soul Rolls", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Bola parada no chão. Coloca a sola do pé direito em cima da bola e rola ela para o lado.","Faz o mesmo com o pé esquerdo. Alterna os dois pés sem parar.","Mantém ritmo constante — olhar para frente, não para a bola."],
+        dica:"Olhar para frente, sente o movimento sem olhar para baixo", url:yt(V3,5), ts:"V3 → 0:05"},
+      {id:"s5", nome:"Laces-Sole", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Com a bola parada, toca ela com o cadarço (parte de cima do pé).","Depois imediatamente coloca a sola em cima. Alterna os dois pés.","Cadarço = bate. Sola = para. Repete em ritmo crescente."],
+        dica:"Começa devagar, acelera mantendo o controle", url:yt(V3,9), ts:"V3 → 0:09"},
+      {id:"s6", nome:"Scanning obrigatório — Rondo 4x1", volume:"3 min contínuos | Com parceiro",
+        instrucoes:["Joga rondo normal. A REGRA: só pode tocar na bola depois de virar a cabeça para a direita e para a esquerda.","Se tocar sem escanear, perde o ponto. O scanning vira hábito assim.","Frequência certa: olha 2x antes de cada toque — não importa se a bola demora."],
+        dica:"Scanning antes de CADA toque — construindo hábito, não só cumprindo regra",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento: panturrilha + quadríceps, 30s cada perna",
+    dica_dia:"💡 Pliometria 3x por semana. Hoje é Dia 1 — dê tudo na explosão!"
+  },
+  { // TERÇA — La Croqueta + Passes + Desmarcação
+    tema:"⚽ La Croqueta + Passes + Desmarcação",
+    foco:"Finta, velocidade de toque e movimentação sem bola (novo)",
+    aquecimento:"5 min: condução leve + 10 passes rápidos na parede",
+    exercicios:[
+      {id:"t1", nome:"Croquettes in Place", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Bola entre os pés. Empurra ela para o lado direito com o pé direito.","Depois para o esquerdo com o pé esquerdo. No lugar, sem andar.","Começa devagar. Aumenta a velocidade a cada série."],
+        dica:"Toque suave com a parte interna — bola sempre no centro", url:yt(V2,5), ts:"V2 → 0:05"},
+      {id:"t2", nome:"La Croqueta in Place", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Usa a SOLA do pé direito para empurrar a bola para a esquerda.","O pé esquerdo recebe e controla. Depois inverte.","Diferença da Croquette: é a sola que empurra, não o interior do pé."],
+        dica:"Movimento fluido — não para entre um toque e outro", url:yt(V2,9), ts:"V2 → 0:09"},
+      {id:"t3", nome:"Quick Passing (parede)", volume:"3 séries × 20 passes | Descanso: 20s",
+        instrucoes:["Fica a 1,5m da parede. Chuta a bola com o pé direito.","Quando ela voltar, chuta de novo sem parar — como 1 toque só.","Depois faz o mesmo com o pé esquerdo."],
+        dica:"Pé de apoio ao lado da bola, não atrás — postura de jogo", url:yt(V4,5), ts:"V4 → 0:05"},
+      {id:"t4", nome:"One Touch Passing (parede)", volume:"3 séries × 16 passes (8 por pé) | Descanso: 20s",
+        instrucoes:["Chuta na parede com o pé direito. Quando volta, toca com o ESQUERDO.","Alterna sempre: direito, esquerdo, direito, esquerdo.","O segredo: posiciona o corpo ANTES da bola chegar."],
+        dica:"Corpo já posicionado antes da bola chegar — antecipa", url:yt(V4,9), ts:"V4 → 0:09"},
+      {id:"t5", nome:"First Touch Variations (parede)", volume:"3 séries × 10 toques | Descanso: 30s",
+        instrucoes:["Chuta na parede com força. Quando a bola voltar, controla com partes diferentes do pé.","Interno, externo, peito do pé, sola — cada vez uma parte diferente.","Não repete a mesma parte duas vezes seguidas."],
+        dica:"Amortece a bola — absorve o impacto, não bloqueia", url:yt(V4,13), ts:"V4 → 0:13"},
+      {id:"t6", nome:"Passa e vai — desmarcação diagonal", volume:"10 min | Com parceiro",
+        instrucoes:["Após cada passe, CORRE imediatamente para um espaço novo em diagonal — nunca fica parado.","O destino do movimento: longe do marcador, não em linha reta.","Quem recebe o passe faz o mesmo depois. Fluxo contínuo."],
+        dica:"Movimento começa ANTES da bola sair do pé — antecipa, não reage",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento: tornozelos + isquiotibiais, 30s cada",
+    dica_dia:"💡 La Croqueta é a finta mais usada no futsal. Treine devagar primeiro."
+  },
+  { // QUARTA — Pliometria + Dribles + Mudança de direção
+    tema:"⚡ Pliometria + Dribles + Reação",
+    foco:"Explosão lateral, movimentos com bola e mudança sem telegrafar (novo)",
+    aquecimento:"5 min: skipping + rotação de quadril + 10 agachamentos leves",
+    exercicios:[
+      {id:"q1", nome:"Low Wall Sprint", volume:"3 séries × 15s | Descanso: 40s",
+        instrucoes:["Encosta as duas mãos na parede com o corpo inclinado a 45°.","Corre no lugar com as pernas o mais rápido possível — como sprint.","Mantém os quadris altos. Faça por 15 segundos sem parar."],
+        dica:"Quadril alto, pernas alternam o mais rápido possível", url:yt(V1,9), ts:"V1 → 0:09"},
+      {id:"q2", nome:"Split Stance Jumps", volume:"3 séries × 20s | Descanso: 45s",
+        instrucoes:["Fica com um pé à frente e outro atrás (posição de avanço).","Salta e no ar troca as pernas: pé de trás vai para frente e vice-versa.","Aterrissa na mesma posição de avanço mas com as pernas trocadas."],
+        dica:"Aterrissa suave — joelhos alinhados com os pés", url:yt(V1,33), ts:"V1 → 0:33"},
+      {id:"q3", nome:"L Drags", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Coloca a sola do pé em cima da bola. Puxa ela para TRÁS.","Depois empurra para o LADO com a parte interna do pé.","O movimento faz um L: trás, depois lado. Alterna os dois pés."],
+        dica:"Trás primeiro, depois lado — dois movimentos distintos", url:yt(V3,21), ts:"V3 → 0:21"},
+      {id:"q4", nome:"V Cut Outside", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Coloca o pé direito na bola e empurra ela para frente.","Antes de ir longe, corta ela para FORA com o pé externo.","O movimento faz um V. Repete com o pé esquerdo."],
+        dica:"O corte tem que ser abrupto — não suave", url:yt(V3,33), ts:"V3 → 0:33"},
+      {id:"q5", nome:"Croquettes in Motion", volume:"3 séries × 10m | Descanso: 30s",
+        instrucoes:["Igual às Croquettes do lugar, mas agora andando para frente.","A cada 2 toques avança um passo. Mantém o ritmo de toque.","Faz 10m para frente, depois volta. Não para no meio."],
+        dica:"Mantém o ritmo constante mesmo em movimento", url:yt(V2,17), ts:"V2 → 0:17"},
+      {id:"q6", nome:"Reação ao sinal — mudança de direção", volume:"5 min | Com pai ou parceiro",
+        instrucoes:["Corre em linha reta. Quando o pai bater palma ou gritar, muda de direção IMEDIATAMENTE.","Regra: o corpo NÃO inclina antes de mudar. A mudança tem que ser surpresa.","Objetivo: eliminar o telegrafar — o adversário não pode adivinhar antes."],
+        dica:"Se você inclinar antes, o defensor já sabe. Mudança sem aviso",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento: quadril + coluna, 30s cada",
+    dica_dia:"💡 O V Cut é a base do drible de corte. Mais efetivo que qualquer finta complexa."
+  },
+  { // QUINTA — Velocidade + Cortes + Transição Defensiva
+    tema:"⚽ Velocidade + Cortes + Transição Defensiva",
+    foco:"Sprint explosivo, corte com bola e reversão rápida (novo)",
+    aquecimento:"5 min: corrida leve + 3×15s skipping + 5 agachamentos explosivos",
+    exercicios:[
+      {id:"qi1", nome:"Tiro de 10 metros", volume:"6 repetições | Descanso: 45s entre cada tiro",
+        instrucoes:["Coloca dois cones com 10m de distância. Fica parado atrás do primeiro.","Ao sinal (pode ser você batendo palma), EXPLODE em sprint máximo até o 2º cone.","Volta CAMINHANDO — o descanso é obrigatório para o próximo tiro ser 100%."],
+        dica:"Primeiros 3 passos inclinado para frente — não pula para cima", url:null, ts:null},
+      {id:"qi2", nome:"Tiro com mudança de direção", volume:"5 repetições por lado | Descanso: 45s",
+        instrucoes:["Dois cones com 8m. Sai em sprint máximo até o 2º cone.","Toca o cone com a mão, corta RÁPIDO e volta em sprint para o início.","O toque no cone força você a parar e sair — não contorna devagar."],
+        dica:"Planta o pé FORA do cone ao cortar — não dentro", url:null, ts:null},
+      {id:"qi3", nome:"V Cut Outside + Inside em sequência", volume:"3 séries × 30s | Descanso: 25s",
+        instrucoes:["Empurra a bola para frente. Antes de ir longe, corta para FORA (V Cut Outside).","Repete: empurra para frente, dessa vez corta para DENTRO (V Cut Inside).","Alterna: fora, dentro, fora, dentro — sem parar o ritmo."],
+        dica:"O corte tem que ser abrupto — planta o pé e explode", url:yt(V3,33), ts:"V3 → 0:33 / 0:37"},
+      {id:"qi4", nome:"Croquettes in Motion (direção alternada)", volume:"3 séries × 4 idas e voltas | Descanso: 30s",
+        instrucoes:["Faz a Croqueta em deslocamento para frente por 5m.","Ao chegar no cone, muda de direção e faz a Croqueta voltando.","Cada ida e volta = 1 rep. Mantém o ritmo de toque durante a virada."],
+        dica:"A virada no cone tem que manter o ritmo — não para", url:yt(V2,17), ts:"V2 → 0:17"},
+      {id:"qi5", nome:"L Drags em deslocamento", volume:"3 séries × 10m por pé | Descanso: 30s",
+        instrucoes:["Sola do pé em cima da bola. Puxa PARA TRÁS (movimento 1).","Empurra PARA O LADO com a parte interna (movimento 2). Avança 1 passo.","Repete: trás, lado, avança. Faz 10m, depois volta com o outro pé."],
+        dica:"Dois movimentos distintos: TRÁS depois LADO — não junto", url:yt(V3,21), ts:"V3 → 0:21"},
+      {id:"qi6", nome:"Tiro com transição defensiva — reversão em <1.5s", volume:"8 repetições | Descanso: 40s",
+        instrucoes:["Corre 20m. O pai grita 'PERDE!' em qualquer momento.","Lucas tem menos de 1.5 segundo para reverter a corrida e correr de volta — sem hesitar.","Objetivo: contra-pressing. Time perde a bola → você já está indo pressionar."],
+        dica:"No jogo a janela é 1-2 segundos. Treino mais rígido que o jogo",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento: isquiotibiais + panturrilha + quadril, 30s cada",
+    dica_dia:"💡 No tiro: VAI COM TUDO. 6 vezes com 100% vale mais que 10 com 70%."
+  },
+  { // SEXTA — Pliometria + Toque Avançado + Proteção de Bola
+    tema:"⚡ Pliometria + Toque Avançado + Proteção",
+    foco:"Explosão, dribles nível 2 e uso do corpo em duelos (novo)",
+    aquecimento:"5 min: corrida leve + skipping + 10 rotações de tornozelo",
+    exercicios:[
+      {id:"sx1", nome:"High Knee Wall Sprint", volume:"3 séries × 15s | Descanso: 40s",
+        instrucoes:["Igual ao Low Wall Sprint, mas agora os joelhos sobem MAIS alto.","Corpo inclinado na parede (45°), joelhos sobem até a altura do quadril.","Máxima velocidade possível pelos 15 segundos inteiros."],
+        dica:"Joelhos até a altura do quadril — mais alto que o Low Wall Sprint", url:yt(V1,13), ts:"V1 → 0:13"},
+      {id:"sx2", nome:"Plyometrics Fast Switch", volume:"3 séries × 20s | Descanso: 45s",
+        instrucoes:["Em pé, levanta levemente um joelho. Troca de perna o mais rápido possível.","Não é corrida normal — são trocas RÁPIDAS com pouco movimento vertical.","Pensa que está sobre brasas: toca o chão e sai imediatamente."],
+        dica:"Quanto mais rápida a troca, melhor — pés quase não tocam o chão", url:yt(V1,41), ts:"V1 → 0:41"},
+      {id:"sx3", nome:"Condução em 8 nos cones", volume:"5 percursos completos por pé | Descanso: 20s",
+        instrucoes:["2 cones com 2m de distância. Conduz a bola em formato de 8 ao redor deles.","Toque suave — a bola nunca fica a mais de 1 passo de distância.","Faz com o pé dominante, depois repete com o outro."],
+        dica:"Bola sempre perto — 1 passo de distância no máximo", url:null, ts:null},
+      {id:"sx4", nome:"La Croqueta in Motion", volume:"3 séries × 10m | Descanso: 30s",
+        instrucoes:["Igual à La Croqueta parada, mas agora em deslocamento para frente.","A sola empurra a bola, o outro pé recebe e você avança 1 passo.","10m para frente sem parar o ritmo de toques."],
+        dica:"Finges para um lado com o ombro antes do movimento", url:yt(V2,25), ts:"V2 → 0:25"},
+      {id:"sx5", nome:"Finta + aceleração", volume:"3 séries × 6 fintas por lado | Descanso: 30s",
+        instrucoes:["Conduz a bola devagar. Faz movimento de corpo para a DIREITA (inclina ombro, olha pro lado).","Mas leva a bola para a ESQUERDA — V Cut Outside.","Depois do corte, EXPLODE com 3 passos rápidos. Repete para o outro lado."],
+        dica:"A finta vale pelo corpo todo — ombro, quadril e olhar", url:yt(V3,33), ts:"V3 → 0:33"},
+      {id:"sx6", nome:"Proteção de bola com quadril baixo — duelos", volume:"5 duelos × 30s | Descanso: 30s",
+        instrucoes:["Com bola, um parceiro tenta roubá-la. Lucas protege usando o corpo — NÃO as pernas.","Regra: quadril baixo (flexiona o joelho), ombro entre você e o adversário.","Objetivo: segurar 20s sem perder. Não foge — firma o corpo."],
+        dica:"Quadril baixo = centro de gravidade baixo = mais difícil de derrubar",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento: quadríceps + lombar + tornozelo, 30s cada",
+    dica_dia:"💡 A finta real não é o movimento — é você fazer o adversário acreditar."
+  },
+  { // SÁBADO — Circuito Completo
+    tema:"🏆 Circuito Completo",
+    foco:"Tudo junto — intensidade total e scanning em cada exercício",
+    aquecimento:"5 min: corrida leve + skipping + 5 agachamentos explosivos",
+    exercicios:[
+      {id:"sb1", nome:"Ventral Hops", volume:"3 séries × 10s cada perna | Descanso: 40s",
+        instrucoes:["Em pé numa perna só. Salta para frente e aterrissa na mesma perna.","Cada salto vai um pouco mais longe. Alterna: 10s na direita, 10s na esquerda.","Aterrissa suave — dobra o joelho ao pousar, não trava a perna."],
+        dica:"Aterrissagem suave como gato — amortece com o joelho", url:yt(V1,45), ts:"V1 → 0:45"},
+      {id:"sb2", nome:"Max Intent La Croqueta", volume:"3 séries × 20s | Descanso: 30s",
+        instrucoes:["É a La Croqueta na velocidade MÁXIMA que você consegue.","Sola empurra, pé recebe. O mais rápido possível pelos 20 segundos.","Sábado é intensidade total — sem ritmo moderado."],
+        dica:"Hoje é intensidade máxima — sem ritmo moderado", url:yt(V2,33), ts:"V2 → 0:33"},
+      {id:"sb3", nome:"Sole Rolls", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Rola a sola do pé PARA FRENTE sobre a bola, depois PARA TRÁS.","Alterna os dois pés: direito rola para frente, esquerdo rola para trás.","Aumenta a velocidade a cada 10 segundos."],
+        dica:"Velocidade crescente ao longo das 3 séries", url:yt(V3,25), ts:"V3 → 0:25"},
+      {id:"sb4", nome:"Two Touches Passing (parede)", volume:"3 séries × 12 toques | Descanso: 25s",
+        instrucoes:["Chuta na parede. Quando volta, 1º toque CONTROLA a bola.","2º toque CHUTA de volta na parede. Não para entre os toques.","Sequência contínua: chuta → controla → chuta → controla."],
+        dica:"1º toque posiciona, 2º toque finaliza — sem pausa", url:yt(V4,29), ts:"V4 → 0:29"},
+      {id:"sb5", nome:"Air Ball Control (parede)", volume:"2 séries × 8 controles | Descanso: 30s",
+        instrucoes:["Chuta na parede COM FORÇA. A bola vai voltar rápido e no ar.","Tenta controlar ela ANTES de ela quicar no chão.","Usa o peito do pé, interno ou externo — o que vier natural."],
+        dica:"Posiciona o corpo antes da bola chegar — não corre atrás", url:yt(V4,25), ts:"V4 → 0:25"},
+      {id:"sb6", nome:"Circuito tático — scanning em tudo", volume:"10 min | Com parceiro",
+        instrucoes:["Mistura: passe + scanning obrigatório + desmarcação diagonal + proteção de bola.","Regra do dia: em TODO exercício com bola, fazer scanning antes de tocar.","Sábado é onde os hábitos da semana viram automáticos."],
+        dica:"Scanning antes de CADA toque — hoje não é exercício, é padrão",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento completo: pernas + costas + ombros, 45s cada",
+    dica_dia:"💡 Sábado é o dia de MEDIR. Você está melhor que semana passada?"
+  },
+  { // DOMINGO — Recuperação
+    tema:"🧘 Recuperação Ativa",
+    foco:"Manter o corpo em movimento sem desgastar",
+    aquecimento:"Não precisa — o domingo já é o aquecimento",
+    exercicios:[
+      {id:"d1", nome:"Condução livre com variações", volume:"10 minutos contínuos | Sem pausa",
+        instrucoes:["Conduz a bola pelo espaço no ritmo que quiser.","De vez em quando testa: In-Soul Rolls, Sole Rolls, L Drags — sem pressa.","Não é treino — é brincadeira. Explora o que aprendeu na semana."],
+        dica:"Domingo é exploração, não pressão", url:yt(V3,5), ts:"V3 → 0:05 — escolha"},
+      {id:"d2", nome:"Croquettes in Place (leve)", volume:"3 × 30s devagar | Descanso livre",
+        instrucoes:["A mesma Croqueta da semana, mas bem devagar.","Foca no toque perfeito — bola sempre no centro, peso equilibrado.","Não pensa em velocidade. Pensa em capricho."],
+        dica:"Foca no toque perfeito, não na velocidade", url:yt(V2,5), ts:"V2 → 0:05"},
+      {id:"d3", nome:"Alongamento completo", volume:"30–35s por grupo muscular | Sem pressa",
+        instrucoes:["Panturrilha → quadríceps → isquiotibial → quadril → lombar → ombros.","30 segundos em cada músculo. Respira fundo e solta devagar.","Não força com dor. Relaxa na expiração — o músculo cede sozinho."],
+        dica:"Respira fundo em cada posição — músculos relaxam na expiração", url:null, ts:null},
+    ],
+    finalizacao:"Beba água, descanse. Semana que vem começa mais forte.",
+    dica_dia:"💡 Seu corpo cresce no descanso. Domingo é parte do treino."
+  },
+];
+
+const MIGUEL=[
+  {tema:"⚡ Pliometria + Ball Feeling",foco:"Explosão de goleiro + toque de bola com os pés",aquecimento:"5 min: polichinelos + pulos no lugar + rotação de pulsos e tornozelos",
+    exercicios:[
+      {id:"ms1",nome:"Step A-Skip",volume:"3 séries × 30s | Descanso: 30s",instrucoes:["Em pé, levanta o joelho direito até a altura do quadril enquanto salta levemente no pé esquerdo.","Troca de perna em ritmo constante. Braços a 90° se movem junto.","Goleiro precisa dessa potência de pernas para saltar rápido."],dica:"Cotovelo a 90°, joelho sobe até o quadril",url:yt(V1,1),ts:"V1 → 0:01"},
+      {id:"ms2",nome:"High Knees",volume:"3 séries × 15s | Descanso: 30s",instrucoes:["Corrida no lugar levantando os joelhos o mais alto possível.","Tronco ereto — não incline para frente. Braços em movimento.","Goleiro precisa dessa potência de pernas para saltar rápido."],dica:"Tronco ereto — goleiro que se curva perde alcance",url:yt(V1,17),ts:"V1 → 0:17"},
+      {id:"ms3",nome:"Speed Skaters",volume:"3 séries × 10s cada perna | Descanso: 40s",instrucoes:["Salte lateralmente do pé direito para o esquerdo como um patinador.","Ao aterrissar, dobra o joelho e leva o outro pé atrás do corpo.","Imita o movimento lateral do goleiro ao se jogar para o canto."],dica:"Aterrissa em uma perna só — fortalece o tornozelo",url:yt(V1,25),ts:"V1 → 0:25"},
+      {id:"ms4",nome:"In-Soul Rolls",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Bola parada. Coloca a sola do pé direito em cima e rola para o lado.","Faz o mesmo com o pé esquerdo. Alterna sem parar.","Goleiro que treina toque de bola distribui melhor para o time."],dica:"Olhar para frente — sente o movimento, não olha para baixo",url:yt(V3,5),ts:"V3 → 0:05"},
+      {id:"ms5",nome:"Quick Passing (parede)",volume:"3 séries × 20 passes | Descanso: 20s",instrucoes:["A 1,5m da parede. Chuta com o pé direito, quando volta chuta com o esquerdo.","Alterna os pés sempre. Mantém ritmo rápido sem parar.","Goleiro não escolhe com qual pé vai sair jogando — treina os dois."],dica:"Alternância de pés — goleiro distribui para qualquer lado",url:yt(V4,5),ts:"V4 → 0:05"},
+    ],finalizacao:"Alongamento: panturrilha + ombros, 30s cada",dica_dia:"💡 Pliometria deixa o goleiro mais explosivo no salto. Dia 1 — vai com tudo!"},
+  {tema:"↔️ Lateralidade + Saída",foco:"Velocidade lateral e saída do gol",aquecimento:"5 min: deslocamentos laterais leves + giro de quadril + 10 pulos",
+    exercicios:[
+      {id:"mt1",nome:"Ventral Hops",volume:"3 séries × 10s cada perna | Descanso: 40s",instrucoes:["Em pé numa perna. Salta para frente e aterrissa na mesma perna.","10 segundos no pé direito, 10 segundos no pé esquerdo.","Imita a saída explosiva do goleiro para cortar cruzamento."],dica:"Primeiro passo explosivo — imita saída para cortar cruzamento",url:yt(V1,45),ts:"V1 → 0:45"},
+      {id:"mt2",nome:"Split Stance Jumps",volume:"3 séries × 20s | Descanso: 45s",instrucoes:["Um pé à frente, outro atrás. Salta e troca as pernas no ar.","Aterrissa com as pernas trocadas, na mesma posição de avanço.","Essa posição imita o goleiro pronto para se jogar."],dica:"Posição de avanço = posição de base do goleiro",url:yt(V1,33),ts:"V1 → 0:33"},
+      {id:"mt3",nome:"Saída do gol simulada",volume:"6 repetições | Descanso: 30s",instrucoes:["Coloca 2 cones no chão separados por 2m (simula o gol).","Fica em posição de goleiro entre eles. Ao seu sinal, sai em sprint 5m e volta.","O primeiro passo TEM que ser explosivo — não pode sair devagar."],dica:"Primeiro passo explosivo, não vagaroso — decide se chega na bola",url:null,ts:null},
+      {id:"mt4",nome:"One Touch Passing (parede)",volume:"3 séries × 16 passes (8 por pé) | Descanso: 20s",instrucoes:["Chuta na parede com o pé direito. Quando volta, toca com o ESQUERDO.","Alterna sempre: direito, esquerdo, direito, esquerdo.","Treina a distribuição rápida do goleiro depois de pegar a bola."],dica:"Posiciona o corpo antes da bola chegar",url:yt(V4,9),ts:"V4 → 0:09"},
+      {id:"mt5",nome:"Laces-Sole",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Com a bola parada, toca com o cadarço depois coloca a sola em cima.","Alterna os dois pés sem parar. Cadarço = chute. Sola = controle.","Goleiro usa o cadarço para chutar longe e a sola para controlar."],dica:"Cadarço = chute. Sola = controle. Os dois são armas do goleiro",url:yt(V3,9),ts:"V3 → 0:09"},
+    ],finalizacao:"Alongamento: quadril + isquiotibiais + ombros, 30s cada",dica_dia:"💡 O primeiro passo do goleiro decide se vai ou não chegar na bola."},
+  {tema:"⚡ Pliometria + Dribles de Pé",foco:"Explosão + habilidade técnica com os pés",aquecimento:"5 min: skipping + rotação de quadril + 10 agachamentos leves",
+    exercicios:[
+      {id:"mq1",nome:"Low Wall Sprint",volume:"3 séries × 15s | Descanso: 40s",instrucoes:["Mãos na parede com corpo inclinado a 45°. Corre no lugar com as pernas o mais rápido possível.","Quadris altos durante os 15 segundos.","Essa velocidade de pernas é o que o goleiro precisa nas saídas curtas."],dica:"Quadril alto — pernas alternam o mais rápido possível",url:yt(V1,9),ts:"V1 → 0:09"},
+      {id:"mq2",nome:"Plyometrics Fast Switch",volume:"3 séries × 20s | Descanso: 45s",instrucoes:["Em pé, troca as pernas rapidamente com pouco movimento vertical.","Pensa que está sobre brasas: toca e sai imediatamente.","Cada troca de perna simula um passo lateral rápido de goleiro."],dica:"Pés quase não tocam o chão — troca mais rápida possível",url:yt(V1,41),ts:"V1 → 0:41"},
+      {id:"mq3",nome:"L Drags",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Sola do pé em cima da bola. Puxa ela PARA TRÁS.","Depois empurra para o LADO com a parte interna. Movimento em L.","Goleiro usa esse movimento para desviar da pressão e distribuir."],dica:"Trás primeiro, depois lado — dois movimentos distintos",url:yt(V3,21),ts:"V3 → 0:21"},
+      {id:"mq4",nome:"First Touch Variations (parede)",volume:"3 séries × 10 toques | Descanso: 30s",instrucoes:["Chuta na parede com força. Quando volta, controla com partes diferentes do pé.","Interno, externo, peito do pé, sola — cada vez uma parte diferente.","Goleiro precisa receber bola com qualquer parte do pé."],dica:"Amortece a bola — não bloqueia, absorve o impacto",url:yt(V4,13),ts:"V4 → 0:13"},
+      {id:"mq5",nome:"V Cut Inside",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Empurra a bola para frente com o pé. Antes de ir longe,","corta ela para DENTRO com a parte interna do pé.","O movimento faz um V. Treina o driblar para sair jogando."],dica:"O corte para dentro — base da saída jogando pelo chão",url:yt(V3,37),ts:"V3 → 0:37"},
+    ],finalizacao:"Alongamento: tornozelo + panturrilha + lombar, 30s cada",dica_dia:"💡 Goleiro que joga bem com os pés é goleiro que o time confia."},
+  {tema:"🦵 Base + Espacate + Giro",foco:"Amplitude de movimento e posição de goleiro",aquecimento:"5 min: caminhada com passos largos + rotação de quadril + polichinelos",
+    exercicios:[
+      {id:"mqi1",nome:"Base + shuffle lateral",volume:"3 séries × 8 deslocamentos por lado | Descanso: 30s",instrucoes:["Fica em posição de goleiro: pés afastados na largura dos ombros, joelhos levemente dobrados.","Peso na ponta dos pés, mãos abertas e prontas.","Desloca 2 passos para a direita (sem cruzar os pés) e 2 para a esquerda."],dica:"Não cruza os pés — desliza lateralmente mantendo a base",url:null,ts:null},
+      {id:"mqi2",nome:"Espacate lateral progressivo",volume:"3 séries × 35s | Descanso: 20s",instrucoes:["Senta no chão e abre as pernas o máximo que conseguir SEM DOR.","Inclina o tronco para frente devagar e segura 35 segundos.","Cada semana tenta ir 2cm mais longe. Nunca force com dor."],dica:"Nunca força com dor — vai 2cm mais longe a cada semana",url:null,ts:null},
+      {id:"mqi3",nome:"Giro no chão (rolamento lateral)",volume:"3 séries × 4 giros por lado | Descanso: 30s",instrucoes:["Deita de lado no chão com os braços abertos.","Rola para o lado até a posição de barriga para baixo, continua rolando.","Levanta RÁPIDO em posição de goleiro. Alterna o lado do giro."],dica:"A levantada tem que ser explosiva — simula recuperação pós-defesa",url:null,ts:null},
+      {id:"mqi4",nome:"Inside-Sole",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Com a bola parada, toca ela com a parte INTERNA do pé.","Depois coloca a SOLA em cima. Alterna os dois pés sem parar.","Ritmo crescente: começa devagar, acelera a cada 10 segundos."],dica:"Mantém o equilíbrio mesmo em ritmo rápido",url:yt(V3,29),ts:"V3 → 0:29"},
+      {id:"mqi5",nome:"Sole Stepovers",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Com a bola parada, passa a perna por CIMA dela (stepover) com o pé direito.","A perna passa por cima sem tocar na bola. Depois faz o mesmo com a esquerda.","Alterna os dois pés em ritmo constante."],dica:"Goleiro que domina stepover tem confiança total nos pés",url:yt(V3,41),ts:"V3 → 0:41"},
+    ],finalizacao:"Alongamento profundo: quadril + virilha + coluna, 40s cada",dica_dia:"💡 O espacate não é show — é alcançar aquela bola no canto que parecia impossível."},
+  {tema:"⚡ Pliometria + Toque Avançado",foco:"Explosão + controle fino de bola",aquecimento:"5 min: corrida leve + skipping + 10 rotações de tornozelo",
+    exercicios:[
+      {id:"msx1",nome:"High Knee Wall Sprint",volume:"3 séries × 15s | Descanso: 40s",instrucoes:["Mãos na parede (45°). Joelhos sobem até o quadril — mais alto que o Low Wall Sprint.","Velocidade máxima pelos 15 segundos.","É o sprint mais intenso da semana."],dica:"Joelhos até o quadril — mais alto que antes",url:yt(V1,13),ts:"V1 → 0:13"},
+      {id:"msx2",nome:"Croquettes in Motion",volume:"3 séries × 10m | Descanso: 30s",instrucoes:["Croqueta em deslocamento: bola vai de pé em pé enquanto você anda.","Faz 10m com o pé dominante, depois 10m com o outro.","Goleiro precisa dos dois pés para distribuir em qualquer direção."],dica:"Treina os dois pés — goleiro distribui para qualquer lado",url:yt(V2,17),ts:"V2 → 0:17"},
+      {id:"msx3",nome:"Max Intent La Croqueta",volume:"3 séries × 20s | Descanso: 30s",instrucoes:["La Croqueta na velocidade MÁXIMA possível.","Sola empurra, pé recebe. O mais rápido que conseguir por 20 segundos.","Goleiro que tem pés rápidos distribui mais rápido."],dica:"Velocidade máxima de pés — sem ritmo moderado",url:yt(V2,33),ts:"V2 → 0:33"},
+      {id:"msx4",nome:"Air Ball Control (avançado)",volume:"2 séries × 10 controles | Descanso: 30s",instrucoes:["Agora chuta MAIS FORTE e de mais longe (3m).","Controla no ar — sem deixar quicar.","Depois de controlar, imediatamente dá o passe de volta na parede (1 toque)."],dica:"Controla e já distribui — como no jogo real",url:yt(V4,25),ts:"V4 → 0:25"},
+      {id:"msx5",nome:"Two Touches Passing (parede)",volume:"3 séries × 12 toques | Descanso: 25s",instrucoes:["Chuta na parede. 1º toque CONTROLA. 2º toque CHUTA de volta.","Não para entre os dois toques. Sequência contínua.","Simula o goleiro que pega a bola e distribui rápido para o time."],dica:"1º posiciona, 2º distribui — sem pausa entre eles",url:yt(V4,29),ts:"V4 → 0:29"},
+    ],finalizacao:"Alongamento: pernas + costas + ombros, 40s cada",dica_dia:"💡 Sexta é o dia de combinar tudo. Físico + técnica = goleiro completo."},
+  {tema:"🏆 Circuito Completo (Goleiro)",foco:"Juntar tudo da semana em sequência real",aquecimento:"5 min: pulos + deslocamento lateral + passes na parede",
+    exercicios:[
+      {id:"msb1",nome:"Ventral Hops",volume:"3 séries × 10s cada | Descanso: 40s",instrucoes:["Em pé numa perna. Salta para frente, aterrissa na mesma perna.","10 segundos no pé direito, 10 no esquerdo.","Sábado = intensidade máxima em tudo."],dica:"Aterrissagem suave — amortece com o joelho",url:yt(V1,45),ts:"V1 → 0:45"},
+      {id:"msb2",nome:"Max Intent La Croqueta",volume:"3 séries × 20s | Descanso: 30s",instrucoes:["La Croqueta na velocidade MÁXIMA possível.","Sola empurra, pé recebe. O mais rápido que conseguir por 20 segundos.","Goleiro que tem pés rápidos distribui mais rápido."],dica:"Velocidade máxima de pés — sem ritmo moderado",url:yt(V2,33),ts:"V2 → 0:33"},
+      {id:"msb3",nome:"Croquettes in Motion",volume:"3 séries × 10m | Descanso: 30s",instrucoes:["Croqueta em deslocamento por 10m com o pé dominante, depois 10m com o outro.","Goleiro precisa dos dois pés para distribuir em qualquer direção."],dica:"Treina os dois pés — goleiro distribui em qualquer direção",url:yt(V2,17),ts:"V2 → 0:17"},
+      {id:"msb4",nome:"Sole Rolls",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Rola a sola do pé para frente e para trás sobre a bola.","Alterna os dois pés. Aumenta a velocidade a cada série.","Última série em velocidade máxima."],dica:"Velocidade máxima na última série",url:yt(V3,25),ts:"V3 → 0:25"},
+      {id:"msb5",nome:"Giro no chão + levantada",volume:"2 séries × 5 giros por lado | Descanso: 30s",instrucoes:["Deita de lado. Rola lateralmente até a posição de barriga para baixo.","Continua rolando e levanta EXPLOSIVO em posição de goleiro.","A levantada tem que ser o mais rápida possível — mede a evolução."],dica:"A levantada rápida é o objetivo — cronometra para ver a melhora",url:null,ts:null},
+    ],finalizacao:"Alongamento completo: pernas + quadril + ombros + pescoço, 45s",dica_dia:"💡 Sábado é onde o goleiro mede a semana. Você evoluiu?"},
+  {tema:"🧘 Recuperação Ativa",foco:"Descanso inteligente — o corpo cresce agora",aquecimento:"Não precisa",
+    exercicios:[
+      {id:"md1",nome:"Condução leve com bola",volume:"10 minutos | Sem pressão",instrucoes:["Conduz a bola devagar pelo espaço. Sem pressa, sem competição.","De vez em quando experimenta: In-Soul Rolls, Sole Rolls — o que quiser.","Domingo é brincadeira. Explora o que aprendeu na semana."],dica:"Domingo é exploração, não treino",url:yt(V3,5),ts:"V3 → 0:05 — escolha"},
+      {id:"md2",nome:"Passes leves (parede)",volume:"10 minutos | Sem pausa obrigatória",instrucoes:["Fica a 2m da parede. Passa a bola suavemente com o pé direito.","Quando volta, controla com o pé esquerdo e devolve.","Sem pressa. Foca em capricho — toque limpo e controlado."],dica:"Foca no toque perfeito — qualidade, não velocidade",url:yt(V4,5),ts:"V4 → 0:05"},
+      {id:"md3",nome:"Alongamento completo",volume:"35s por grupo | Sem pressa",instrucoes:["Pescoço → ombros → costas → quadril → pernas. 35s em cada.","Respira fundo em cada posição. Na expiração, o músculo relaxa sozinho.","Não força. Se doer, recua um pouco."],dica:"Músculo relaxa na expiração — respira fundo em cada posição",url:null,ts:null},
+    ],finalizacao:"Descansou, recuperou. Amanhã começa mais forte.",dica_dia:"💡 Goleiro descansado reage mais rápido. Domingo é parte do treino."},
+];
+
+let currentPlayer=null,currentDay=0;
+const DAYS=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
+
+function selectPlayer(player){
+  currentPlayer=player;currentDay=0;
+  const r=document.documentElement;
+  if(player==='lucas'){
+    r.style.setProperty('--accent','var(--lucas)');
+    r.style.setProperty('--accent-dim','var(--lucas-dim)');
+    r.style.setProperty('--accent-border','var(--lucas-border)');
+    r.style.setProperty('--accent-glow','var(--lucas-glow)');
+    r.style.setProperty('--accent-deep','var(--lucas-deep)');
+    document.getElementById('topbar-name').textContent='Lucas';
+  } else {
+    r.style.setProperty('--accent','var(--miguel)');
+    r.style.setProperty('--accent-dim','var(--miguel-dim)');
+    r.style.setProperty('--accent-border','var(--miguel-border)');
+    r.style.setProperty('--accent-glow','var(--miguel-glow)');
+    r.style.setProperty('--accent-deep','var(--miguel-deep)');
+    document.getElementById('topbar-name').textContent='Miguel';
+  }
+  document.getElementById('page-home').classList.remove('active');
+  document.getElementById('page-training').classList.add('active');
+  selectDay(0);
+}
+
+function goHome(){
+  document.getElementById('page-training').classList.remove('active');
+  document.getElementById('page-home').classList.add('active');
+  closeSidebar();
+}
+
+function selectDay(idx){
+  currentDay=idx;
+  document.querySelectorAll('.day-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.getElementById('topbar-day').textContent=DAYS[idx];
+  renderDay(idx);
+  closeSidebar();
+  document.getElementById('main-content').scrollTop=0;
+}
+
+function renderDay(idx){
+  const data=currentPlayer==='lucas'?LUCAS[idx]:MIGUEL[idx];
+  const main=document.getElementById('main-content');
+
+  let html=`
+    <div class="day-header">
+      <div class="day-tema">${data.tema}</div>
+      <div class="day-foco">${data.foco}</div>
+    </div>
+    <div class="aquecimento-block">
+      <div class="aquecimento-label">🔥 aquecimento</div>
+      <div class="aquecimento-text">${data.aquecimento}</div>
+    </div>
+    <div class="exercises-label">// exercícios — ${data.exercicios.length} movimentos</div>
+  `;
+
+  data.exercicios.forEach((ex,i)=>{
+    const instrHtml=ex.instrucoes.map(l=>`<div class="instruction-line">${l}</div>`).join('');
+    const videoHtml=ex.url?`
+      <div class="video-block">
+        <div class="video-label">// referência em vídeo</div>
+        <a class="video-btn" href="${ex.url}" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Assistir
+        </a>
+        <span class="video-timestamp">${ex.ts}</span>
+        <div class="qr-container">
+          <div class="qr-img"><img src="${qrUrl(ex.url)}" alt="QR" loading="lazy"></div>
+          <div class="qr-label">escanear</div>
+        </div>
+      </div>`:'' ;
+
+    const concluido=estado[ex.id+'-concluido'];
+    const filmado=estado[ex.id+'-filmado'];
+    const taticoClass=ex.tatico?'tatico':'';
+    const concluidoClass=concluido?'concluido':'';
+    const taticoTag=ex.tatico?`<div class="tatico-badge">⚡ foco tático</div>`:'';
+
+    html+=`
+      <div class="exercise-card ${taticoClass} ${concluidoClass}" id="card-${ex.id}">
+        <div class="exercise-header" onclick="toggleEx('${ex.id}')">
+          <div class="exercise-num">${i+1}</div>
+          <div class="exercise-title-block">
+            ${taticoTag}
+            <div class="exercise-name">${ex.nome}</div>
+            <div class="exercise-volume">${ex.volume}</div>
+          </div>
+          <div class="exercise-chevron">▼</div>
+        </div>
+        <div class="filmar-block" onclick="event.stopPropagation()">
+          <button class="btn-filmar" onclick="filmarExercicio('${ex.id}','${ex.nome.replace(/'/g,'')}')">
+            🎬 Filmar
+          </button>
+          <button class="btn-concluir ${concluido?'done':''}" id="btn-${ex.id}" onclick="marcarConcluido('${ex.id}')">
+            ${concluido?'✓ Concluído':'✓ Feito'}
+          </button>
+          ${filmado?`<span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#4CAF50;letter-spacing:1px;">📹 filmado</span>`:''}
+          <div class="upload-progress" id="prog-${ex.id}"><div class="upload-bar" id="bar-${ex.id}"></div></div>
+          <div class="upload-status" id="status-${ex.id}"></div>
+        </div>
+        <div class="exercise-body">
+          <div class="exercise-instructions">${instrHtml}</div>
+          <div class="exercise-tip">
+            <div class="exercise-tip-label">// dica de execução</div>
+            <div class="exercise-tip-text">${ex.dica}</div>
+          </div>
+          ${videoHtml}
+        </div>
+      </div>
+    `;
+  });
+
+  html+=`
+    <div class="finalizacao-block">
+      <div class="finalizacao-label">🧘 finalização</div>
+      <div class="finalizacao-text">${data.finalizacao}</div>
+    </div>
+    <div class="dica-block">${data.dica_dia}</div>
+    <div style="margin-top:16px;text-align:right;">
+      <a href="painel_motor.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:var(--text-dim);text-decoration:none;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:2px;">
+        → Painel do Pai
+      </a>
+    </div>
+  `;
+
+  main.innerHTML=html;
+}
+
+function toggleEx(id){
+  const card=document.getElementById('card-'+id);
+  card.classList.toggle('open');
+}
+
+function marcarConcluido(id){
+  const btn=document.getElementById('btn-'+id);
+  const card=document.getElementById('card-'+id);
+  if(estado[id+'-concluido']){
+    delete estado[id+'-concluido'];
+    btn.textContent='✓ Feito';btn.classList.remove('done');
+    card.classList.remove('concluido');
+  } else {
+    estado[id+'-concluido']=true;
+    btn.textContent='✓ Concluído';btn.classList.add('done');
+    card.classList.add('concluido');
+  }
+  salvarEstado();
+}
+
+function filmarExercicio(id,nome){
+  const input=document.getElementById('file-input');
+  input.value='';
+  input.onchange=(e)=>processarVideo(e,id,nome);
+  input.click();
+}
+
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL='https://dxqsjkvpzdvzyqfwcpro.supabase.co';
+const SUPABASE_KEY='sb_publishable_hLGKARCdEPRZfEWaNhg71A_-8LKa3tO';
+// YT_CLIENT_ID removido do código — módulo YouTube pendente de implementação
+// IDs das playlists criadas no YouTube
+const PLAYLISTS={lucas:'PLKpuwkMh4nD1NOfxILX3ZIAfutb8VQGia',miguel:'PLKpuwkMh4nD0Kg20rL5fSkTP-Fn8fb2Ac'};
+
+async function sbFetch(path,opts={}){
+  return fetch(SUPABASE_URL+path,{
+    ...opts,
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',...(opts.headers||{})}
+  });
+}
+
+async function getYtToken(){
+  // Busca token do atleta atual no Supabase
+  // A tabela tem: id, jogador, access_token, refresh_token, playlist_id, atualizado_em
+  const r=await sbFetch('/rest/v1/youtube_tokens?select=id,access_token,refresh_token,atualizado_em&order=atualizado_em.desc&limit=1');
+  const rows=await r.json();
+  if(!rows||!rows.length) return null;
+  let {id,access_token,refresh_token,atualizado_em}=rows[0];
+
+  // Access token dura 1h — renova se passou mais de 50min desde atualizado_em
+  const atualizado=new Date(atualizado_em);
+  const expirado=(Date.now()-atualizado.getTime())>50*60*1000;
+
+  if(expirado){
+    const resp=await fetch('https://oauth2.googleapis.com/token',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        client_id:'', // YouTube OAuth — pendente de implementação
+        client_secret:'',
+        refresh_token,
+        grant_type:'refresh_token'
+      })
+    });
+    const data=await resp.json();
+    if(!data.access_token) return null;
+    access_token=data.access_token;
+    await sbFetch('/rest/v1/youtube_tokens?id=eq.'+id,{
+      method:'PATCH',
+      headers:{'Prefer':'return=minimal'},
+      body:JSON.stringify({access_token,atualizado_em:new Date().toISOString()})
+    });
+  }
+  return access_token;
+}
+
+async function uploadYouTube(file,titulo,atleta,accessToken){
+  const playlistId=PLAYLISTS[atleta]||null;
+  // 1. Inicia upload resumable
+  const meta={snippet:{title:titulo,description:`Treino ${atleta} — ${new Date().toLocaleDateString('pt-BR')}`,categoryId:'17'},status:{privacyStatus:'unlisted'}};
+  const initResp=await fetch('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json','X-Upload-Content-Type':file.type,'X-Upload-Content-Length':file.size},
+    body:JSON.stringify(meta)
+  });
+  if(!initResp.ok) throw new Error('Falha ao iniciar upload: '+initResp.status);
+  const uploadUrl=initResp.headers.get('Location');
+
+  // 2. Faz upload do arquivo
+  const uploadResp=await fetch(uploadUrl,{method:'PUT',headers:{'Content-Type':file.type},body:file});
+  if(!uploadResp.ok) throw new Error('Falha no upload: '+uploadResp.status);
+  const video=await uploadResp.json();
+  const videoId=video.id;
+
+  // 3. Adiciona à playlist do atleta
+  if(playlistId){
+    await fetch('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({snippet:{playlistId,resourceId:{kind:'youtube#video',videoId}}})
+    });
+  }
+  return videoId;
+}
+
+async function registrarSupabase(exercicioId,nomeExercicio,atleta,semana,videoId){
+  const payload={
+    treino_id: null,
+    jogador: atleta,
+    exercicio: exercicioId,
+    resultado: JSON.stringify({
+      nome_exercicio: nomeExercicio,
+      semana,
+      youtube_id: videoId,
+      data: new Date().toISOString()
+    }),
+    feedback: null
+  };
+  const r=await sbFetch('/rest/v1/avaliacoes',{
+    method:'POST',
+    headers:{'Prefer':'return=representation'},
+    body:JSON.stringify(payload)
+  });
+  const result=await r.json();
+  if(!r.ok){
+    const msg=result?.message||result?.hint||result?.details||JSON.stringify(result);
+    throw new Error('Supabase: '+msg);
+  }
+  return result;
+}
+
+async function analisarComIA(registroId, exercicioId, nomeExercicio, atleta, videoId){
+  // Perfil do atleta para contexto
+  const perfis={
+    lucas:'Lucas, 13 anos, meio-campo. Pontos críticos: movimentação sem bola (reativo), transição defensiva lenta, não usa o corpo em duelos. Pontos fortes: explosão curta, controle de bola.',
+    miguel:'Miguel, 12 anos, goleiro. Foco em: distribuição com os pés, posicionamento, saída explosiva do gol, controle com partes variadas do pé.'
+  };
+
+  // Descrições dos exercícios para contexto
+  const descEx={
+    s1:'Step A-Skip: levanta joelho até quadril, cotovelos a 90°, ritmo constante',
+    s2:'High Knees: corrida com joelhos altos, tronco ereto',
+    s3:'Speed Skaters: salto lateral, aterrissagem suave em uma perna',
+    s4:'In-Soul Rolls: sola do pé rola a bola lateralmente, olhar para frente',
+    s5:'Laces-Sole: cadarço toca bola, depois sola, ritmo crescente',
+    s6:'Scanning Rondo 4x1: virar cabeça direita e esquerda ANTES de cada toque',
+    t1:'Croquettes in Place: bola de pé em pé com interior, no lugar',
+    t2:'La Croqueta: sola empurra a bola lateralmente, fluido',
+    t3:'Quick Passing parede: 1 toque, alterna pés, pé de apoio ao lado da bola',
+    t4:'One Touch Passing: alterna pés, corpo posicionado antes da bola chegar',
+    t5:'First Touch Variations: controla com partes diferentes do pé',
+    t6:'Passa e vai: corre em diagonal ANTES da bola sair do pé',
+    q1:'Low Wall Sprint: mãos na parede 45°, sprint máximo no lugar, quadril alto',
+    q2:'Split Stance Jumps: troca de pernas no ar, aterrissagem suave',
+    q3:'L Drags: sola puxa trás depois empurra lado — dois movimentos distintos',
+    q4:'V Cut Outside: empurra bola para frente, corta abrupto com externo',
+    q5:'Croquettes in Motion: croqueta em deslocamento, ritmo constante',
+    q6:'Reação ao sinal: muda direção SEM inclinar o corpo antes',
+    qi1:'Tiro 10m: sprint máximo, primeiros 3 passos inclinado',
+    qi2:'Tiro c/ mudança: sprint, toca cone, corta e volta em sprint',
+    qi3:'V Cut Outside+Inside: corte fora depois dentro, abrupto',
+    qi4:'Croquettes alternada: virada no cone mantendo ritmo',
+    qi5:'L Drags deslocamento: trás, lado, avança — mantém distinção',
+    qi6:'Transição defensiva: reversão em menos de 1.5 segundos ao sinal',
+    sx1:'High Knee Wall Sprint: joelhos até o quadril, velocidade máxima',
+    sx2:'Fast Switch: troca de pernas rapidíssima, pés mal tocam o chão',
+    sx3:'Condução 8 nos cones: controle em curva, olhar para frente',
+    sx4:'La Croqueta in Motion: sola empurra em deslocamento',
+    sx5:'Finta + aceleração: finta real e explode, não telegrafar',
+    sx6:'Proteção bola quadril baixo: ombro como barreira, quadril baixo',
+    sb1:'Ventral Hops: salto para frente em uma perna, aterrissagem suave',
+    sb2:'Max Intent La Croqueta: velocidade máxima de pés',
+    sb3:'Sole Rolls: sola para frente e trás, velocidade crescente',
+    sb4:'Two Touches Passing: 1° controla, 2° chuta — sem pausa',
+    sb5:'Air Ball Control: controla no ar sem deixar quicar',
+    sb6:'Circuito scanning: scanning antes de cada toque em todos exercícios',
+    d1:'Condução leve: exploração livre, sem pressão',
+    d2:'Passes leves: toque limpo e controlado, sem velocidade',
+    d3:'Alongamento: respiração profunda em cada posição',
+    ms1:'Step A-Skip para goleiro: potência de pernas para saída rápida',
+    ms2:'High Knees para goleiro: tronco ereto, braços em movimento',
+    ms3:'Speed Skaters: imita movimento lateral do goleiro',
+    ms4:'In-Soul Rolls: toque de bola para distribuição',
+    ms5:'Quick Passing parede: alterna pés, goleiro distribui para qualquer lado',
+    mt1:'Quick Passing parede variado: pés alternados, ritmo',
+    mt2:'Sole Rolls velocidade: velocidade crescente',
+    mt3:'La Croqueta: sola empurra, fluido',
+    mt4:'One Touch Passing: antecipa, corpo posicionado',
+    mt5:'Two Touches Passing: controla e distribui sem pausa',
+    mq1:'Low Wall Sprint: saída explosiva do gol',
+    mq2:'Split Stance Jumps: salto lateral para defesas de canto',
+    mq3:'Ventral Hops: equilíbrio de perna única nas saídas',
+    mq4:'Plyometrics Fast Switch: pés rápidos para reposicionamento',
+    mq5:'In-Soul + Sole Rolls: fluência entre movimentos',
+    mqi1:'First Touch Variations: controla qualquer tipo de bola',
+    mqi2:'Air Ball Control: bola no ar, posiciona antes de chegar',
+    mqi3:'Two Touches Passing: decide o passe antes de controlar',
+    mqi4:'Giro + levantada: levanta EXPLOSIVO em posição de goleiro',
+    mqi5:'Sole Rolls velocidade: velocidade máxima na última série',
+    msx1:'High Knee Wall Sprint: sprint mais intenso da semana',
+    msx2:'Croquettes in Motion: dois pés para distribuir em qualquer direção',
+    msx3:'Max Intent La Croqueta: pés rápidos = distribuição rápida',
+    msx4:'Air Ball Control avançado: controla e já distribui em 1 toque',
+    msx5:'Two Touches Passing: 1° posiciona, 2° distribui',
+    msb1:'Ventral Hops: intensidade máxima',
+    msb2:'Max Intent La Croqueta: velocidade máxima',
+    msb3:'Croquettes in Motion: dois pés',
+    msb4:'Sole Rolls: velocidade máxima última série',
+    msb5:'Giro + levantada: mais rápida possível',
+    md1:'Condução leve: exploração',
+    md2:'Passes leves: toque perfeito',
+    md3:'Alongamento: recuperação',
+  };
+
+  const descricao=descEx[exercicioId]||nomeExercicio;
+  const perfil=perfis[atleta]||atleta;
+  const thumbUrl=`https://img.youtube.com/vi/${videoId}/0.jpg`;
+
+  const prompt=`Você é um analista de desenvolvimento esportivo juvenil. Analise a execução deste exercício por um atleta jovem.
+
+ATLETA: ${perfil}
+
+EXERCÍCIO: ${descricao}
+
+THUMBNAIL DO VÍDEO: A imagem anexada é um frame do vídeo do atleta executando o exercício acima.
+
+Avalie em 3 dimensões (nota de 1 a 5):
+
+1. POSTURA: alinhamento corporal, centro de gravidade, posição dos braços, equilíbrio
+2. SCANNING: frequência de olhares, consciência espacial, antecipação (quando aplicável)
+3. PSICOLÓGICO: determinação, reação pós-erro, ousadia, confiança no movimento
+
+Responda APENAS em JSON válido, sem texto antes ou depois:
+{
+  "postura": <1-5>,
+  "scanning": <1-5>,
+  "psicologico": <1-5>,
+  "resumo_crianca": "<frase motivacional de 1 linha para o atleta, máximo 10 palavras, tom encorajador>",
+  "analise_pai": "<análise técnica de 2-3 linhas para o pai, específica sobre o que observou na execução>",
+  "ponto_forte": "<o melhor aspecto da execução em 5 palavras>",
+  "ponto_melhora": "<o principal ponto a trabalhar em 5 palavras>"
+}`;
+
+  // Busca thumbnail como base64
+  let imageData=null;
+  try{
+    const imgResp=await fetch(`https://corsproxy.io/?${encodeURIComponent(thumbUrl)}`);
+    if(imgResp.ok){
+      const blob=await imgResp.blob();
+      imageData=await new Promise(res=>{
+        const r=new FileReader();
+        r.onload=()=>res(r.result.split(',')[1]);
+        r.readAsDataURL(blob);
+      });
+    }
+  }catch(e){console.warn('Thumbnail não disponível, análise sem imagem');}
+
+  // Chama Claude API
+  const messages=[{
+    role:'user',
+    content: imageData ? [
+      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imageData}},
+      {type:'text',text:prompt}
+    ] : [{type:'text',text:prompt+'\n\n(Imagem não disponível — analise baseado no perfil e exercício)'}]
+  }];
+
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      messages
+    })
+  });
+
+  if(!resp.ok) throw new Error('IA: '+resp.status);
+  const data=await resp.json();
+  const txt=data.content?.find(c=>c.type==='text')?.text||'{}';
+  const clean=txt.replace(/```json|```/g,'').trim();
+  return JSON.parse(clean);
+}
+
+async function salvarAnaliseSupabase(registroId, analise){
+  const feedback=JSON.stringify({
+    ia_postura: analise.postura,
+    ia_scanning: analise.scanning,
+    ia_psicologico: analise.psicologico,
+    resumo_crianca: analise.resumo_crianca,
+    analise_pai: analise.analise_pai,
+    ponto_forte: analise.ponto_forte,
+    ponto_melhora: analise.ponto_melhora,
+    av: null,
+    nota_pai: ''
+  });
+  await sbFetch('/rest/v1/avaliacoes?id=eq.'+registroId,{
+    method:'PATCH',
+    headers:{'Prefer':'return=minimal'},
+    body:JSON.stringify({feedback})
+  });
+}
+
+async function processarVideo(e,id,nome){
+  const file=e.target.files[0];
+  if(!file)return;
+  const prog=document.getElementById('prog-'+id);
+  const bar=document.getElementById('bar-'+id);
+  const status=document.getElementById('status-'+id);
+  if(!prog)return;
+
+  prog.style.display='block';status.style.display='block';
+  status.style.color='#E65C00';status.textContent='Obtendo autorização...';
+  let p=0;
+  const iv=setInterval(()=>{if(p<85){p+=2;bar.style.width=p+'%';}},300);
+
+  try{
+    // 1. Busca token do YouTube
+    const token=await getYtToken();
+    if(!token) throw new Error('YouTube não autorizado. Fale com o pai.');
+
+    status.textContent='Enviando para o YouTube...';
+    const semLabel=getSemanaLabel();
+    const titulo=`${currentPlayer.toUpperCase()} — ${nome} — ${semLabel}`;
+
+    // 2. Upload para YouTube
+    const videoId=await uploadYouTube(file,titulo,currentPlayer,token);
+
+    status.textContent='Registrando...';
+
+    // 3. Registra no Supabase
+    const registro=await registrarSupabase(id,nome,currentPlayer,semLabel,videoId);
+    const registroId=Array.isArray(registro)?registro[0]?.id:registro?.id;
+
+    // 4. Análise IA (em paralelo — não bloqueia o fluxo)
+    clearInterval(iv);bar.style.width='100%';
+    estado[id+'-filmado']={nome,data:new Date().toISOString(),semana:semLabel,youtubeId:videoId};
+    salvarEstado();
+    status.textContent='✓ Enviado! Analisando com IA...';
+    status.style.color='#4CAF50';
+
+    const btn=document.getElementById('btn-'+id);
+    if(btn){
+      const existing=btn.parentElement.querySelector('span[data-filmado]');
+      if(!existing){
+        const s=document.createElement('span');s.setAttribute('data-filmado','1');
+        s.style.cssText="font-family:'JetBrains Mono',monospace;font-size:9px;color:#4CAF50;letter-spacing:1px;";
+        s.textContent='📹 enviado';btn.parentElement.appendChild(s);
+      }
+    }
+
+    // Análise IA assíncrona
+    if(registroId){
+      try{
+        const analise=await analisarComIA(registroId,id,nome,currentPlayer,videoId);
+        await salvarAnaliseSupabase(registroId,analise);
+        status.textContent=`✓ Análise pronta! ${analise.resumo_crianca}`;
+        status.style.color='#4CAF50';
+
+        // Mostra resumo na tela do garoto
+        const card=document.getElementById('card-'+id);
+        if(card){
+          const resumoEl=card.querySelector('.ia-resumo');
+          if(!resumoEl){
+            const div=document.createElement('div');
+            div.className='ia-resumo';
+            div.style.cssText='padding:8px 16px;background:rgba(59,158,255,0.08);border-top:1px solid rgba(59,158,255,0.2);font-size:12px;color:#3b9eff;font-style:italic;';
+            div.innerHTML=`🤖 ${analise.resumo_crianca} <span style="color:var(--text-dim);font-size:10px;">— IA</span>`;
+            card.appendChild(div);
+          }
+        }
+      }catch(iaErr){
+        console.warn('Análise IA falhou:',iaErr);
+        status.textContent='✓ Vídeo enviado! (Análise IA indisponível)';
+      }
+    }
+  }catch(err){
+    clearInterval(iv);
+    bar.style.width='0%';
+    status.textContent='❌ Erro: '+err.message;
+    status.style.color='#f44336';
+    // Não some — fica visível para diagnóstico
+    return;
+  }
+
+  setTimeout(()=>{prog.style.display='none';status.textContent='';status.style.display='none';},6000);
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+</script>
+</body>
+</html>

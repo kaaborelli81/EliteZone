@@ -1,0 +1,3151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Painel do Pai — Lucas & Miguel</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060b12;--card:#0c1520;--card2:#0f1a27;
+  --b:rgba(0,255,200,0.10);--tp:#e8f4f8;--ts:#7a9bb5;--td:#3a5268;
+  --lucas:#3b9eff;--ldim:rgba(59,158,255,0.12);--lb:rgba(59,158,255,0.25);
+  --miguel:#00e87a;--mdim:rgba(0,232,122,0.10);--mb:rgba(0,232,122,0.25);
+  --acc:#3b9eff;--adim:rgba(59,158,255,0.12);--ab:rgba(59,158,255,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--tp);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,200,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,0.018) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;z-index:0;}
+.scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,255,200,0.06),transparent);animation:scan 9s linear infinite;pointer-events:none;z-index:100;}
+@keyframes scan{0%{transform:translateY(-2px)}100%{transform:translateY(100vh)}}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(6,11,18,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--ab);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.back{background:none;border:1px solid var(--ab);color:var(--acc);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;padding:6px 10px;border-radius:2px;cursor:pointer;text-decoration:none;text-transform:uppercase;}
+.back:hover{background:var(--adim);}
+.top-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.top-sem{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--td);text-transform:uppercase;}
+
+/* TABS */
+.tabs{display:flex;align-items:center;border-bottom:1px solid var(--b);padding:0 20px;background:var(--card);position:sticky;top:56px;z-index:40;}
+.tab{background:none;border:none;cursor:pointer;padding:14px 22px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);border-bottom:2px solid transparent;position:relative;bottom:-1px;transition:all .2s;}
+.tab.lucas.on{color:var(--lucas);border-bottom-color:var(--lucas);}
+.tab.miguel.on{color:var(--miguel);border-bottom-color:var(--miguel);}
+.tab:not(.on):hover{color:var(--ts);}
+.views{margin-left:auto;display:flex;gap:6px;padding:8px 0;}
+.vbtn{background:var(--bg);border:1px solid var(--b);color:var(--ts);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:2px;cursor:pointer;transition:all .2s;}
+.vbtn.on{background:var(--adim);border-color:var(--ab);color:var(--acc);}
+
+/* ── MENTAL ── */
+.mental-wrap{padding:0;}
+.mental-switcher{display:flex;gap:6px;margin-bottom:16px;}
+.mental-sw-btn{flex:1;padding:10px;border:1px solid var(--b);background:var(--card);color:var(--ts);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .2s;}
+.mental-sw-btn.on{background:var(--adim);border-color:var(--ab);color:var(--acc);}
+.mental-section-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.mental-section-title::after{content:'';flex:1;height:1px;background:var(--b);}
+.mental-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;}
+@media(max-width:600px){.mental-cards{grid-template-columns:repeat(3,1fr);}}
+.mental-card{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:12px 8px;text-align:center;}
+.mental-card-icon{font-size:20px;margin-bottom:4px;}
+.mental-card-dim{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:.5px;margin-bottom:6px;}
+.mental-card-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--acc);line-height:1;}
+.mental-card-delta{font-family:'JetBrains Mono',monospace;font-size:9px;margin-top:3px;}
+.mental-card-delta.up{color:#4CAF50;}
+.mental-card-delta.dn{color:#f44336;}
+.mental-card-delta.eq{color:var(--td);}
+.mental-alert{padding:8px 12px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;margin-bottom:10px;border:1px solid rgba(255,152,0,.3);background:rgba(255,152,0,.07);color:#ff9800;}
+.mental-hist-bar{display:flex;gap:4px;align-items:flex-end;height:60px;margin-bottom:6px;}
+.mental-hb{flex:1;background:var(--adim);border-radius:2px 2px 0 0;min-height:4px;position:relative;cursor:default;}
+.mental-hb-pai{background:rgba(59,158,255,0.5);}
+.mental-hb-atleta{background:rgba(0,232,122,0.4);}
+.mental-hb-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--td);text-align:center;margin-top:3px;}
+.mental-q-wrap{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:16px;margin-bottom:12px;}
+.mental-q-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--tp);margin-bottom:14px;}
+.mental-q-item{margin-bottom:14px;}
+.mental-q-label{font-size:12px;color:var(--ts);margin-bottom:6px;}
+.mental-emoji-row{display:flex;gap:6px;flex-wrap:wrap;}
+.mental-emoji-btn{font-size:22px;cursor:pointer;padding:4px 6px;border-radius:4px;border:2px solid transparent;transition:all .15s;background:none;}
+.mental-emoji-btn.sel{border-color:var(--acc);background:var(--adim);}
+.mental-emoji-btn:hover{transform:scale(1.2);}
+.mental-q-nota{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-top:4px;}
+.mental-textarea{width:100%;background:var(--card2);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'Inter',sans-serif;font-size:12px;padding:8px 10px;resize:vertical;min-height:60px;margin-top:4px;}
+.mental-textarea:focus{outline:none;border-color:var(--ab);}
+.mental-save-btn{width:100%;padding:10px;background:var(--adim);border:1px solid var(--ab);color:var(--acc);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:3px;margin-top:8px;transition:all .2s;}
+.mental-save-btn:hover{background:rgba(59,158,255,0.2);}
+.mental-hist-list{display:flex;flex-direction:column;gap:6px;}
+.mental-hist-item{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:10px 12px;}
+.mental-hist-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.mental-hist-sem{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--acc);}
+.mental-hist-fonte{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);padding:2px 5px;border:1px solid var(--b);border-radius:2px;}
+.mental-hist-score{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;margin-left:auto;}
+.mental-hist-del{background:none;border:none;color:var(--td);cursor:pointer;font-size:11px;padding:2px 5px;}
+.mental-hist-del:hover{color:#f44336;}
+.mental-diario-item{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:10px 12px;margin-bottom:6px;}
+.mental-diario-date{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-bottom:4px;}
+.mental-diario-txt{font-size:12px;color:var(--ts);}
+.mental-ex-card{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:12px 14px;margin-bottom:8px;}
+.mental-ex-id{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--acc);margin-bottom:4px;letter-spacing:1px;}
+.mental-ex-nome{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--tp);margin-bottom:4px;}
+.mental-ex-desc{font-size:11px;color:var(--ts);line-height:1.5;}
+.mental-badge-sessao{display:inline-block;padding:2px 7px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:8px;margin-right:6px;margin-bottom:6px;}
+.mental-badge-s1{background:rgba(59,158,255,0.1);border:1px solid rgba(59,158,255,0.3);color:#3b9eff;}
+.mental-badge-s3{background:rgba(206,147,216,0.1);border:1px solid rgba(206,147,216,0.3);color:#ce93d8;}
+.mental-sem-sel{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.mental-sem-sel label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);letter-spacing:1px;}
+.mental-sem-sel select{background:var(--card2);border:1px solid var(--b);color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 8px;border-radius:3px;cursor:pointer;}
+
+
+/* SEMANA HEADER */
+.sem-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 16px;background:var(--card);border:1px solid var(--b);border-radius:4px;}
+.sem-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);letter-spacing:1px;text-transform:uppercase;}
+.sem-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--acc);}
+.sem-cnt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ts);margin-left:auto;}
+
+/* LEGENDA */
+.leg{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding:8px 14px;background:var(--card);border:1px solid var(--b);border-radius:4px;font-size:11px;color:var(--ts);}
+.leg span{display:flex;align-items:center;gap:4px;}
+.dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+/* DIA */
+.dia{margin-bottom:20px;}
+.dia-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--b);}
+
+/* EXERCÍCIO ROW */
+.exrow{background:var(--card);border:1px solid var(--b);border-radius:4px;margin-bottom:5px;display:flex;align-items:center;overflow:hidden;}
+.exnum{width:40px;min-width:40px;height:50px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--td);border-right:1px solid var(--b);flex-shrink:0;}
+.exinfo{flex:1;padding:7px 12px;min-width:0;}
+.exnome{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tp);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.exsub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-top:2px;}
+.chips{display:flex;gap:4px;padding:0 10px;flex-shrink:0;}
+
+/* CHIP */
+.chip{display:flex;flex-direction:column;align-items:center;justify-content:center;width:36px;height:36px;border-radius:3px;border:1px solid var(--b);background:var(--card2);transition:all .15s;}
+.chip.clk{cursor:pointer;}
+.chip.clk:hover{transform:scale(1.1);}
+.cs{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--td);}
+.cn{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--td);}
+.chip.v{border-color:var(--ab);background:var(--adim);}
+.chip.v .cs{color:var(--acc);}
+.chip.v .cn{color:var(--tp);}
+.chip.ev{border-color:rgba(76,175,80,.5);background:rgba(76,175,80,.08);}
+.chip.ev .cn{color:#4CAF50;}
+.chip.re{border-color:rgba(255,152,0,.5);background:rgba(255,152,0,.08);}
+.chip.re .cn{color:#ff9800;}
+.chip.sb{border-color:rgba(206,147,216,.5);background:rgba(206,147,216,.08);}
+.chip.sb .cn{color:#ce93d8;}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+.ov.show{display:flex;}
+.modal{background:var(--card);border:1px solid var(--ab);border-radius:8px;width:100%;max-width:520px;margin:auto;}
+.mhd{padding:14px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.mtitle{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--acc);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mclose{background:none;border:1px solid var(--b);color:var(--ts);width:26px;height:26px;border-radius:2px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mbody{padding:18px;}
+.yt-wrap{position:relative;padding-bottom:56.25%;margin-bottom:12px;background:#000;border-radius:4px;overflow:hidden;}
+.yt-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
+.novid{padding:12px;text-align:center;color:var(--td);font-size:11px;border:1px dashed var(--b);border-radius:4px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;}
+.mmeta{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:12px;}
+.mmi{background:var(--card2);border:1px solid var(--b);border-radius:3px;padding:6px 10px;}
+.mml{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--td);text-transform:uppercase;margin-bottom:2px;}
+.mmv{font-size:12px;color:var(--tp);}
+.avt{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin-bottom:7px;}
+.ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px;}
+.ni{background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:9px 6px;text-align:center;}
+.nd{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);text-transform:uppercase;margin-bottom:5px;}
+.nstars{display:flex;justify-content:center;gap:2px;}
+.star{font-size:15px;cursor:pointer;opacity:.2;transition:all .1s;color:#ff9800;line-height:1;}
+.star.on{opacity:1;}
+.nval{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--tp);margin-top:3px;}
+.abtns{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+.abtn{flex:1;min-width:68px;padding:8px 4px;border-radius:3px;border:1px solid;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;background:transparent;}
+.abtn.ev{color:#4CAF50;border-color:rgba(76,175,80,.3);}
+.abtn.ev:hover,.abtn.ev.on{background:rgba(76,175,80,.15);border-color:#4CAF50;}
+.abtn.re{color:#ff9800;border-color:rgba(255,152,0,.3);}
+.abtn.re:hover,.abtn.re.on{background:rgba(255,152,0,.15);border-color:#ff9800;}
+.abtn.sb{color:#ce93d8;border-color:rgba(206,147,216,.3);}
+.abtn.sb:hover,.abtn.sb.on{background:rgba(206,147,216,.15);border-color:#ce93d8;}
+.ntxt{width:100%;background:var(--card2);border:1px solid var(--b);border-radius:3px;padding:8px 10px;color:var(--tp);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;min-height:60px;margin-bottom:10px;font-weight:300;}
+.ntxt:focus{outline:none;border-color:var(--ab);}
+.ntxt::placeholder{color:var(--td);}
+.sbtn{width:100%;background:var(--acc);color:#060b12;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:11px;border:none;border-radius:3px;cursor:pointer;}
+.sbtn:hover{opacity:.88;}
+
+/* DASHBOARD */
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:580px){.dgrid{grid-template-columns:1fr;}}
+.dc{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:14px;}
+.dct{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin-bottom:12px;}
+.mbar{margin-bottom:8px;}
+.mbh{display:flex;justify-content:space-between;margin-bottom:3px;}
+.mbn{font-size:12px;color:var(--ts);}
+.mbv{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--acc);}
+.mbbg{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
+.mbf{height:100%;border-radius:3px;background:var(--acc);transition:width .6s;}
+.crow{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.csem{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);width:34px;flex-shrink:0;}
+.cbg{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;}
+.cb{height:100%;border-radius:2px;background:var(--acc);display:flex;align-items:center;padding-left:6px;}
+.cbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(6,11,18,.8);}
+.cv{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--acc);width:26px;text-align:right;flex-shrink:0;}
+.ri{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--card2);border:1px solid var(--b);border-radius:3px;margin-bottom:4px;}
+.rp{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--td);width:16px;}
+.rn{flex:1;font-size:12px;color:var(--ts);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rv{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;}
+.ri.t1 .rp{color:var(--acc);}
+.ri.t1 .rn{color:var(--tp);}
+.srow{display:flex;gap:20px;flex-wrap:wrap;}
+.si{text-align:center;}
+.sn{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;}
+.sl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+.empty{text-align:center;padding:44px 20px;}
+.eico{font-size:32px;margin-bottom:12px;opacity:.3;}
+.etitle{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--td);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
+.esub{font-size:12px;color:var(--td);line-height:1.6;}
+
+/* ERRO */
+.erro{margin:20px;padding:14px;background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#f44336;line-height:1.5;}
+
+/* ── BIOMETRIA WIDGET ── */
+.bio-widget{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:14px 16px;margin-bottom:14px;}
+.bio-widget-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.bio-widget-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);}
+.bio-link{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--acc);text-decoration:none;padding:3px 8px;border:1px solid var(--ab);border-radius:2px;transition:all .2s;}
+.bio-link:hover{background:var(--adim);}
+.bio-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:480px){.bio-tiles{grid-template-columns:repeat(2,1fr);}}
+.bio-tile{background:var(--card2);border:1px solid var(--b);border-radius:3px;padding:10px 8px;text-align:center;}
+.bio-tile-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--tp);line-height:1;}
+.bio-tile-unit{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-left:1px;}
+.bio-tile-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ts);margin-top:4px;}
+.bio-tile-delta{font-family:'JetBrains Mono',monospace;font-size:8px;color:#4CAF50;margin-top:2px;}
+.bio-phv{margin-top:10px;padding:8px 12px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.5px;display:flex;align-items:center;gap:8px;}
+.bio-phv-pre{background:rgba(0,232,122,0.07);border:1px solid rgba(0,232,122,0.25);color:#00e87a;}
+.bio-phv-circa{background:rgba(255,152,0,0.08);border:1px solid rgba(255,152,0,0.3);color:#ff9800;}
+.bio-phv-post{background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.25);color:#f44336;}
+.bio-phv-none{background:rgba(58,82,104,0.2);border:1px solid var(--b);color:var(--td);}
+.bio-phv-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.bio-no-data{text-align:center;padding:16px;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:10px;}
+.saude-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;border:1px solid rgba(206,147,216,0.3);border-radius:3px;background:rgba(206,147,216,0.06);color:#ce93d8;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:all .2s;width:100%;justify-content:center;}
+.saude-btn:hover{background:rgba(206,147,216,0.12);border-color:rgba(206,147,216,0.5);}
+
+@media(max-width:580px){
+  .chips{gap:3px;}
+  .chip{width:30px;height:30px;}
+  .cn{font-size:10px;}
+  .tabs{flex-wrap:wrap;height:auto;padding:8px 12px;}
+  .views{margin-left:0;width:100%;padding:4px 0 6px;}
+}
+
+/* ── MOTOR DE DIAGNÓSTICO ── */
+.motor-wrap{padding:0;}
+.motor-input-card{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:16px;margin-bottom:12px;}
+.motor-section-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.motor-section-title::after{content:'';flex:1;height:1px;background:var(--b);}
+.motor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+@media(max-width:500px){.motor-grid{grid-template-columns:1fr;}}
+.motor-field{display:flex;flex-direction:column;gap:4px;}
+.motor-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--td);}
+.motor-input,.motor-select{background:var(--card2);border:1px solid var(--b);border-radius:3px;padding:8px 10px;color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:11px;width:100%;transition:border-color .2s;}
+.motor-input:focus,.motor-select:focus{outline:none;border-color:var(--ab);}
+.motor-select option{background:#0c1520;}
+.motor-input::placeholder{color:var(--td);}
+.motor-gap-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+@media(max-width:500px){.motor-gap-grid{grid-template-columns:1fr;}}
+.motor-gap-item{background:var(--card2);border:1px solid var(--b);border-radius:3px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;}
+.motor-gap-name{font-size:11px;color:var(--ts);}
+.motor-gap-val{display:flex;align-items:center;gap:6px;}
+.motor-gap-input{width:44px;background:transparent;border:none;border-bottom:1px solid var(--b);color:var(--tp);font-family:'Rajdhani',monospace;font-size:14px;font-weight:700;text-align:center;padding:0 2px;}
+.motor-gap-input:focus{outline:none;border-bottom-color:var(--acc);}
+.motor-gap-max{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);}
+.motor-run-btn{width:100%;padding:14px;background:var(--acc);color:#060b12;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;border:none;border-radius:3px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.motor-run-btn:hover{opacity:.88;}
+.motor-run-btn:disabled{opacity:.4;cursor:not-allowed;}
+.motor-run-btn.loading::after{content:'';position:absolute;bottom:0;left:0;height:2px;background:rgba(0,0,0,.3);animation:motorload 2s ease-in-out infinite;}
+@keyframes motorload{0%{width:0;left:0}50%{width:60%;left:20%}100%{width:0;left:100%}}
+
+/* RESULTADO */
+.motor-result{background:var(--card);border:1px solid var(--b);border-radius:4px;overflow:hidden;margin-bottom:12px;}
+.motor-result-header{padding:12px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;}
+.motor-result-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--acc);}
+.motor-result-meta{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);}
+.motor-diagnostico{padding:14px 16px;border-bottom:1px solid var(--b);font-size:13px;color:var(--tp);line-height:1.7;}
+.motor-diagnostico b{color:var(--acc);}
+.motor-alertas{padding:10px 16px;border-bottom:1px solid var(--b);display:flex;flex-direction:column;gap:6px;}
+.motor-alerta{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:3px;font-size:11px;line-height:1.5;}
+.motor-alerta.warn{background:rgba(255,152,0,.07);border:1px solid rgba(255,152,0,.25);color:#ff9800;}
+.motor-alerta.info{background:rgba(59,158,255,.07);border:1px solid rgba(59,158,255,.2);color:#3b9eff;}
+.motor-alerta.ok{background:rgba(76,175,80,.07);border:1px solid rgba(76,175,80,.25);color:#4CAF50;}
+.motor-sessoes{padding:14px 16px;}
+.motor-sessoes-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:10px;}
+.motor-sessao{background:var(--card2);border:1px solid var(--b);border-radius:4px;margin-bottom:8px;overflow:hidden;}
+.motor-sessao-header{padding:9px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b);}
+.motor-sessao-id{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--acc);width:28px;}
+.motor-sessao-tipo{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--tp);}
+.motor-sessao-dur{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-left:auto;}
+.motor-sessao-foco{padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--acc);letter-spacing:.5px;border-bottom:1px solid var(--b);}
+.motor-exercicios{padding:10px 14px;display:flex;flex-direction:column;gap:4px;}
+.motor-ex{display:flex;align-items:center;gap:8px;padding:5px 0;}
+.motor-ex-n{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);width:16px;flex-shrink:0;}
+.motor-ex-nome{font-size:12px;color:var(--ts);}
+.motor-ex-det{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-left:auto;white-space:nowrap;}
+.motor-gap-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.5px;margin-left:6px;}
+.motor-gap-badge.urgente{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);color:#f44336;}
+.motor-gap-badge.planejado{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.25);color:#ff9800;}
+.motor-loading-state{padding:40px 20px;text-align:center;}
+.motor-loading-icon{font-size:28px;margin-bottom:14px;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.motor-loading-text{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);letter-spacing:1px;}
+.motor-error{padding:16px;background:rgba(244,67,54,.07);border:1px solid rgba(244,67,54,.25);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#f44336;line-height:1.6;}
+.motor-api-row{display:flex;gap:8px;align-items:flex-end;}
+.motor-api-row .motor-field{flex:1;}
+.motor-api-toggle{padding:8px 12px;background:var(--card2);border:1px solid var(--b);border-radius:3px;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer;white-space:nowrap;transition:all .2s;}
+
+/* ══════════════════════════════════════════════════
+   MÓDULO JOGOS — FASE 3: INTEGRAÇÃO VEO
+   ══════════════════════════════════════════════════ */
+.veo-wrap{padding:4px 0 40px;}
+.veo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.veo-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.veo-badge{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:2px;border:1px solid;background:rgba(255,152,0,0.08);color:#ff9800;border-color:rgba(255,152,0,0.3);}
+.veo-badge.pronto{background:rgba(76,175,80,0.08);color:#4CAF50;border-color:rgba(76,175,80,0.3);}
+
+/* FORMULÁRIO */
+.veo-form-card{background:var(--card);border:1px solid var(--b);border-radius:6px;padding:18px;margin-bottom:16px;}
+.veo-form-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:14px;}
+.veo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.veo-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+@media(max-width:600px){.veo-grid,.veo-grid-3{grid-template-columns:1fr;}}
+.veo-field{display:flex;flex-direction:column;gap:4px;}
+.veo-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--td);}
+.veo-input{background:var(--bg);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 10px;outline:none;transition:border .2s;width:100%;}
+.veo-input:focus{border-color:var(--acc);}
+.veo-select{background:var(--bg);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 10px;outline:none;width:100%;}
+.veo-textarea{background:var(--bg);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'Inter',sans-serif;font-size:12px;padding:8px 10px;outline:none;resize:vertical;width:100%;min-height:64px;}
+.veo-textarea:focus{border-color:var(--acc);}
+.veo-section{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--b);}
+.veo-hint{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:3px;font-style:italic;}
+.veo-pending{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,152,0,0.06);border:1px solid rgba(255,152,0,0.2);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#ff9800;margin-bottom:10px;}
+.veo-btn-salvar{width:100%;padding:12px;background:var(--adim);border:1px solid var(--ab);border-radius:3px;color:var(--acc);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:6px;}
+.veo-btn-salvar:hover{background:var(--acc);color:#000;}
+
+/* PLAYER SPOTLIGHT */
+.veo-spotlight{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+@media(max-width:600px){.veo-spotlight{grid-template-columns:1fr;}}
+.veo-player-card{background:var(--card);border-radius:6px;padding:14px;position:relative;overflow:hidden;}
+.veo-player-card.lucas-card{border:1px solid var(--lb);}
+.veo-player-card.miguel-card{border:1px solid var(--mb);}
+.veo-player-num{position:absolute;top:10px;right:14px;font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;opacity:.08;}
+.veo-player-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;}
+.veo-player-pos{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:1px;margin-bottom:10px;}
+.veo-stat-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--b);}
+.veo-stat-row:last-child{border-bottom:none;}
+.veo-stat-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ts);}
+.veo-stat-val{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--td);}
+.veo-stat-val.has-data{color:var(--tp);}
+.veo-stat-unit{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-left:2px;}
+
+/* CRUZAMENTO COM GAPS */
+.veo-cross{background:var(--card);border:1px solid var(--b);border-radius:6px;padding:14px;margin-bottom:16px;}
+.veo-cross-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:10px;}
+.veo-cross-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--b);}
+.veo-cross-item:last-child{border-bottom:none;}
+.veo-cross-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.veo-cross-dot.urgente{background:#ff4444;}
+.veo-cross-dot.aguarda{background:#ff9800;}
+.veo-cross-dot.ok{background:#4CAF50;}
+.veo-cross-info{flex:1;}
+.veo-cross-gap{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--tp);}
+.veo-cross-desc{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:2px;}
+.veo-cross-connector{font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 7px;border-radius:2px;border:1px dashed;white-space:nowrap;}
+.veo-cross-connector.aguarda{color:#ff9800;border-color:rgba(255,152,0,0.3);}
+.veo-cross-connector.pronto{color:#4CAF50;border-color:rgba(76,175,80,0.3);}
+
+/* HISTÓRICO */
+.veo-hist-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:10px;}
+.veo-jogo-card{background:var(--card);border:1px solid var(--b);border-radius:6px;margin-bottom:8px;overflow:hidden;}
+.veo-jogo-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s;}
+.veo-jogo-header:hover{background:var(--card2);}
+.veo-jogo-num{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--td);width:28px;flex-shrink:0;text-align:center;}
+.veo-jogo-info{flex:1;}
+.veo-jogo-data{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);}
+.veo-jogo-adversario{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--tp);}
+.veo-jogo-placar{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--acc);flex-shrink:0;}
+.veo-jogo-body{padding:12px 14px;border-top:1px solid var(--b);display:none;}
+.veo-jogo-body.open{display:block;}
+.veo-jogo-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-bottom:10px;}
+.veo-mini-stat{background:var(--card2);border:1px solid var(--b);border-radius:3px;padding:7px 10px;}
+.veo-mini-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:1px;color:var(--td);}
+.veo-mini-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--tp);}
+.veo-jogo-obs{font-family:'Inter',sans-serif;font-size:12px;color:var(--ts);line-height:1.5;padding:8px 10px;background:var(--card2);border-radius:3px;border:1px solid var(--b);}
+.veo-jogo-del{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);cursor:pointer;padding:4px 8px;border:1px solid var(--b);border-radius:2px;float:right;margin-bottom:8px;}
+.veo-jogo-del:hover{color:#ff4444;border-color:#ff4444;}
+.veo-empty-jogos{text-align:center;padding:40px 20px;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;}
+
+/* EVOLUÇÃO COMPARATIVA */
+.veo-evo{background:var(--card);border:1px solid var(--b);border-radius:6px;padding:14px;margin-bottom:16px;}
+.veo-evo-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:10px;}
+.veo-evo-bars{display:flex;flex-direction:column;gap:7px;}
+.veo-evo-row{display:flex;align-items:center;gap:8px;}
+.veo-evo-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ts);width:120px;flex-shrink:0;}
+.veo-evo-bg{flex:1;height:6px;background:var(--b);border-radius:3px;overflow:hidden;}
+.veo-evo-fill{height:100%;border-radius:3px;background:var(--acc);transition:width .4s;}
+.veo-evo-val{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--tp);width:36px;text-align:right;}
+
+/* ══════════════════════════════════════════════════
+   FASE 5 — PERFORMANCE CLOCK & DOSSIÊ ELITE
+   ══════════════════════════════════════════════════ */
+
+/* CLOCK WRAP */
+.clock-wrap{padding:0;}
+.clock-section{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:0 0 12px;display:flex;align-items:center;gap:8px;}
+.clock-section::after{content:'';flex:1;height:1px;background:var(--b);}
+
+/* STATS HEADER */
+.clock-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+@media(max-width:500px){.clock-stats{grid-template-columns:repeat(2,1fr);}}
+.clock-stat{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:12px 10px;text-align:center;}
+.clock-stat-val{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--acc);line-height:1;}
+.clock-stat-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--td);margin-top:4px;}
+
+/* TIMELINE */
+.clock-timeline{position:relative;padding-left:24px;margin-bottom:20px;}
+.clock-timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:var(--b);}
+.clock-entry{position:relative;margin-bottom:12px;}
+.clock-entry::before{content:'';position:absolute;left:-21px;top:7px;width:8px;height:8px;border-radius:50%;background:var(--acc);border:1px solid var(--bg);flex-shrink:0;}
+.clock-entry.auto::before{background:var(--acc);}
+.clock-entry.manual::before{background:#ce93d8;}
+.clock-entry.milestone::before{background:#ff9800;width:10px;height:10px;left:-22px;box-shadow:0 0 8px rgba(255,152,0,0.5);}
+.clock-card{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:10px 12px;transition:border-color .2s;}
+.clock-card:hover{border-color:var(--ab);}
+.clock-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.clock-card-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--tp);letter-spacing:.5px;}
+.clock-card-date{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);flex-shrink:0;margin-top:2px;}
+.clock-card-desc{font-family:'Inter',sans-serif;font-size:11px;color:var(--ts);line-height:1.5;margin-bottom:6px;}
+.clock-card-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.clock-tag{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:2px;}
+.clock-tag.gap{background:var(--adim);color:var(--acc);border:1px solid var(--ab);}
+.clock-tag.auto{background:rgba(76,175,80,0.08);color:#4CAF50;border:1px solid rgba(76,175,80,0.25);}
+.clock-tag.manual{background:rgba(206,147,216,0.08);color:#ce93d8;border:1px solid rgba(206,147,216,0.25);}
+.clock-tag.milestone{background:rgba(255,152,0,0.1);color:#ff9800;border:1px solid rgba(255,152,0,0.3);}
+.clock-tag.sessao{background:rgba(59,158,255,0.08);color:var(--lucas);border:1px solid rgba(59,158,255,0.25);}
+.clock-del{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);cursor:pointer;padding:2px 6px;border:1px solid var(--b);border-radius:2px;margin-left:4px;flex-shrink:0;}
+.clock-del:hover{color:#f44336;border-color:#f44336;}
+
+.clock-empty{text-align:center;padding:36px 20px;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:9px;line-height:1.8;letter-spacing:.5px;}
+
+/* FORM ADICIONAR MARCO */
+.clock-add-card{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:14px;margin-bottom:16px;}
+.clock-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+@media(max-width:500px){.clock-form-grid{grid-template-columns:1fr;}}
+.clock-field{display:flex;flex-direction:column;gap:4px;}
+.clock-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--td);}
+.clock-input,.clock-select,.clock-textarea{background:var(--card2);border:1px solid var(--b);border-radius:3px;padding:8px 10px;color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:11px;width:100%;transition:border-color .2s;}
+.clock-input:focus,.clock-select:focus,.clock-textarea:focus{outline:none;border-color:var(--ab);}
+.clock-select option{background:#0c1520;}
+.clock-textarea{min-height:56px;resize:vertical;font-family:'Inter',sans-serif;font-size:12px;}
+.clock-add-btn{width:100%;background:var(--acc);color:#060b12;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px;border:none;border-radius:3px;cursor:pointer;margin-top:4px;}
+.clock-add-btn:hover{opacity:.88;}
+
+/* NARRATIVA EVOLUTIVA */
+.narrativa-card{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:14px;margin-bottom:16px;}
+.narrativa-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.narrativa-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:5px;}
+.narrativa-texto{font-family:'Inter',sans-serif;font-size:12px;color:var(--ts);line-height:1.5;}
+.narrativa-vazio{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);padding:12px 0;text-align:center;}
+
+/* DOSSIÊ ELITE */
+.dossie-card{background:var(--card);border:1px solid var(--b);border-radius:4px;padding:14px;margin-bottom:16px;}
+.dossie-info{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);line-height:1.8;margin-bottom:14px;}
+.dossie-checklist{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.dossie-check-item{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);}
+.dossie-check-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dossie-check-dot.ok{background:#4CAF50;}
+.dossie-check-dot.warn{background:#ff9800;}
+.dossie-check-dot.empty{background:var(--td);opacity:.4;}
+.dossie-btn{width:100%;background:transparent;border:1px solid var(--acc);color:var(--acc);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px;border-radius:3px;cursor:pointer;transition:all .2s;margin-bottom:6px;}
+.dossie-btn:hover{background:var(--adim);}
+.dossie-btn.primary{background:var(--acc);color:#060b12;}
+.dossie-btn.primary:hover{opacity:.88;}
+
+/* PRINT STYLES — Dossiê Elite PDF */
+@media print {
+  .topbar,.tabs,.clock-add-card,.dossie-card,.clock-del,.clock-add-btn,
+  button:not(.print-hide) { display:none!important; }
+  body { background:#fff!important; color:#111!important; }
+  .clock-card { background:#f8f9fa!important; border-color:#dee2e6!important; }
+  .clock-card-title,.clock-card-desc { color:#111!important; }
+  .clock-tag { border-color:#ccc!important; }
+  .clock-timeline::before { background:#dee2e6!important; }
+  .clock-entry::before { background:#333!important; }
+}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="index.html" class="back">← Treinos</a>
+    <span class="top-title">Painel do Pai</span>
+  </div>
+  <span class="top-sem" id="tsem"></span>
+</div>
+<div class="tabs">
+  <button class="tab lucas on" onclick="setP('lucas')">⚡ Lucas</button>
+  <button class="tab miguel" onclick="setP('miguel')">🧤 Miguel</button>
+  <div class="views">
+    <button class="vbtn on" id="vt" onclick="setV('treinos')">Treinos</button>
+    <button class="vbtn" id="vd" onclick="setV('dashboard')">Dashboard</button>
+    <button class="vbtn" id="vm" onclick="setV('motor')">⚡ Diagnóstico</button>
+    <button class="vbtn" id="vj" onclick="setV('jogos')">🎥 Jogos</button>
+    <button class="vbtn" id="vc" onclick="setV('clock')">🏆 Clock</button>
+    <button class="vbtn" id="vme" onclick="setV('mental')">🧠 Mental</button>
+    <button class="vbtn" id="vnu" onclick="setV('nutricao')">🥗 Nutrição</button>
+  </div>
+</div>
+<div class="wrap" id="wrap"></div>
+<div class="ov" id="ov" onclick="fmse(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mhd">
+      <div class="mtitle" id="mt"></div>
+      <button class="mclose" onclick="fm()">✕</button>
+    </div>
+    <div class="mbody" id="mb"></div>
+  </div>
+</div>
+<script>
+const SB_URL='https://dxqsjkvpzdvzyqfwcpro.supabase.co';
+const SB_KEY='sb_publishable_hLGKARCdEPRZfEWaNhg71A_-8LKa3tO';
+const DIAS=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+
+const IL={
+  lucas:[
+    {d:0,ids:['s1','s2','s3','s4','s5','s6']},
+    {d:1,ids:['t1','t2','t3','t4','t5','t6']},
+    {d:2,ids:['q1','q2','q3','q4','q5','q6']},
+    {d:3,ids:['qi1','qi2','qi3','qi4','qi5','qi6']},
+    {d:4,ids:['sx1','sx2','sx3','sx4','sx5','sx6']},
+    {d:5,ids:['sb1','sb2','sb3','sb4','sb5','sb6']},
+    {d:6,ids:['d1','d2','d3']},
+  ],
+  miguel:[
+    {d:0,ids:['mg_s1a','mg_s1b','mg_s1c','mg_s1d','mg_s1e']},
+    {d:1,ids:['mg_s2a','mg_s2b','mg_s2c','mg_s2d','mg_s2e']},
+    {d:2,ids:['mg_s3a','mg_s3b','mg_s3c','mg_s3d','mg_s3e']},
+    {d:3,ids:['mg_s1a','mg_s1b','mg_s2a','mg_s2c','mg_s3a']},
+    {d:4,ids:['mg_s2a','mg_s2b','mg_s3a','mg_s3b','mg_s3d']},
+    {d:5,ids:['mg_s1b','mg_s1c','mg_s2c','mg_s3c','mg_s3e']},
+    {d:6,ids:['mg_s4a','mg_s4b','mg_s4c']},
+  ]
+};
+
+const NM={
+  s1:'Step A-Skip',s2:'High Knees',s3:'Speed Skaters',s4:'In-Soul Rolls',s5:'Laces-Sole',s6:'Scanning — Rondo 4x1',
+  t1:'Croquettes in Place',t2:'La Croqueta in Place',t3:'Quick Passing (parede)',t4:'One Touch Passing (parede)',t5:'First Touch Variations (parede)',t6:'Passa e vai — desmarcação',
+  q1:'Low Wall Sprint',q2:'Split Stance Jumps',q3:'L Drags',q4:'V Cut Outside',q5:'Croquettes in Motion',q6:'Reação ao sinal',
+  qi1:'Tiro de 10m',qi2:'Tiro c/ mudança',qi3:'V Cut Outside+Inside',qi4:'Croquettes alt.',qi5:'L Drags deslocamento',qi6:'Tiro transição defensiva',
+  sx1:'High Knee Wall Sprint',sx2:'Plyometrics Fast Switch',sx3:'Condução 8 nos cones',sx4:'La Croqueta in Motion',sx5:'Finta + aceleração',sx6:'Proteção quadril baixo',
+  sb1:'Ventral Hops',sb2:'Max Intent La Croqueta',sb3:'Sole Rolls',sb4:'Two Touches Passing',sb5:'Air Ball Control',sb6:'Circuito tático scanning',
+  d1:'Condução leve',d2:'Passes leves (parede)',d3:'Alongamento',
+  ms1:'Step A-Skip',ms2:'High Knees',ms3:'Speed Skaters',ms4:'In-Soul Rolls',ms5:'Quick Passing (parede)',
+  mt1:'Ventral Hops',mt2:'Split Stance Jumps',mt3:'Saída do gol simulada',mt4:'One Touch Passing (parede)',mt5:'Laces-Sole',
+  mq1:'Low Wall Sprint',mq2:'Plyometrics Fast Switch',mq3:'L Drags',mq4:'First Touch Variations (parede)',mq5:'V Cut Inside',
+  mqi1:'Base + shuffle lateral',mqi2:'Espacate lateral progressivo',mqi3:'Giro no chão (rolamento lateral)',mqi4:'Inside-Sole',mqi5:'Sole Stepovers',
+  msx1:'High Knee Wall Sprint',msx2:'Speed Skaters',msx3:'La Croqueta in Motion',msx4:'Air Ball Control (parede)',msx5:'Two Touches Passing (parede)',
+  msb1:'Ventral Hops',msb2:'Max Intent La Croqueta',msb3:'Croquettes in Motion',msb4:'Sole Rolls',msb5:'Giro + levantada',
+  md1:'Condução leve',md2:'Passes leves (parede)',md3:'Alongamento completo',
+  mg_s1a:'Laces-Sole alternado',mg_s1b:'Passe curto c/ os pés (parede)',mg_s1c:'Passe longo c/ os pés (parede)',mg_s1d:'Grito de organização (simulado)',mg_s1e:'Defesa baixa + levantada',
+  mg_s2a:'Saída do gol — bola no chão',mg_s2b:'Saída do gol — bola no ar',mg_s2c:'Reposição c/ os pés (alvo)',mg_s2d:'Shuffle lateral + defesa',mg_s2e:'Comunicação ativa (simulado)',
+  mg_s3a:'Reflexo — defesa por reação',mg_s3b:'Defesa + levantada rápida',mg_s3c:'Passe longo preciso (alvo)',mg_s3d:'1×1 saída + comunicação',mg_s3e:'Posicionamento no cruzamento',
+  mg_s4a:'Passe leve (parede)',mg_s4b:'Defesas suaves (sem impacto)',mg_s4c:'Alongamento completo',
+};
+
+// ── Estado
+let player='lucas', view='treinos', dados=[], mctx=null;
+
+function semAtual(){
+  const ini=new Date('2026-03-01');
+  const n=Math.max(1,Math.floor((new Date()-ini)/(7*24*60*60*1000))+1);
+  const m=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const d=new Date();
+  return `S${n} ${m[d.getMonth()]}/${d.getFullYear().toString().slice(2)}`;
+}
+
+async function carregar(){
+  try{
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout — servidor nao respondeu em 10s')),10000));
+    const req=fetch(SB_URL+'/rest/v1/avaliacoes?select=*',{
+      headers:{
+        'apikey':SB_KEY,
+        'Authorization':'Bearer '+SB_KEY,
+        'Accept':'application/json',
+        'Content-Type':'application/json'
+      }
+    });
+    const r=await Promise.race([req,timeout]);
+    if(!r.ok){
+      const txt=await r.text();
+      throw new Error('HTTP '+r.status+': '+txt.slice(0,200));
+    }
+    const rows=await r.json();
+    if(!Array.isArray(rows)) throw new Error('Resposta inválida: '+JSON.stringify(rows).slice(0,200));
+    dados=rows.map(r=>{
+      let res={},fb={};
+      try{res=JSON.parse(r.resultado||'{}');}catch(e){}
+      try{fb=JSON.parse(r.feedback||'{}');}catch(e){}
+      return {
+        _id:r.id, exId:r.exercicio, atleta:r.jogador,
+        semana:res.semana||'—', data:res.data||r.avaliado_em||'',
+        nome:res.nome_exercicio||NM[r.exercicio]||r.exercicio,
+        ytId:res.youtube_id||null,
+        av:fb.av||null, notaPai:fb.nota_pai||'',
+        ia:{p:fb.ia_postura||null,s:fb.ia_scanning||null,ps:fb.ia_psicologico||null},
+        resumoCrianca:fb.resumo_crianca||null,
+        analisePai:fb.analise_pai||null,
+        pontoForte:fb.ponto_forte||null,
+        pontoMelhora:fb.ponto_melhora||null
+      };
+    }).sort((a,b)=>new Date(a.data)-new Date(b.data));
+    return null;
+  }catch(err){
+    return err.message;
+  }
+}
+
+function hist(exId){
+  return dados.filter(d=>d.exId===exId&&d.atleta===player).slice(-4);
+}
+
+// ── Nav
+function setP(p){
+  player=p;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelector('.tab.'+p).classList.add('on');
+  const r=document.documentElement;
+  if(p==='lucas'){r.style.setProperty('--acc','var(--lucas)');r.style.setProperty('--adim','var(--ldim)');r.style.setProperty('--ab','var(--lb)');}
+  else{r.style.setProperty('--acc','var(--miguel)');r.style.setProperty('--adim','var(--mdim)');r.style.setProperty('--ab','var(--mb)');}
+  render();
+}
+function setV(v){
+  view=v;
+  document.getElementById('vt').classList.toggle('on',v==='treinos');
+  document.getElementById('vd').classList.toggle('on',v==='dashboard');
+  document.getElementById('vm').classList.toggle('on',v==='motor');
+  document.getElementById('vj').classList.toggle('on',v==='jogos');
+  document.getElementById('vc').classList.toggle('on',v==='clock');
+  document.getElementById('vme').classList.toggle('on',v==='mental');
+  document.getElementById('vnu').classList.toggle('on',v==='nutricao');
+  renderView();
+}
+async function render(){
+  document.getElementById('tsem').textContent=semAtual();
+  document.getElementById('wrap').innerHTML=`<div style="padding:40px;text-align:center;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;">carregando...</div>`;
+  const err=await carregar();
+  if(err){
+    document.getElementById('wrap').innerHTML=`<div class="erro">
+      ❌ Erro ao carregar dados:<br><br>
+      <strong>${err}</strong><br><br>
+      <small>Verifique o console do navegador (F12) para mais detalhes.</small>
+    </div>`;
+    return;
+  }
+  renderView();
+}
+function renderView(){
+  if(view==='treinos') rTreinos();
+  else if(view==='dashboard') rDash();
+  else if(view==='motor') rMotor();
+  else if(view==='jogos') rJogos();
+  else if(view==='clock') rClock();
+  else if(view==='mental') rMental();
+  else if(view==='nutricao') rNutricao();
+}
+
+// ── TREINOS
+function rTreinos(){
+  const ids=IL[player];
+  const total=dados.filter(d=>d.atleta===player).length;
+  let h=`
+    <div class="sem-bar">
+      <span class="sem-lbl">Semana atual</span>
+      <span class="sem-val">${semAtual()}</span>
+      <span class="sem-cnt">${total} vídeo${total!==1?'s':''} gravado${total!==1?'s':''}</span>
+    </div>
+    <div class="leg">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:1px;text-transform:uppercase;">chips:</span>
+      <span><span class="dot" style="background:var(--adim);border:1px solid var(--ab);"></span>com vídeo</span>
+      <span><span class="dot" style="background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.4);"></span>evoluiu</span>
+      <span><span class="dot" style="background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.4);"></span>repetir</span>
+      <span><span class="dot" style="background:rgba(206,147,216,.1);border:1px solid rgba(206,147,216,.4);"></span>sobe nível</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:4px;margin-bottom:4px;padding:0 2px;">
+      ${['S1','S2','S3','S4'].map(s=>`<div style="width:36px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);">${s}</div>`).join('')}
+    </div>`;
+
+  ids.forEach(({d,ids:ex})=>{
+    h+=`<div class="dia"><div class="dia-lbl">// ${DIAS[d]}</div>`;
+    ex.forEach((id,i)=>{
+      const hs=hist(id);
+      const nm=hs[0]?.nome||NM[id]||id;
+      const slots=[null,null,null,null];
+      hs.forEach((e,j)=>slots[j]=e);
+      const chips=slots.map((e,j)=>{
+        if(!e) return `<div class="chip"><span class="cs">S${j+1}</span><span class="cn">—</span></div>`;
+        let c='chip v clk';
+        if(e.av==='evoluiu')c+=' ev';
+        else if(e.av==='repetir')c+=' re';
+        else if(e.av==='sobe')c+=' sb';
+        const m=media(e.ia);
+        return `<div class="${c}" onclick="abrir('${id}',${j})" title="${e.semana}">
+          <span class="cs">${e.semana.split(' ')[0]||'S'+(j+1)}</span>
+          <span class="cn">${m!==null?m.toFixed(1):'▶'}</span>
+        </div>`;
+      }).join('');
+      h+=`<div class="exrow">
+        <div class="exnum">${i+1}</div>
+        <div class="exinfo">
+          <div class="exnome">${nm}</div>
+          <div class="exsub">${hs.length} sem. filmada${hs.length!==1?'s':''}</div>
+        </div>
+        <div class="chips">${chips}</div>
+      </div>`;
+    });
+    h+='</div>';
+  });
+  document.getElementById('wrap').innerHTML=h;
+}
+
+// ── BIOMETRIA HELPERS
+const BIO_KEY='biometria_v2';
+function bioData(){try{const s=localStorage.getItem(BIO_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
+function bioAthlete(name){const s=bioData();if(!s)return null;return s.athletes?.find(a=>a.name.toLowerCase()===name.toLowerCase())||null;}
+
+// ── INTEGRAÇÃO SONO → MOTOR (Fase 1 — pendência resolvida)
+// Lê os registros de sono do saude.html/biometria via localStorage (biometria_v2)
+// Retorna: { media, dias, total, status, label } ou null se não houver dados
+function lerSonoDoSaude(atletaNome) {
+  const a = bioAthlete(atletaNome);
+  if (!a || !a.sono || !a.sono.length) return null;
+
+  const hoje = new Date();
+  hoje.setHours(23,59,59,999);
+  const seteAtras = new Date(hoje);
+  seteAtras.setDate(seteAtras.getDate() - 6);
+  seteAtras.setHours(0,0,0,0);
+
+  // Filtra últimos 7 dias
+  const recentes = a.sono
+    .filter(s => { const d = new Date(s.date); return d >= seteAtras && d <= hoje; })
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  if (!recentes.length) {
+    // Sem dados recentes — pega últimas 3 medições disponíveis como fallback
+    const ultimas = [...a.sono].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0,3);
+    if (!ultimas.length) return null;
+    const media = ultimas.reduce((s,x) => s + x.hours, 0) / ultimas.length;
+    return {
+      media: parseFloat(media.toFixed(1)),
+      dias: ultimas.length,
+      total: 7,
+      status: media >= 9 ? 'ok' : media >= 7 ? 'warn' : 'baixo',
+      label: `${parseFloat(media.toFixed(1))}h · baseado nas últimas ${ultimas.length} medições`,
+      fonte: 'historico'
+    };
+  }
+
+  const media = recentes.reduce((s,x) => s + x.hours, 0) / recentes.length;
+  const status = media >= 9 ? 'ok' : media >= 7 ? 'warn' : 'baixo';
+  const statusLabels = { ok:'✓ adequado', warn:'⚠ atenção', baixo:'⚠ insuficiente' };
+  return {
+    media: parseFloat(media.toFixed(1)),
+    dias: recentes.length,
+    total: 7,
+    status,
+    label: `${parseFloat(media.toFixed(1))}h · média ${recentes.length}/7 dias · ${statusLabels[status]}`,
+    fonte: 'saude'
+  };
+}
+function calcPHVOffset(h,w,dob){
+  if(!h||!w||!dob)return null;
+  const age=(new Date()-new Date(dob))/(365.25*24*3600*1000);
+  if(age<8)return null;
+  return parseFloat((-9.236+(0.0002708*(h*w))+(-0.001663*(age*h))+(0.007216*(age*w))+(0.02292*(w/h*100))).toFixed(2));
+}
+function bioWidget(p){
+  const a=bioAthlete(p);
+  if(!a||!a.records?.length){
+    return `<div class="bio-widget">
+      <div class="bio-widget-header">
+        <span class="bio-widget-title">// biometria &amp; crescimento</span>
+        <a href="saude.html" class="bio-link">ver painel completo →</a>
+      </div>
+      <div class="bio-no-data">Sem medições ainda. Acesse o painel de saúde para registrar.</div>
+      <a href="saude.html" class="saude-btn">🩺 Abrir painel de saúde</a>
+    </div>`;
+  }
+  const recs=[...a.records].sort((x,y)=>new Date(y.date)-new Date(x.date));
+  const lat=recs[0], prev=recs[1];
+  const dH=prev?(lat.height-prev.height).toFixed(1):null;
+  const dW=prev?(lat.weight-prev.weight).toFixed(1):null;
+  const target=a.fatherHeight&&a.motherHeight?((parseFloat(a.fatherHeight)+parseFloat(a.motherHeight)+13)/2).toFixed(1):null;
+  const off=calcPHVOffset(lat.height,lat.weight,a.dob);
+  let phvHtml='';
+  if(off!==null){
+    const sign=off>0?'+':'';
+    if(off<-1) phvHtml=`<div class="bio-phv bio-phv-pre"><span class="bio-phv-dot"></span>Pré-PHV &nbsp;${sign}${off}a &nbsp;— janela de ouro para técnica e coordenação</div>`;
+    else if(off<=1) phvHtml=`<div class="bio-phv bio-phv-circa"><span class="bio-phv-dot"></span>Circa-PHV &nbsp;${sign}${off}a &nbsp;— pico de crescimento: reduzir carga de impacto agora</div>`;
+    else phvHtml=`<div class="bio-phv bio-phv-post"><span class="bio-phv-dot"></span>Pós-PHV &nbsp;${sign}${off}a &nbsp;— janela para força e potência</div>`;
+  } else {
+    phvHtml=`<div class="bio-phv bio-phv-none"><span class="bio-phv-dot"></span>PHV: insira dados dos pais no painel de saúde para calcular</div>`;
+  }
+  return `<div class="bio-widget">
+    <div class="bio-widget-header">
+      <span class="bio-widget-title">// biometria &amp; crescimento · ${recs.length} medição${recs.length!==1?'s':''}</span>
+      <a href="saude.html" class="bio-link">painel completo →</a>
+    </div>
+    <div class="bio-tiles">
+      <div class="bio-tile">
+        <div class="bio-tile-val">${lat.height}<span class="bio-tile-unit">cm</span></div>
+        ${dH!==null?`<div class="bio-tile-delta">+${dH}cm</div>`:''}
+        <div class="bio-tile-lbl">Altura</div>
+      </div>
+      <div class="bio-tile">
+        <div class="bio-tile-val">${lat.weight}<span class="bio-tile-unit">kg</span></div>
+        ${dW!==null?`<div class="bio-tile-delta" style="color:${parseFloat(dW)>0?'#4CAF50':'#ff9800'}">${parseFloat(dW)>0?'+':''}${dW}kg</div>`:''}
+        <div class="bio-tile-lbl">Peso</div>
+      </div>
+      <div class="bio-tile">
+        <div class="bio-tile-val" style="font-size:14px;color:var(--ts)">${target?target+'cm':'—'}</div>
+        <div class="bio-tile-lbl">Altura alvo</div>
+      </div>
+      <div class="bio-tile">
+        <div class="bio-tile-val">${((new Date()-new Date(a.dob))/(365.25*24*3600*1000)).toFixed(1)}</div>
+        <div class="bio-tile-lbl">Idade</div>
+      </div>
+    </div>
+    ${phvHtml}
+  </div>`;
+}
+
+// ── DASHBOARD
+function rDash(){
+  const ids=IL[player].flatMap(g=>g.ids);
+  const todas=ids.flatMap(id=>hist(id).map(e=>({...e,id})));
+  if(!todas.length){
+    document.getElementById('wrap').innerHTML=`<div class="empty">
+      <div class="eico">📊</div>
+      <div class="etitle">Dashboard vazio</div>
+      <div class="esub">Avalie vídeos na aba Treinos para ver gráficos aqui.</div>
+    </div>`;
+    return;
+  }
+  const dims=[{k:'p',l:'Postura'},{k:'s',l:'Scanning'},{k:'ps',l:'Psicológico'}];
+  const md={};
+  dims.forEach(({k})=>{
+    const v=todas.filter(e=>e.ia[k]!==null).map(e=>e.ia[k]);
+    md[k]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+  });
+  const ps={};
+  todas.forEach(e=>{const m=media(e.ia);if(m===null)return;if(!ps[e.semana])ps[e.semana]=[];ps[e.semana].push(m);});
+  const sems=Object.keys(ps).sort((a,b)=>parseInt(a)-parseInt(b));
+  const pe={};
+  todas.forEach(e=>{const m=media(e.ia);if(m===null)return;if(!pe[e.id])pe[e.id]={nm:e.nome,vs:[]};pe[e.id].vs.push(m);});
+  const rank=Object.values(pe).map(x=>({nm:x.nm,m:x.vs.reduce((a,b)=>a+b,0)/x.vs.length})).sort((a,b)=>b.m-a.m);
+  let ev=0,re=0,sb=0;
+  todas.forEach(e=>{if(e.av==='evoluiu')ev++;else if(e.av==='repetir')re++;else if(e.av==='sobe')sb++;});
+
+  const bars=dims.map(({k,l})=>{
+    const v=md[k];const p=v!==null?(v/5*100):0;
+    return `<div class="mbar"><div class="mbh"><span class="mbn">${l}</span><span class="mbv">${v!==null?v.toFixed(1)+'/5':'—'}</span></div><div class="mbbg"><div class="mbf" style="width:${p}%"></div></div></div>`;
+  }).join('');
+
+  const cbars=sems.map(s=>{
+    const v=ps[s];const m=v.reduce((a,b)=>a+b,0)/v.length;const p=Math.round(m/5*100);
+    return `<div class="crow"><span class="csem">${s.split(' ')[0]}</span><div class="cbg"><div class="cb" style="width:${p}%"><span class="cbl">${m.toFixed(1)}</span></div></div><span class="cv">${m.toFixed(1)}</span></div>`;
+  }).join('')||'<div style="color:var(--td);font-size:12px;">Avalie vídeos para ver evolução</div>';
+
+  const rrow=(x,i,t)=>`<div class="ri ${t&&i===0?'t1':''}"><span class="rp">${t?i+1:'⚠'}</span><span class="rn">${x.nm}</span><span class="rv" style="color:${t?'var(--acc)':'#ff9800'}">${x.m.toFixed(1)}</span></div>`;
+  const top=rank.slice(0,3).map((x,i)=>rrow(x,i,true)).join('');
+  const bot=rank.length>1?rank.slice(-Math.min(3,rank.length-1)).reverse().map((x,i)=>rrow(x,i,false)).join(''):'';
+
+  document.getElementById('wrap').innerHTML=`
+    <div style="margin-top:4px;">
+      ${bioWidget(player)}
+      <div class="dgrid">
+        <div class="dc"><div class="dct">// média por dimensão</div>${bars}</div>
+        <div class="dc"><div class="dct">// evolução semanal</div>${cbars}</div>
+      </div>
+      <div class="dgrid">
+        <div class="dc"><div class="dct">// melhores exercícios</div>${top||'<div style="color:var(--td);font-size:12px;">Avalie vídeos para ver ranking</div>'}</div>
+        <div class="dc"><div class="dct">// atenção</div>${bot||'<div style="color:var(--td);font-size:12px;">Avalie mais para ver</div>'}</div>
+      </div>
+      <div class="dc" style="margin-bottom:20px;">
+        <div class="dct">// decisões do pai</div>
+        <div class="srow">
+          <div class="si"><div class="sn" style="color:#4CAF50;">${ev}</div><div class="sl">Evoluiu</div></div>
+          <div class="si"><div class="sn" style="color:#ff9800;">${re}</div><div class="sl">Repetir</div></div>
+          <div class="si"><div class="sn" style="color:#ce93d8;">${sb}</div><div class="sl">Sobe nível</div></div>
+          <div class="si"><div class="sn" style="color:var(--acc);">${todas.length}</div><div class="sl">Total</div></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── MODAL
+function abrir(exId,idx){
+  const hs=hist(exId);
+  const e=hs[idx];
+  if(!e) return;
+  mctx={exId,idx,_id:e._id};
+  document.getElementById('mt').textContent=e.nome;
+  document.getElementById('ov').classList.add('show');
+  const dims=[{k:'p',l:'Postura'},{k:'s',l:'Scanning'},{k:'ps',l:'Psicológico'}];
+  const ng=dims.map(({k,l})=>`
+    <div class="ni">
+      <div class="nd">${l}</div>
+      <div class="nstars" id="st-${k}">
+        ${[1,2,3,4,5].map(n=>`<span class="star ${e.ia[k]!==null&&n<=e.ia[k]?'on':''}" onclick="sn('${k}',${n})" data-n="${n}">★</span>`).join('')}
+      </div>
+      <div class="nval" id="nv-${k}">${e.ia[k]!==null?e.ia[k]+'/5':'—'}</div>
+    </div>`).join('');
+  const vid=e.ytId
+    ?`<div class="yt-wrap"><iframe src="https://www.youtube.com/embed/${e.ytId}" allowfullscreen></iframe></div>`
+    :`<div class="novid">📹 vídeo não disponível</div>`;
+
+  const iaBlock=e.analisePai
+    ?`<div style="background:rgba(59,158,255,0.06);border:1px solid rgba(59,158,255,0.2);border-radius:6px;padding:12px 14px;margin-bottom:12px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#3b9eff;margin-bottom:8px;">// análise da IA</div>
+        <div style="font-size:13px;color:var(--tp);line-height:1.6;margin-bottom:10px;">${e.analisePai}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${e.pontoForte?`<div style="background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);border-radius:3px;padding:4px 9px;font-size:11px;color:#4CAF50;">✓ ${e.pontoForte}</div>`:''}
+          ${e.pontoMelhora?`<div style="background:rgba(255,152,0,0.1);border:1px solid rgba(255,152,0,0.3);border-radius:3px;padding:4px 9px;font-size:11px;color:#ff9800;">↑ ${e.pontoMelhora}</div>`:''}
+        </div>
+      </div>`
+    :`<div style="padding:10px;background:rgba(255,255,255,0.02);border:1px dashed var(--b);border-radius:4px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);text-align:center;">🤖 análise IA não disponível para este vídeo</div>`;
+
+  document.getElementById('mb').innerHTML=`
+    ${vid}
+    ${iaBlock}
+    <div class="mmeta">
+      <div class="mmi"><div class="mml">Semana</div><div class="mmv">${e.semana}</div></div>
+      <div class="mmi"><div class="mml">Data</div><div class="mmv">${fdt(e.data)}</div></div>
+      <div class="mmi"><div class="mml">Atleta</div><div class="mmv" style="text-transform:capitalize">${e.atleta}</div></div>
+      <div class="mmi"><div class="mml">Dia</div><div class="mmv">${diaDe(exId)}</div></div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin-bottom:7px;">// notas ${e.analisePai?'(IA — ajuste se necessário)':'(avalie manualmente)'}</div>
+    <div class="ngrid">${ng}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin-bottom:7px;">// decisão do pai</div>
+    <div class="abtns">
+      <button class="abtn ev ${e.av==='evoluiu'?'on':''}" onclick="sa('evoluiu')">👍 Evoluiu</button>
+      <button class="abtn re ${e.av==='repetir'?'on':''}" onclick="sa('repetir')">🔁 Repetir</button>
+      <button class="abtn sb ${e.av==='sobe'?'on':''}"    onclick="sa('sobe')">⬆ Sobe nível</button>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin-bottom:7px;">// anotação (opcional)</div>
+    <textarea class="ntxt" id="ntxt" placeholder="Observação...">${e.notaPai||''}</textarea>
+    <button class="sbtn" onclick="salvar()">Salvar avaliação</button>`;
+}
+function sn(k,v){
+  if(!mctx) return;
+  const e=dados.find(d=>d._id===mctx._id);
+  if(e) e.ia[k]=v;
+  document.querySelectorAll(`#st-${k} .star`).forEach(s=>s.classList.toggle('on',parseInt(s.dataset.n)<=v));
+  document.getElementById('nv-'+k).textContent=v+'/5';
+}
+function sa(av){
+  if(!mctx) return;
+  const e=dados.find(d=>d._id===mctx._id);
+  if(e) e.av=av;
+  document.querySelectorAll('.abtn').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.abtn.'+av.slice(0,2))?.classList.add('on');
+}
+async function salvar(){
+  if(!mctx) return;
+  const e=dados.find(d=>d._id===mctx._id);
+  if(!e) return;
+  e.notaPai=document.getElementById('ntxt')?.value||'';
+  // Preserva campos da IA ao salvar avaliação do pai
+  const fb=JSON.stringify({
+    av:e.av, nota_pai:e.notaPai,
+    ia_postura:e.ia.p, ia_scanning:e.ia.s, ia_psicologico:e.ia.ps,
+    resumo_crianca:e.resumoCrianca||null,
+    analise_pai:e.analisePai||null,
+    ponto_forte:e.pontoForte||null,
+    ponto_melhora:e.pontoMelhora||null
+  });
+  await fetch(SB_URL+'/rest/v1/avaliacoes?id=eq.'+mctx._id,{
+    method:'PATCH',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({feedback:fb,avaliado_em:new Date().toISOString()})
+  });
+  fm();
+  renderView();
+}
+function fm(){document.getElementById('ov').classList.remove('show');mctx=null;}
+function fmse(ev){if(ev.target===document.getElementById('ov'))fm();}
+
+// ── HELPERS
+function media(ia){
+  if(!ia) return null;
+  const v=[ia.p,ia.s,ia.ps].filter(x=>x!==null);
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+}
+function fdt(iso){
+  if(!iso) return '—';
+  return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+}
+function diaDe(id){
+  const g=IL[player].find(g=>g.ids.includes(id));
+  return g?DIAS[g.d]:'—';
+}
+
+// ══════════════════════════════════════════════════
+// MOTOR DE DIAGNÓSTICO SEMANAL — FASE 1
+// ══════════════════════════════════════════════════
+
+let motorState = {
+  apiKey: localStorage.getItem('pae_api_key') || localStorage.getItem('motor_api_key') || '',
+  ultimoResultado: null,
+  rodando: false
+};
+
+const PERFIL_ATLETA = {
+  lucas: {
+    nome: 'Lucas',
+    numero: '30',
+    posicao: 'Meio / Ponta Esquerda',
+    idade: 13,
+    modalidade: 'Fut7 e Futsal',
+    psicologico: {
+      perfil: 'Autoconfiança condicional — age com coragem só quando sente que o contexto está autorizado',
+      mecanismo: 'Reduz participação após falha (autopreservação, não preguiça)',
+      flow: 'Quando solto e confiante, linguagem corporal muda completamente',
+      regra: 'NUNCA punir tentativas corajosas, mesmo com erro'
+    },
+    gaps: {
+      'Movimentação sem bola':   { nota: 3.0, status: 'urgente',   desc: 'Move-se DEPOIS da bola sair — delay 1-2s fecha janelas de passe' },
+      'Uso do corpo em duelos':  { nota: 2.8, status: 'urgente',   desc: 'Nunca foi ensinado a usar o corpo em duelos' },
+      'Transição defensiva':     { nota: 2.5, status: 'urgente',   desc: 'Lenta (2-4s) — precisa chegar a <1.5s' },
+      'Posicionamento ofensivo': { nota: 3.8, status: 'planejado', desc: 'Reativo, baixa frequência de desmarque proativo' },
+      'Timing de passe':         { nota: 4.2, status: 'planejado', desc: 'Funcional, sem consistência' },
+      'Visão de jogo':           { nota: 4.5, status: 'planejado', desc: 'Bola-dependente, precisa ser periférica' },
+      'Controle de bola':        { nota: 5.8, status: 'completo',  desc: 'Adequado em baixa velocidade' },
+      'Explosão / aceleração':   { nota: 6.5, status: 'completo',  desc: 'Ponto forte, base para explorar' }
+    },
+    biblioteca: {
+      S1:[
+        {id:'s1',nome:'Step A-Skip',det:'3×20m'},
+        {id:'s2',nome:'High Knees',det:'3×20m'},
+        {id:'s3',nome:'Speed Skaters',det:'3×10'},
+        {id:'s4',nome:'In-Soul Rolls',det:'5min'},
+        {id:'s5',nome:'Laces-Sole',det:'5min'},
+        {id:'s6',nome:'Scanning — Rondo 4x1',det:'10min · scanning obrigatório'}
+      ],
+      S2:[
+        {id:'q1',nome:'Low Wall Sprint',det:'4×5'},
+        {id:'q2',nome:'Split Stance Jumps',det:'3×8'},
+        {id:'q3',nome:'L Drags',det:'4×10m'},
+        {id:'q4',nome:'V Cut Outside',det:'4×6'},
+        {id:'q5',nome:'Croquettes in Motion',det:'4×15m'},
+        {id:'q6',nome:'Reação ao sinal',det:'3×8'}
+      ],
+      S3:[
+        {id:'t1',nome:'Croquettes in Place',det:'5min'},
+        {id:'t2',nome:'La Croqueta in Place',det:'5min'},
+        {id:'t3',nome:'Quick Passing (parede)',det:'10min'},
+        {id:'t4',nome:'One Touch Passing (parede)',det:'10min'},
+        {id:'t5',nome:'First Touch Variations (parede)',det:'10min'},
+        {id:'t6',nome:'Passa e vai — desmarcação',det:'10min · FOCO: movimento proativo'}
+      ],
+      S4:[
+        {id:'d1',nome:'Condução leve',det:'livre'},
+        {id:'d2',nome:'Passes leves (parede)',det:'livre'},
+        {id:'d3',nome:'Alongamento',det:'5min'}
+      ]
+    }
+  },
+  miguel: {
+    nome: 'Miguel',
+    posicao: 'Goleiro',
+    idade: 12,
+    modalidade: 'Fut7 e Futsal',
+    psicologico: {
+      perfil: 'Corajoso nas saídas — age com decisão mesmo sob pressão. Silencioso em campo, não organiza a defesa verbalmente.',
+      mecanismo: 'Coragem nas saídas é ponto forte — nunca punir tentativas corajosas, mesmo com erro. Silêncio não é timidez, é foco — precisa de gatilhos para verbalizar.',
+      flow: 'Quando decide sair, sai com convicção. Esse instinto precisa ser preservado e canalizado.',
+      regra: 'REGRA ABSOLUTA: nunca punir saída corajosa com erro. Reforçar a decisão, corrigir a execução.'
+    },
+    gaps: {
+      'Distribuição com os pés': { nota: null, status: 'urgente',  desc: 'Evoluindo mas ainda fraco — gap prioritário. Nota a confirmar com Veo.' },
+      'Comunicação':             { nota: null, status: 'urgente',  desc: 'Silencioso durante o jogo — não organiza a defesa. Observação direta do pai.' },
+      'Reflexo / instinto':      { nota: null, status: 'urgente',  desc: 'Instinto precisa ser desenvolvido — reações tardias a lançamentos e cruzamentos.' },
+      'Posicionamento na área':  { nota: null, status: 'planejado', desc: 'A confirmar com Veo. Saídas aparentemente corretas — aguarda dados.' },
+      'Saídas do gol':           { nota: null, status: 'planejado', desc: 'Corajoso nas saídas (ponto forte). Qualidade a avaliar com Veo.' }
+    },
+    biblioteca: {
+      S1:[
+        {id:'mg_s1a',nome:'Laces-Sole alternado',det:'5min · dominância do pé'},
+        {id:'mg_s1b',nome:'Passe curto c/ os pés (parede)',det:'3×3min · interior + peito'},
+        {id:'mg_s1c',nome:'Passe longo c/ os pés (parede)',det:'3×5 · foco na trajetória'},
+        {id:'mg_s1d',nome:'Grito de organização (simulado)',det:'4×5 · "sai meu!" + "minha!"'},
+        {id:'mg_s1e',nome:'Defesa baixa + levantada',det:'3×8 · mãos corretas, cotovelo'}
+      ],
+      S2:[
+        {id:'mg_s2a',nome:'Saída do gol — bola no chão',det:'4×5 · decisão: fica ou sai'},
+        {id:'mg_s2b',nome:'Saída do gol — bola no ar',det:'4×5 · timing + grito "minha!"'},
+        {id:'mg_s2c',nome:'Reposição c/ os pés (alvo)',det:'3×6 · alvo a 15m, precisão'},
+        {id:'mg_s2d',nome:'Shuffle lateral + defesa',det:'3×10 · pés paralelos, não cruzar'},
+        {id:'mg_s2e',nome:'Comunicação ativa (simulado)',det:'3×5min · narrar o jogo em voz alta'}
+      ],
+      S3:[
+        {id:'mg_s3a',nome:'Reflexo — defesa por reação',det:'4×8 · chute surpresa, s/ aviso'},
+        {id:'mg_s3b',nome:'Defesa + levantada rápida',det:'3×8 · 2ª bola imediata'},
+        {id:'mg_s3c',nome:'Passe longo preciso (alvo)',det:'3×8 · alvo a 20m, peito do pé'},
+        {id:'mg_s3d',nome:'1×1 saída + comunicação',det:'4×5 · verbalizar ANTES de sair'},
+        {id:'mg_s3e',nome:'Posicionamento no cruzamento',det:'3×6 · ponto alto da área, linha'}
+      ],
+      S4:[
+        {id:'mg_s4a',nome:'Passe leve (parede)',det:'livre · sem pressão'},
+        {id:'mg_s4b',nome:'Defesas suaves (sem impacto)',det:'livre · mobilidade articular'},
+        {id:'mg_s4c',nome:'Alongamento completo',det:'5min · ombros + quadril + tornozelo'}
+      ]
+    }
+  }
+};
+
+// ── Exercícios de Fusão — Lucas + Miguel juntos
+const FUSAO = {
+  descricao: 'Sessões que Lucas e Miguel fazem juntos. Goleiro treina distribuição e comunicação; Lucas treina recepção sob pressão e finalização.',
+  sessoes: [
+    {
+      id: 'f1',
+      nome: 'Passes Longos — Goleiro Distribui',
+      foco: 'Distribuição com os pés (Miguel) + Primeiro toque (Lucas)',
+      det: '3×8 passes · distância crescente: 10m → 15m → 20m',
+      instrucoes: [
+        'Miguel distribui com os pés para Lucas em movimento.',
+        'Lucas controla e devolve no chão. Miguel alterna pé direito e esquerdo.',
+        'Miguel GRITA o nome antes de passar — treina comunicação ativa.',
+        'Lucas faz desmarcação antes de receber — scanning obrigatório.'
+      ],
+      gap_miguel: 'Distribuição com os pés',
+      gap_lucas: 'Movimentação sem bola'
+    },
+    {
+      id: 'f2',
+      nome: '1×1 Finalização — Goleiro no Gol',
+      foco: 'Reflexo e posicionamento (Miguel) + Explosão e finalização (Lucas)',
+      det: '4×5 finalizações · variações: chão, meia altura, alta',
+      instrucoes: [
+        'Lucas parte do meio-campo, conduz e finaliza.',
+        'Miguel defende em posição — atenção ao posicionamento antes do chute.',
+        'Após cada defesa: Miguel distribui imediatamente com os pés para Lucas.',
+        'Lucas não pode finalizar sem antes fazer 1 mudança de direção.'
+      ],
+      gap_miguel: 'Reflexo / instinto',
+      gap_lucas: 'Explosão / aceleração'
+    },
+    {
+      id: 'f3',
+      nome: 'Rondo 3×1 — Miguel Organiza',
+      foco: 'Comunicação (Miguel) + Visão de jogo (Lucas)',
+      det: '3 séries × 3min · Miguel fora do rondo, organizando',
+      instrucoes: [
+        'Lucas + 1 adulto fazem o rondo. O marcador tenta roubar.',
+        'Miguel fica FORA do rondo e narra em voz alta: "vira!", "passa!", "cuidado!".',
+        'Treina Miguel a ler o jogo e verbalizar sem estar sob pressão da bola.',
+        'Troca: Lucas entra como marcador, Miguel entra no rondo.'
+      ],
+      gap_miguel: 'Comunicação',
+      gap_lucas: 'Visão de jogo'
+    },
+    {
+      id: 'f4',
+      nome: 'Saída + Transição Rápida',
+      foco: 'Saída do gol (Miguel) + Transição defensiva (Lucas)',
+      det: '4×6 repetições · reset de 30s entre cada',
+      instrucoes: [
+        'Adulto cruza a bola na área. Miguel sai e intercepta — GRITA "minha!" antes.',
+        'Após pegar, distribui imediatamente para Lucas que arranca em sprint.',
+        'Lucas deve estar se movimentando ANTES da bola sair da mão de Miguel.',
+        'Mede o tempo de saída de Miguel + tempo de sprint de Lucas.'
+      ],
+      gap_miguel: 'Saídas do gol',
+      gap_lucas: 'Movimentação sem bola'
+    }
+  ]
+};
+
+// Adiciona NM para exercícios de fusão
+Object.assign(NM, {
+  f1:'Passes Longos — Goleiro Distribui',
+  f2:'1×1 Finalização — Goleiro no Gol',
+  f3:'Rondo 3×1 — Miguel Organiza',
+  f4:'Saída + Transição Rápida'
+});
+
+function rMotor() {
+  const p = PERFIL_ATLETA[player];
+  const cor = player === 'lucas' ? 'var(--lucas)' : 'var(--miguel)';
+
+  const gapsHTML = Object.entries(p.gaps).map(([nome, g]) => {
+    const notaAtual = g.nota !== null && g.nota !== undefined ? g.nota : '';
+    const badgeCls = g.status === 'urgente' ? 'urgente' : g.status === 'planejado' ? 'planejado' : '';
+    const badgeHTML = badgeCls ? `<span class="motor-gap-badge ${badgeCls}">${g.status}</span>` : '';
+    return `
+      <div class="motor-gap-item">
+        <div class="motor-gap-name">${nome}${badgeHTML}</div>
+        <div class="motor-gap-val">
+          <input class="motor-gap-input" type="number" min="0" max="10" step="0.1"
+            id="gap_${nome.replace(/[\s\/]+/g,'_')}"
+            value="${notaAtual}" placeholder="—">
+          <span class="motor-gap-max">/10</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  const resultadoHTML = motorState.ultimoResultado && motorState.ultimoResultado.atleta === player
+    ? renderResultado(motorState.ultimoResultado) : '';
+
+  document.getElementById('wrap').innerHTML = `
+    <div class="motor-wrap">
+      <div class="motor-input-card">
+        <div class="motor-section-title">// estado da semana — ${p.nome}</div>
+        <div class="motor-grid">
+          <div class="motor-field">
+            <label class="motor-label">Fase PHV</label>
+            <select class="motor-select" id="m_phv">
+              <option value="desconhecido">Não medido ainda</option>
+              <option value="pre">Pré-PHV</option>
+              <option value="circa">Circa-PHV ⚠</option>
+              <option value="pos">Pós-PHV</option>
+            </select>
+          </div>
+          <div class="motor-field">
+            <label class="motor-label">Sono médio (horas) <span id="sono-fonte-badge" style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;padding:1px 5px;border-radius:2px;margin-left:4px;vertical-align:middle;"></span></label>
+            <input class="motor-input" type="number" id="m_sono" min="4" max="12" step="0.5" placeholder="ex: 8.0">
+            <div id="sono-fonte-hint" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:3px;display:none;"></div>
+          </div>
+          <div class="motor-field">
+            <label class="motor-label">RPE semana anterior</label>
+            <select class="motor-select" id="m_rpe">
+              <option value="">Primeira semana</option>
+              <option value="leve">1-3 — Leve</option>
+              <option value="moderado">4-6 — Moderado</option>
+              <option value="alto">7-8 — Alto</option>
+              <option value="maximo">9-10 — Máximo</option>
+            </select>
+          </div>
+          <div class="motor-field">
+            <label class="motor-label">Semanas de treino (total)</label>
+            <input class="motor-input" type="number" id="m_semanas" min="1" max="24" placeholder="ex: 1" value="1">
+          </div>
+          <div class="motor-field">
+            <label class="motor-label">Sessões disponíveis</label>
+            <select class="motor-select" id="m_sessoes">
+              <option value="4">4 sessões — Semana completa</option>
+              <option value="3">3 sessões — Semana cheia</option>
+              <option value="2">2 sessões — Semana apertada</option>
+            </select>
+          </div>
+          <div class="motor-field">
+            <label class="motor-label">Estado mental do atleta</label>
+            <select class="motor-select" id="m_mental">
+              <option value="normal">Normal / Motivado</option>
+              <option value="alto">Alto / Animado</option>
+              <option value="baixo">Baixo / Cansado</option>
+              <option value="pos_erro">Pós-erro / Retraído</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="motor-section-title" style="margin-top:14px;">// notas atuais dos gaps — ajuste se necessário</div>
+        <div class="motor-gap-grid">${gapsHTML}</div>
+
+        <div class="motor-section-title" style="margin-top:14px;">// claude api key</div>
+        <div class="motor-api-row">
+          <div class="motor-field">
+            <label class="motor-label">Chave da API (salva localmente)</label>
+            <input class="motor-input" type="password" id="m_apikey"
+              placeholder="sk-ant-api03-..."
+              value="${motorState.apiKey}">
+          </div>
+          <button class="motor-api-toggle" onclick="salvarApiKey()">Salvar</button>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:4px;">
+          A chave fica no localStorage do seu navegador. Nunca sai do seu dispositivo.
+        </div>
+      </div>
+
+      <button class="motor-run-btn" id="motorBtn" onclick="rodarMotor()">
+        ⚡ Gerar Diagnóstico da Semana
+      </button>
+
+      <div id="motorResultado">${resultadoHTML}</div>
+
+      <div class="motor-input-card" style="margin-top:12px;border-color:rgba(0,232,122,0.2);">
+        <div class="motor-section-title" style="color:var(--miguel);">// sessões de fusão — lucas + miguel juntos</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-bottom:12px;line-height:1.5;">
+          ${FUSAO.descricao}
+        </div>
+        ${FUSAO.sessoes.map(s => `
+        <div style="background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:12px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--tp);">${s.nome}</span>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ts);margin-bottom:6px;">${s.det}</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;padding:2px 7px;border-radius:2px;background:var(--ldim);color:var(--lucas);border:1px solid var(--lb);">LUCAS: ${s.gap_lucas}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:7px;padding:2px 7px;border-radius:2px;background:var(--mdim);color:var(--miguel);border:1px solid var(--mb);">MIGUEL: ${s.gap_miguel}</span>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);line-height:1.6;">
+            ${s.instrucoes.map((inst,i) => `<div>${i+1}. ${inst}</div>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+  // ── AUTO-PREENCHE SONO a partir do saude.html (biometria_v2) ──────────────
+  const sonoData = lerSonoDoSaude(p.nome);
+  const sonoInput  = document.getElementById('m_sono');
+  const sonoBadge  = document.getElementById('sono-fonte-badge');
+  const sonoHint   = document.getElementById('sono-fonte-hint');
+
+  if (sonoData && sonoInput) {
+    sonoInput.value = sonoData.media;
+    const cores = { ok:'rgba(0,232,122,0.15)', warn:'rgba(255,152,0,0.15)', baixo:'rgba(244,67,54,0.15)' };
+    const textCores = { ok:'#00e87a', warn:'#ff9800', baixo:'#f44336' };
+    if (sonoBadge) {
+      sonoBadge.textContent = '↓ saude.html';
+      sonoBadge.style.cssText = `background:${cores[sonoData.status]};color:${textCores[sonoData.status]};`;
+    }
+    if (sonoHint) {
+      sonoHint.style.display = 'block';
+      sonoHint.style.color = textCores[sonoData.status];
+      sonoHint.textContent = sonoData.label + ' · edite se necessário';
+    }
+  } else if (sonoBadge) {
+    sonoBadge.textContent = 'sem dados';
+    sonoBadge.style.cssText = 'background:rgba(58,82,104,0.3);color:var(--td);';
+    if (sonoHint) {
+      sonoHint.style.display = 'block';
+      sonoHint.textContent = 'registre sono no saude.html para auto-preencher';
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+}
+
+function salvarApiKey() {
+  const key = document.getElementById('m_apikey')?.value?.trim();
+  if (!key) return;
+  motorState.apiKey = key;
+  localStorage.setItem('pae_api_key', key);
+  localStorage.removeItem('motor_api_key'); // migrar chave antiga
+  const btn = document.querySelector('.motor-api-toggle');
+  if (btn) { btn.textContent = '✓ Salvo'; setTimeout(()=>{btn.textContent='Salvar';},1500); }
+}
+
+async function rodarMotor() {
+  if (motorState.rodando) return;
+  const apiKey = document.getElementById('m_apikey')?.value?.trim() || motorState.apiKey;
+  if (!apiKey || !apiKey.startsWith('sk-ant')) {
+    document.getElementById('motorResultado').innerHTML =
+      `<div class="motor-error">⚠ Insira uma Claude API key válida (começa com sk-ant-api03-...) antes de gerar o diagnóstico.</div>`;
+    return;
+  }
+  motorState.apiKey = apiKey;
+  localStorage.setItem('pae_api_key', apiKey);
+  localStorage.removeItem('motor_api_key'); // migrar chave antiga
+
+  const phv     = document.getElementById('m_phv')?.value || 'desconhecido';
+  const sono    = parseFloat(document.getElementById('m_sono')?.value) || null;
+  const rpe     = document.getElementById('m_rpe')?.value || '';
+  const semanas = parseInt(document.getElementById('m_semanas')?.value) || 1;
+  const sessoes = parseInt(document.getElementById('m_sessoes')?.value) || 4;
+  const mental  = document.getElementById('m_mental')?.value || 'normal';
+
+  // ── FASE 7: Ler exames clínicos do biometria_v2 ─────────────────────────
+  // Suporta dois formatos:
+  //   LEGACY  (saude.html manual): { ferritina: 25.3, vitaminaD: 39, tsh: 3.61, date: '...' }
+  //   AGENTE  (agente_exames.html): array de { id, date, name, value, unit, source }
+  const EXAM_NAME_MAP_F7 = {
+    'Ferritina': 'ferritina', 'ferritina': 'ferritina',
+    'Vitamina D': 'vitaminaD', 'vitamina d': 'vitaminaD', 'vitaminaD': 'vitaminaD',
+    'Ferro': 'ferro', 'ferro': 'ferro', 'Ferro Sérico': 'ferro',
+    'Hemoglobina': 'hemoglobina', 'hemoglobina': 'hemoglobina',
+    'TSH': 'tsh', 'tsh': 'tsh',
+    'Magnésio': 'magnesio', 'magnesio': 'magnesio',
+    'Zinco': 'zinco', 'zinco': 'zinco',
+    'Vitamina B12': 'vitaminaB12', 'vitamina b12': 'vitaminaB12',
+    'Vitamina B6': 'vitaminaB6', 'vitamina b6': 'vitaminaB6',
+    'CPK': 'cpk', 'cpk': 'cpk',
+    'PCR': 'pcr', 'pcr': 'pcr',
+    'Testosterona': 'testosterona', 'testosterona': 'testosterona',
+    'Cálcio': 'calcio', 'calcio': 'calcio',
+    'IGF-1': 'igf1', 'igf1': 'igf1',
+  };
+  function lerExamesClinicosF7(atletaNome) {
+    try {
+      const raw = localStorage.getItem('biometria_v2');
+      if (!raw) return null;
+      const store = JSON.parse(raw);
+      const a = store.athletes?.find(x => x.name.toLowerCase() === atletaNome.toLowerCase());
+      if (!a || !a.exames || !a.exames.length) return null;
+      const sorted = [...a.exames].sort((x,y) => new Date(y.date) - new Date(x.date));
+      const newest = sorted[0];
+      // Detectar formato: AGENTE tem {name, value}, LEGACY tem chaves diretas como ferritina
+      if (newest.name !== undefined && newest.value !== undefined) {
+        // Formato AGENTE — consolidar todos os exames mais recentes por nome em objeto flat
+        const flat = { date: newest.date };
+        const seen = {};
+        for (const ex of sorted) {
+          const key = EXAM_NAME_MAP_F7[ex.name] || EXAM_NAME_MAP_F7[ex.name?.toLowerCase()];
+          if (key && !seen[key]) { flat[key] = ex.value; seen[key] = true; }
+          if (!flat.date || new Date(ex.date) > new Date(flat.date)) flat.date = ex.date;
+        }
+        return flat;
+      }
+      // Formato LEGACY — retorna direto
+      return newest;
+    } catch(e) { return null; }
+  }
+
+  // ── FASE 7: PHV automático do biometria_v2 ──────────────────────────────
+  function lerPHVAutomaticoF7(atletaNome) {
+    try {
+      const raw = localStorage.getItem('biometria_v2');
+      if (!raw) return null;
+      const store = JSON.parse(raw);
+      const a = store.athletes?.find(x => x.name.toLowerCase() === atletaNome.toLowerCase());
+      if (!a || !a.records || !a.records.length) return null;
+      const ultimo = [...a.records].sort((x,y) => new Date(y.date) - new Date(x.date))[0];
+      if (!ultimo || !ultimo.height || !ultimo.weight || !a.dob) return null;
+      const age = (new Date() - new Date(a.dob)) / (365.25*24*3600*1000);
+      const offset = parseFloat((-9.236+(0.0002708*(ultimo.height*ultimo.weight))+(-0.001663*(age*ultimo.height))+(0.007216*(age*ultimo.weight))+(0.02292*(ultimo.weight/ultimo.height*100))).toFixed(2));
+      const fase = offset < -1 ? 'pre' : offset <= 1 ? 'circa' : 'pos';
+      return { offset, fase, altura: ultimo.height, peso: ultimo.weight, data: ultimo.date };
+    } catch(e) { return null; }
+  }
+
+  const p = PERFIL_ATLETA[player];
+  const examesClinicos = lerExamesClinicosF7(p.nome);
+  const phvAuto = lerPHVAutomaticoF7(p.nome);
+
+  // Auto-detectar PHV se não foi selecionado manualmente
+  const phvFinal = (phv === 'desconhecido' && phvAuto) ? phvAuto.fase : phv;
+
+  // ── FASE 7: Construir bloco clínico para o prompt ───────────────────────
+  let blocoClinico = '';
+  const alertasF7 = []; // alertas visuais gerados localmente (sem IA)
+
+  // Sono → carga (regra ativa)
+  const sonoStatus = !sono ? 'sem_dados'
+    : sono < 7 ? 'insuficiente'
+    : sono < 8 ? 'adequado'
+    : 'otimo';
+  const sonoReducao = sono && sono < 7;
+
+  if (sonoReducao) {
+    alertasF7.push({ tipo: 'warn', texto: `🌙 Sono insuficiente (${sono}h) — carga reduzida automaticamente. Objetivo: ≥8h para atletas em desenvolvimento.` });
+  }
+
+  // Exames → alertas
+  let ferritinaAlerta = null, vitDAlerta = null;
+  if (examesClinicos) {
+    const ferritina = examesClinicos.ferritina ? parseFloat(examesClinicos.ferritina) : null;
+    const vitD = examesClinicos.vitaminaD ? parseFloat(examesClinicos.vitaminaD) : null;
+    if (ferritina !== null && ferritina < 30) {
+      ferritinaAlerta = ferritina;
+      alertasF7.push({ tipo: 'warn', texto: `🩸 Ferritina baixa (${ferritina} ng/mL — mín. recomendado: 30). Motor adiciona sessão de recuperação ativa. Consultar pediatra.` });
+    }
+    if (vitD !== null && vitD < 30) {
+      vitDAlerta = vitD;
+      alertasF7.push({ tipo: 'warn', texto: `☀️ Vitamina D baixa (${vitD} ng/mL — mín. recomendado: 30 ng/mL). Sugestão: suplementação e exposição solar. Consultar médico.` });
+    }
+    blocoClinico = `\n## EXAMES CLÍNICOS (última coleta: ${examesClinicos.date || 'sem data'})
+- Ferritina: ${ferritina !== null ? ferritina + ' ng/mL' + (ferritina < 30 ? ' ⚠ BAIXA' : ' ✓') : 'não informado'}
+- Vitamina D: ${vitD !== null ? vitD + ' ng/mL' + (vitD < 30 ? ' ⚠ BAIXA' : ' ✓') : 'não informado'}`;
+  }
+
+  // Bio-banding: bloco de maturação para o prompt
+  let biobandingBloco = '';
+  if (phvAuto) {
+    const faseLabel = phvAuto.fase === 'pre' ? 'Pré-PHV' : phvAuto.fase === 'circa' ? 'Circa-PHV ⚠ pico de crescimento' : 'Pós-PHV';
+    biobandingBloco = `\n## BIO-BANDING — MATURAÇÃO BIOLÓGICA
+- Fase PHV calculada: ${faseLabel} (offset: ${phvAuto.offset > 0 ? '+' : ''}${phvAuto.offset} anos)
+- Altura atual: ${phvAuto.altura} cm | Peso: ${phvAuto.peso} kg
+- Data da medição: ${phvAuto.data || 'não registrada'}`;
+    if (phvAuto.fase === 'circa') {
+      biobandingBloco += `\n- ⚠ PROTOCOLO DE LESÃO PHV ATIVO: risco 31-49% maior de lesão. Reduzir exercícios de alto impacto, priorizar mobilidade e recuperação.`;
+      alertasF7.push({ tipo: 'warn', texto: `🦴 Circa-PHV detectado automaticamente — protocolo de lesão ativo. Reduzir impacto, priorizar recuperação e mobilidade.` });
+    }
+  }
+
+  // ── Enriquecer mental com dados do Módulo Mental (Fase 6)
+  let mentalBloco = `Estado mental (select): ${mental}`;
+  try {
+    const semanal = JSON.parse(localStorage.getItem('mental_semanal') || '[]');
+    const semAtleta = semanal.filter(e => e.atleta === player && e.score != null);
+    if (semAtleta.length > 0) {
+      const ultima = semAtleta[semAtleta.length - 1];
+      const penultima = semAtleta.length > 1 ? semAtleta[semAtleta.length - 2] : null;
+      const dims = ultima.dimensoes || {};
+      const dimStr = Object.entries({
+        'Concentração': dims.concentracao,
+        'Coragem': dims.coragem,
+        'Recup.Erro': dims.recuperacao,
+        'Comunicação': dims.comunicacao,
+        'Energia': dims.energia
+      }).filter(([,v]) => v != null)
+        .map(([k,v]) => `${k}: ${v.toFixed(1)}/10`)
+        .join(' · ');
+
+      const tendencia = penultima
+        ? (ultima.score - penultima.score > 0 ? '▲ subindo' : ultima.score - penultima.score < 0 ? '▼ caindo' : '━ estável')
+        : 'primeira semana';
+
+      // Detectar 2 semanas consecutivas abaixo de 5
+      const baixas = semAtleta.slice(-2).filter(e => e.score < 5);
+      const alertaBaixo = baixas.length >= 2
+        ? '\n  ⚠ ALERTA: score mental abaixo de 5 por 2 semanas consecutivas — sugerir conversa pai-atleta no diagnóstico'
+        : '';
+
+      mentalBloco = `Estado mental (módulo Mental):
+  Score: ${ultima.score.toFixed(1)}/10 | Tendência: ${tendencia} | Semana: ${ultima.semana} | Fonte: ${ultima.fonte === 'pai' ? 'Olhar do Pai' : 'Olhar do Atleta'}
+  Dimensões: ${dimStr || 'não detalhadas'}${alertaBaixo}`;
+
+      // Sincronizar select com score
+      const el = document.getElementById('m_mental');
+      if (el) {
+        if (ultima.score >= 7.5) el.value = 'alto';
+        else if (ultima.score >= 5) el.value = 'normal';
+        else el.value = 'pos_erro';
+      }
+    }
+  } catch(e) { /* sem dados do módulo mental — usar select */ }
+
+  const gapsAtuais = {};
+  Object.keys(p.gaps).forEach(nome => {
+    const el = document.getElementById('gap_' + nome.replace(/[\s\/]+/g,'_'));
+    const val = el ? parseFloat(el.value) : null;
+    if (val !== null && !isNaN(val)) gapsAtuais[nome] = val;
+    else if (p.gaps[nome].nota !== null && p.gaps[nome].nota !== undefined) gapsAtuais[nome] = p.gaps[nome].nota;
+  });
+
+  const faseProj = semanas <= 8 ? 1 : semanas <= 16 ? 2 : 3;
+  const faseDesc = {
+    1: 'Fase 1 (sem. 1-8) — Fundação: scanning obrigatório, centro de gravidade, corrida',
+    2: 'Fase 2 (sem. 9-16) — Posicionamento e timing: movimentação proativa, terceiro homem',
+    3: 'Fase 3 (sem. 17-24) — Autonomia decisória: 2x1, 3x2 sob pressão, liderança'
+  };
+
+  const sessoesAtivas = sessoes >= 4 ? ['S1','S2','S3','S4']
+    : sessoes === 3 ? ['S1','S3','S4'] : ['S1','S4'];
+
+  const exDisponiveis = {};
+  sessoesAtivas.forEach(s => {
+    exDisponiveis[s] = p.biblioteca[s].map(e => `${e.nome} (${e.det})`).join(' | ');
+  });
+
+  const prompt = `Você é o motor de diagnóstico semanal do Projeto Atleta Elite. Analise o estado do atleta e gere o plano da semana.
+
+## ATLETA
+- Nome: ${p.nome} | ${p.posicao} | ${p.idade} anos | ${p.modalidade}
+- Semana ${semanas} de 24 | ${faseDesc[faseProj]}
+
+## PERFIL PSICOLÓGICO
+${p.psicologico.perfil}
+Mecanismo: ${p.psicologico.mecanismo}
+REGRA CRÍTICA: ${p.psicologico.regra}
+
+## ESTADO DA SEMANA
+- Fase PHV: ${phvFinal === 'desconhecido' ? 'Não medido — usar protocolo padrão' : phvFinal}
+- Sono médio: ${sono ? sono + 'h/noite' + (sonoReducao ? ' ⚠ INSUFICIENTE — carga deve ser REDUZIDA' : '') : 'Não informado'}
+- RPE semana anterior: ${rpe || 'Primeira semana — sem histórico'}
+- ${mentalBloco}
+- Sessões disponíveis: ${sessoes} → Ativas: ${sessoesAtivas.join(', ')}
+${blocoClinico}
+${biobandingBloco}
+
+## GAPS TÉCNICOS ATUAIS (0-10)
+${Object.entries(gapsAtuais).map(([k,v])=>`- ${k}: ${v}/10 [${p.gaps[k]?.status||''}]`).join('\n')}
+
+## REGRAS DO MOTOR
+1. Escolha o gap prioritário mais urgente para ser o FOCO desta semana (rotacione com critério pedagógico — não sempre o mesmo)
+2. Se sono < 7h → OBRIGATÓRIO: definir carga_semana como "reduzida" e justificar com o sono. Se fase circa-PHV → também reduzida.
+3. Se ferritina baixa (< 30 ng/mL) → adicionar sessão de recuperação ativa no plano, reduzir volume total
+4. Se vitamina D baixa (< 30 ng/mL) → mencionar no diagnóstico_narrativo com recomendação ao pai
+5. Se mental=pos_erro OU score mental < 5: aumentar encorajamento, reduzir pressão técnica, priorizar jogo livre. Se score < 5 por 2 semanas consecutivas: incluir sugestão de conversa pai-atleta no diagnóstico_narrativo
+6. Circa-PHV: NUNCA incluir exercícios de alto impacto (saltos, sprints máximos, duelos de contato). Substituir por técnica suave e mobilidade.
+7. Fase 1: priorizar scanning + centro de gravidade + corrida
+8. NUNCA punir tentativa corajosa — validar o esforço sempre
+
+## EXERCÍCIOS DISPONÍVEIS
+${Object.entries(exDisponiveis).map(([s,ex])=>`${s}: ${ex}`).join('\n')}
+
+## RESPONDA APENAS COM JSON VÁLIDO (sem markdown, sem texto antes ou depois):
+{
+  "gap_prioritario": "nome do gap",
+  "justificativa_gap": "1-2 frases",
+  "carga_semana": "normal|reduzida|aumentada",
+  "justificativa_carga": "1-2 frases",
+  "diagnostico_narrativo": "3-4 frases para o pai — contexto da semana, o que priorizar, como apoiar o atleta",
+  "alertas": [{"tipo": "warn|info|ok", "texto": "mensagem"}],
+  "sessoes": {
+    ${sessoesAtivas.map(s=>`"${s}": {
+      "tipo": "${s==='S1'?'Técnica':s==='S2'?'Físico':s==='S3'?'Tático':'Jogo Livre'}",
+      "duracao": "${s==='S1'?'45':s==='S2'?'35':s==='S3'?'40':'60'} min",
+      "foco": "1 frase do foco específico desta sessão esta semana",
+      "exercicios": [{"nome": "nome", "detalhe": "séries/reps", "motivo": "por que este exercício"}]
+    }`).join(',\n    ')}
+  }
+}`;
+
+  motorState.rodando = true;
+  const btn = document.getElementById('motorBtn');
+  if(btn){btn.disabled=true;btn.classList.add('loading');btn.textContent='Consultando Claude...';}
+  document.getElementById('motorResultado').innerHTML = `
+    <div class="motor-result">
+      <div class="motor-loading-state">
+        <div class="motor-loading-icon">⚡</div>
+        <div class="motor-loading-text">motor analisando ${p.nome}...<br><br>cruzando gaps · carga · mental · PHV</div>
+      </div>
+    </div>`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{role:'user',content:prompt}]
+      })
+    });
+    if (!resp.ok) { const t=await resp.text(); throw new Error(`API ${resp.status}: ${t.slice(0,200)}`); }
+    const data = await resp.json();
+    const raw = data.content?.find(b=>b.type==='text')?.text || '';
+    let resultado;
+    try {
+      resultado = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    } catch(e) {
+      throw new Error('Resposta da IA não é JSON válido: ' + raw.slice(0,300));
+    }
+    resultado.atleta = player;
+    resultado.geradoEm = new Date().toISOString();
+    resultado.semana = semanas;
+    // ── FASE 7: Mesclar alertas locais (sono, exames, PHV) com os da IA ──
+    if (alertasF7.length > 0) {
+      resultado.alertas = [...alertasF7, ...(resultado.alertas || [])];
+    }
+    motorState.ultimoResultado = resultado;
+    const hist = JSON.parse(localStorage.getItem('motor_historico')||'[]');
+    hist.unshift(resultado);
+    localStorage.setItem('motor_historico', JSON.stringify(hist.slice(0,12)));
+    clockDetectarMarcos(player, resultado);
+    document.getElementById('motorResultado').innerHTML = renderResultado(resultado);
+  } catch(err) {
+    document.getElementById('motorResultado').innerHTML =
+      `<div class="motor-error">❌ Erro ao gerar diagnóstico:<br><br>${err.message}<br><br>
+      <small>Verifique se a API key está correta e se você tem créditos disponíveis.</small></div>`;
+  } finally {
+    motorState.rodando = false;
+    const btn2 = document.getElementById('motorBtn');
+    if(btn2){btn2.disabled=false;btn2.classList.remove('loading');btn2.textContent='⚡ Gerar Diagnóstico da Semana';}
+  }
+}
+
+function renderResultado(r) {
+  if (!r) return '';
+  const cor = r.atleta === 'lucas' ? 'var(--lucas)' : 'var(--miguel)';
+  const now = r.geradoEm ? new Date(r.geradoEm).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+  const cargaCor = r.carga_semana==='reduzida'?'#ff9800':r.carga_semana==='aumentada'?'#4CAF50':'var(--td)';
+  const cargaLabel = r.carga_semana==='reduzida'?'↓ Carga Reduzida':r.carga_semana==='aumentada'?'↑ Carga Aumentada':'→ Carga Normal';
+  const gapStatus = PERFIL_ATLETA[r.atleta]?.gaps?.[r.gap_prioritario]?.status || 'planejado';
+
+  // ── Alerta I: score mental < 5 por 2 semanas consecutivas
+  let alertaMentalHTML = '';
+  try {
+    const semanal = JSON.parse(localStorage.getItem('mental_semanal') || '[]');
+    const semAtleta = semanal.filter(e => e.atleta === r.atleta && e.score != null);
+    const ult2 = semAtleta.slice(-2);
+    if (ult2.length === 2 && ult2[0].score < 5 && ult2[1].score < 5) {
+      const nomeAtleta = r.atleta === 'lucas' ? 'Lucas' : 'Miguel';
+      alertaMentalHTML = `
+        <div class="motor-alerta warn" style="border-color:rgba(244,67,54,.35);background:rgba(244,67,54,.06);color:#f44336;margin:10px 16px 0;border-radius:3px;">
+          <span>🔴</span>
+          <span><strong>Atenção:</strong> Score mental de ${nomeAtleta} abaixo de 5 por 2 semanas consecutivas
+          (${ult2[0].score.toFixed(1)} → ${ult2[1].score.toFixed(1)}).
+          Considere uma conversa aberta com ${nomeAtleta} antes do próximo treino.</span>
+        </div>`;
+    }
+  } catch(e) {}
+
+  const alertasHTML = (r.alertas||[]).map(a=>
+    `<div class="motor-alerta ${a.tipo}">
+      <span>${a.tipo==='warn'?'⚠':a.tipo==='ok'?'✓':'ℹ'}</span>
+      <span>${a.texto}</span>
+    </div>`).join('');
+
+  const sessoesHTML = Object.entries(r.sessoes||{}).map(([sId,s])=>{
+    const exHTML = (s.exercicios||[]).map((e,i)=>`
+      <div class="motor-ex">
+        <div class="motor-ex-n">${i+1}.</div>
+        <div style="flex:1;">
+          <div class="motor-ex-nome">${e.nome}</div>
+          ${e.motivo?`<div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:1px;">${e.motivo}</div>`:''}
+        </div>
+        <div class="motor-ex-det">${e.detalhe||''}</div>
+      </div>`).join('');
+    return `
+      <div class="motor-sessao">
+        <div class="motor-sessao-header">
+          <div class="motor-sessao-id">${sId}</div>
+          <div class="motor-sessao-tipo">${s.tipo||''}</div>
+          <div class="motor-sessao-dur">${s.duracao||''}</div>
+        </div>
+        ${s.foco?`<div class="motor-sessao-foco">// ${s.foco}</div>`:''}
+        <div class="motor-exercicios">${exHTML}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="motor-result">
+      <div class="motor-result-header">
+        <div>
+          <div class="motor-result-title" style="color:${cor};">Diagnóstico · Semana ${r.semana||'—'}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:2px;">
+            Gap prioritário: <span style="color:${cor};">${r.gap_prioritario||'—'}</span>
+            &nbsp;·&nbsp;<span style="color:${cargaCor};">${cargaLabel}</span>
+          </div>
+        </div>
+        <div class="motor-result-meta">${now}</div>
+      </div>
+      ${alertaMentalHTML}
+      <div class="motor-diagnostico">
+        ${(r.diagnostico_narrativo||'').replace(/\n/g,'<br>')}
+        <br><br>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);">// foco semanal: </span>
+        <b>${r.gap_prioritario||'—'}</b>
+        <span class="motor-gap-badge ${gapStatus}">${gapStatus}</span>
+        <br>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);">${r.justificativa_gap||''}</span>
+      </div>
+      ${alertasHTML?`<div class="motor-alertas">${alertasHTML}</div>`:''}
+      <div class="motor-sessoes">
+        <div class="motor-sessoes-title">// plano das sessões</div>
+        ${sessoesHTML}
+      </div>
+    </div>`;
+}
+
+
+// ══════════════════════════════════════════════════
+// MÓDULO JOGOS — FASE 3: INTEGRAÇÃO VEO
+// Chave localStorage: veo_jogos (nova, sem conflito)
+// ══════════════════════════════════════════════════
+
+const VEO_KEY = 'veo_jogos';
+
+function veoLoad() {
+  try { return JSON.parse(localStorage.getItem(VEO_KEY) || '[]'); } catch(e) { return []; }
+}
+function veoSave(jogos) {
+  localStorage.setItem(VEO_KEY, JSON.stringify(jogos));
+}
+function veoJogosDoAtleta(atleta) {
+  return veoLoad().filter(j => j.atleta === atleta).sort((a,b) => new Date(b.data) - new Date(a.data));
+}
+
+// Conectores Veo — campos mapeados para quando a câmera chegar
+// Campos: identificação (data, adversário, placar, local, modalidade)
+//         Veo stats: heatmap zona (frio/morno/quente), passes, distância, sprints, gols, assistências
+//         Observação livre do pai
+const VEO_CAMPOS_LUCAS = [
+  { key: 'passes_ok',     label: 'Passes certos',    unit: '',    tipo: 'numero', placeholder: 'Ex: 18' },
+  { key: 'passes_total',  label: 'Passes tentados',  unit: '',    tipo: 'numero', placeholder: 'Ex: 23' },
+  { key: 'distancia',     label: 'Distância (m)',     unit: 'm',   tipo: 'numero', placeholder: 'Ex: 4200' },
+  { key: 'sprints',       label: 'Sprints',           unit: '',    tipo: 'numero', placeholder: 'Ex: 12' },
+  { key: 'gols',          label: 'Gols',              unit: '',    tipo: 'numero', placeholder: 'Ex: 0' },
+  { key: 'assistencias',  label: 'Assistências',      unit: '',    tipo: 'numero', placeholder: 'Ex: 1' },
+  { key: 'heatmap_zona',  label: 'Heatmap zona ofensiva', unit: '', tipo: 'select',
+    opcoes: ['— selecionar —','muito frio (quase ausente)','frio (pouca presença)','morno (presença média)','quente (ativo na zona)','muito quente (dominante)'] },
+  { key: 'heatmap_lateral', label: 'Corredor preferido', unit: '', tipo: 'select',
+    opcoes: ['— selecionar —','esquerda (correto para ponta)','centro','direita','distribuído'] },
+];
+const VEO_CAMPOS_MIGUEL = [
+  { key: 'defesas',       label: 'Defesas',           unit: '',    tipo: 'numero', placeholder: 'Ex: 4' },
+  { key: 'gols_sofridos', label: 'Gols sofridos',     unit: '',    tipo: 'numero', placeholder: 'Ex: 1' },
+  { key: 'saidas',        label: 'Saídas do gol',     unit: '',    tipo: 'numero', placeholder: 'Ex: 3' },
+  { key: 'passes_ok',     label: 'Passes c/ os pés certos', unit: '', tipo: 'numero', placeholder: 'Ex: 6' },
+  { key: 'distancia',     label: 'Distância (m)',     unit: 'm',   tipo: 'numero', placeholder: 'Ex: 1800' },
+  { key: 'posicionamento', label: 'Posicionamento',   unit: '',    tipo: 'select',
+    opcoes: ['— selecionar —','ruim (fora da linha)','regular','bom','muito bom'] },
+  { key: 'comunicacao',   label: 'Comunicação',       unit: '',    tipo: 'select',
+    opcoes: ['— selecionar —','silencioso','pouco','regular','comunicativo'] },
+];
+
+// Mapeamento gaps → conectores Veo (cruzamento automático)
+const VEO_CRUZAMENTOS = {
+  lucas: [
+    { gap: 'Movimentação sem bola', campo: 'heatmap_zona',
+      desc: 'Heatmap frio na zona ofensiva = confirma delay. Alimenta S3 do motor.',
+      status: 'aguarda' },
+    { gap: 'Scanning e leitura', campo: 'passes_ok',
+      desc: 'Taxa de acerto de passe reflete qualidade da leitura pré-recepção.',
+      status: 'aguarda' },
+    { gap: 'Transição defensiva', campo: 'distancia',
+      desc: 'Distância total + sprints indicam intensidade de transições.',
+      status: 'aguarda' },
+    { gap: 'Uso do corpo em duelos', campo: null,
+      desc: 'Sem métrica Veo direta — avaliação observacional pelo pai.',
+      status: 'observacao' },
+  ],
+  miguel: [
+    { gap: 'Posicionamento na área', campo: 'posicionamento',
+      desc: 'Avaliação direta no Veo app após análise de jogo.',
+      status: 'aguarda' },
+    { gap: 'Saídas do gol', campo: 'saidas',
+      desc: 'Número de saídas + qualidade (observação).',
+      status: 'aguarda' },
+    { gap: 'Distribuição com os pés', campo: 'passes_ok',
+      desc: 'Passes certos com os pés — taxa de acerto.',
+      status: 'aguarda' },
+    { gap: 'Comunicação', campo: 'comunicacao',
+      desc: 'Campo observacional — avaliado pelo pai durante o jogo.',
+      status: 'aguarda' },
+  ]
+};
+
+function veoSalvarJogo() {
+  const data       = document.getElementById('vj_data')?.value;
+  const adversario = document.getElementById('vj_adversario')?.value?.trim();
+  const placar     = document.getElementById('vj_placar')?.value?.trim();
+  const local      = document.getElementById('vj_local')?.value;
+  const modalidade = document.getElementById('vj_modalidade')?.value;
+  const obs        = document.getElementById('vj_obs')?.value?.trim();
+
+  if (!data || !adversario) {
+    alert('Preencha pelo menos data e adversário para salvar.');
+    return;
+  }
+
+  const campos = player === 'lucas' ? VEO_CAMPOS_LUCAS : VEO_CAMPOS_MIGUEL;
+  const stats = {};
+  campos.forEach(c => {
+    const el = document.getElementById('vj_' + c.key);
+    if (el && el.value && el.value !== '— selecionar —') {
+      stats[c.key] = c.tipo === 'numero' ? (parseFloat(el.value) || el.value) : el.value;
+    }
+  });
+
+  const jogo = {
+    id: Date.now().toString(),
+    atleta: player,
+    data, adversario, placar, local, modalidade, obs,
+    stats,
+    criadoEm: new Date().toISOString()
+  };
+
+  const jogos = veoLoad();
+  jogos.unshift(jogo);
+  veoSave(jogos);
+
+  rJogos(); // re-render
+}
+
+function veoDeletarJogo(id) {
+  if (!confirm('Remover este jogo do histórico?')) return;
+  const jogos = veoLoad().filter(j => j.id !== id);
+  veoSave(jogos);
+  rJogos();
+}
+
+function veoToggleJogo(id) {
+  const el = document.getElementById('vjbody_' + id);
+  if (el) el.classList.toggle('open');
+}
+
+function rJogos() {
+  const p = player;
+  const cor = p === 'lucas' ? 'var(--lucas)' : 'var(--miguel)';
+  const camposDef = p === 'lucas' ? VEO_CAMPOS_LUCAS : VEO_CAMPOS_MIGUEL;
+  const cruzamentos = VEO_CRUZAMENTOS[p];
+  const jogos = veoJogosDoAtleta(p);
+  const perfil = PERFIL_ATLETA[p];
+  const nomeCurto = p === 'lucas' ? 'Lucas #30' : 'Miguel (Goleiro)';
+
+  // ── Formulário de registro
+  const formInputs = camposDef.map(c => {
+    if (c.tipo === 'select') {
+      return `<div class="veo-field">
+        <label class="veo-label">${c.label}</label>
+        <select class="veo-select" id="vj_${c.key}">
+          ${c.opcoes.map(o => `<option value="${o}">${o}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+    return `<div class="veo-field">
+      <label class="veo-label">${c.label}${c.unit ? ' ('+c.unit+')' : ''}</label>
+      <input class="veo-input" type="number" id="vj_${c.key}" placeholder="${c.placeholder}" min="0" step="any">
+    </div>`;
+  }).join('');
+
+  // ── Player Spotlight: stats do último jogo
+  const ultimo = jogos[0];
+  const spotlightStats = ultimo
+    ? camposDef.filter(c => ultimo.stats[c.key] !== undefined).map(c => {
+        const val = ultimo.stats[c.key];
+        return `<div class="veo-stat-row">
+          <span class="veo-stat-lbl">${c.label}</span>
+          <span class="veo-stat-val has-data">${val}<span class="veo-stat-unit">${c.unit||''}</span></span>
+        </div>`;
+      }).join('')
+    : `<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);text-align:center;padding:16px 0;">Nenhum jogo registrado ainda</div>`;
+
+  const spotlightPlacar = ultimo ? `<div style="font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--td);margin-bottom:6px;">${ultimo.adversario} · ${ultimo.placar||'—'} · ${new Date(ultimo.data).toLocaleDateString('pt-BR')}</div>` : '';
+
+  // ── Cruzamento gaps → campos Veo
+  const cruzHTML = cruzamentos.map(c => {
+    // Verificar se já existe dado nos jogos
+    const temDado = jogos.some(j => j.stats[c.campo] !== undefined);
+    const dotCls = temDado ? 'ok' : c.campo ? 'aguarda' : 'aguarda';
+    const connCls = temDado ? 'pronto' : 'aguarda';
+    const connTxt = temDado ? `✓ ${c.campo}` : c.campo ? `aguarda: ${c.campo}` : 'observacional';
+    return `<div class="veo-cross-item">
+      <div class="veo-cross-dot ${dotCls}"></div>
+      <div class="veo-cross-info">
+        <div class="veo-cross-gap">${c.gap}</div>
+        <div class="veo-cross-desc">${c.desc}</div>
+      </div>
+      <div class="veo-cross-connector ${connCls}">${connTxt}</div>
+    </div>`;
+  }).join('');
+
+  // ── Histórico de jogos
+  const histHTML = jogos.length === 0
+    ? `<div class="veo-empty-jogos">⬜ nenhum jogo registrado ainda<br><br>quando a câmera Veo chegar,<br>registre o primeiro jogo acima.</div>`
+    : jogos.map((j, i) => {
+        const statsHTML = camposDef.filter(c => j.stats[c.key] !== undefined).map(c => `
+          <div class="veo-mini-stat">
+            <div class="veo-mini-lbl">${c.label}</div>
+            <div class="veo-mini-val">${j.stats[c.key]}${c.unit ? '<span style="font-size:10px;color:var(--td);">'+c.unit+'</span>' : ''}</div>
+          </div>`).join('');
+        const obsHTML = j.obs ? `<div class="veo-jogo-obs">${j.obs}</div>` : '';
+        const dt = new Date(j.data).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'2-digit'});
+        return `<div class="veo-jogo-card">
+          <div class="veo-jogo-header" onclick="veoToggleJogo('${j.id}')">
+            <div class="veo-jogo-num">${jogos.length - i}</div>
+            <div class="veo-jogo-info">
+              <div class="veo-jogo-data">${dt} · ${j.modalidade||'Fut7'} · ${j.local||'—'}</div>
+              <div class="veo-jogo-adversario">vs ${j.adversario}</div>
+            </div>
+            <div class="veo-jogo-placar">${j.placar||'?'}</div>
+          </div>
+          <div class="veo-jogo-body" id="vjbody_${j.id}">
+            <span class="veo-jogo-del" onclick="veoDeletarJogo('${j.id}')">✕ remover</span>
+            ${statsHTML ? `<div class="veo-jogo-stats">${statsHTML}</div>` : '<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--td);margin-bottom:8px;">— sem stats Veo registrados —</div>'}
+            ${obsHTML}
+          </div>
+        </div>`;
+      }).join('');
+
+  // ── Evolução comparativa (jogo 1 vs último)
+  let evoHTML = '';
+  if (jogos.length >= 2) {
+    const primeiro = jogos[jogos.length - 1];
+    const ultimo2 = jogos[0];
+    const camposNumericos = camposDef.filter(c => c.tipo === 'numero');
+    const rows = camposNumericos.filter(c => primeiro.stats[c.key] !== undefined && ultimo2.stats[c.key] !== undefined).map(c => {
+      const v1 = parseFloat(primeiro.stats[c.key]) || 0;
+      const v2 = parseFloat(ultimo2.stats[c.key]) || 0;
+      const max = Math.max(v1, v2, 1);
+      const pct1 = Math.round(v1 / max * 100);
+      const pct2 = Math.round(v2 / max * 100);
+      return `<div style="margin-bottom:10px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:1px;margin-bottom:4px;">${c.label.toUpperCase()}</div>
+        <div class="veo-evo-row">
+          <span class="veo-evo-lbl">Jogo 1</span>
+          <div class="veo-evo-bg"><div class="veo-evo-fill" style="width:${pct1}%;opacity:.5;"></div></div>
+          <span class="veo-evo-val">${v1}</span>
+        </div>
+        <div class="veo-evo-row" style="margin-top:3px;">
+          <span class="veo-evo-lbl">Jogo ${jogos.length}</span>
+          <div class="veo-evo-bg"><div class="veo-evo-fill" style="width:${pct2}%;"></div></div>
+          <span class="veo-evo-val">${v2}</span>
+        </div>
+      </div>`;
+    }).join('');
+    if (rows) {
+      evoHTML = `<div class="veo-evo">
+        <div class="veo-evo-title">// dossiê evolutivo — jogo 1 vs jogo ${jogos.length}</div>
+        ${rows}
+      </div>`;
+    }
+  }
+
+  document.getElementById('wrap').innerHTML = `
+    <div class="veo-wrap">
+
+      <!-- HEADER -->
+      <div class="veo-header">
+        <div class="veo-title" style="color:${cor};">🎥 Análise de Jogo — ${nomeCurto}</div>
+        <div class="veo-badge">câmera: aguardando</div>
+      </div>
+
+      <div class="veo-pending">
+        ⚡ Conectores prontos — preencha quando a câmera Veo chegar e o primeiro jogo for gravado.
+      </div>
+
+      <!-- PLAYER SPOTLIGHT -->
+      <div class="veo-spotlight">
+        <div class="veo-player-card ${p}-card">
+          <div class="veo-player-num">${p === 'lucas' ? '30' : '1'}</div>
+          <div class="veo-player-name" style="color:${cor};">${perfil.nome}</div>
+          <div class="veo-player-pos">${perfil.posicao} · ${perfil.modalidade}</div>
+          ${spotlightPlacar}
+          ${spotlightStats}
+        </div>
+        <div class="veo-cross">
+          <div class="veo-cross-title">// gaps × conectores veo</div>
+          ${cruzHTML}
+        </div>
+      </div>
+
+      <!-- FORMULÁRIO -->
+      <div class="veo-form-card">
+        <div class="veo-form-title">// registrar novo jogo</div>
+
+        <div class="veo-section">identificação</div>
+        <div class="veo-grid">
+          <div class="veo-field">
+            <label class="veo-label">Data do jogo</label>
+            <input class="veo-input" type="date" id="vj_data" value="${new Date().toISOString().split('T')[0]}">
+          </div>
+          <div class="veo-field">
+            <label class="veo-label">Adversário</label>
+            <input class="veo-input" type="text" id="vj_adversario" placeholder="Ex: Náutico Sub-13">
+          </div>
+          <div class="veo-field">
+            <label class="veo-label">Placar</label>
+            <input class="veo-input" type="text" id="vj_placar" placeholder="Ex: 3-1">
+          </div>
+          <div class="veo-field">
+            <label class="veo-label">Modalidade</label>
+            <select class="veo-select" id="vj_modalidade">
+              <option>Fut7</option>
+              <option>Futsal</option>
+              <option>Fut11</option>
+              <option>Rachão</option>
+            </select>
+          </div>
+          <div class="veo-field">
+            <label class="veo-label">Local</label>
+            <select class="veo-select" id="vj_local">
+              <option>Casa</option>
+              <option>Fora</option>
+              <option>Neutro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="veo-section">stats veo — ${p === 'lucas' ? 'jogador de campo (#30)' : 'goleiro'}</div>
+        <div class="veo-hint" style="margin-bottom:10px;">Deixe em branco o que não tiver dados. Preencha quando tiver o app do Veo aberto após o jogo.</div>
+        <div class="veo-grid">
+          ${formInputs}
+        </div>
+
+        <div class="veo-section">observação do pai</div>
+        <textarea class="veo-textarea" id="vj_obs" placeholder="O que você observou neste jogo? Momentos específicos, comportamento, confiança, execução do foco da semana..."></textarea>
+
+        <button class="veo-btn-salvar" onclick="veoSalvarJogo()">+ Salvar Jogo</button>
+      </div>
+
+      <!-- EVOLUÇÃO COMPARATIVA -->
+      ${evoHTML}
+
+      <!-- HISTÓRICO -->
+      <div>
+        <div class="veo-hist-title">// histórico — ${jogos.length} jogo${jogos.length !== 1 ? 's' : ''} registrado${jogos.length !== 1 ? 's' : ''}</div>
+        ${histHTML}
+      </div>
+
+    </div>`;
+}
+
+render();
+
+// ══════════════════════════════════════════════════
+// FASE 5 — PERFORMANCE CLOCK & DOSSIÊ ELITE
+// Chave localStorage: performance_clock
+// Inspirado no EPPP inglês (Elite Player Performance Plan)
+// ══════════════════════════════════════════════════
+
+const CLOCK_KEY = 'performance_clock';
+
+function clockLoad() {
+  try { return JSON.parse(localStorage.getItem(CLOCK_KEY) || '{"lucas":[],"miguel":[]}'); }
+  catch(e) { return {lucas:[], miguel:[]}; }
+}
+function clockSave(data) {
+  localStorage.setItem(CLOCK_KEY, JSON.stringify(data));
+}
+function clockEntries(atleta) {
+  const d = clockLoad();
+  return (d[atleta] || []).sort((a,b) => new Date(b.data) - new Date(a.data));
+}
+
+// Detecta marcos automáticos comparando diagnósticos salvos
+// Chamado após rodarMotor() — compara gap atual vs histórico
+function clockDetectarMarcos(atletaNome, novoResultado) {
+  if (!novoResultado || !novoResultado.gap_prioritario) return;
+  const hist = JSON.parse(localStorage.getItem('motor_historico') || '[]')
+    .filter(r => r.atleta === atletaNome);
+  if (hist.length < 2) return;
+
+  const perfil = PERFIL_ATLETA[atletaNome];
+  if (!perfil) return;
+
+  // Verifica se algum gap melhorou ≥ 1.0 ponto desde a última vez que foi prioritário
+  const gapAtual = novoResultado.gap_prioritario;
+  const notaAtual = perfil.gaps[gapAtual]?.nota;
+  if (!notaAtual) return;
+
+  // Busca último diagnóstico que focou no mesmo gap
+  const anterior = hist.slice(1).find(r => r.gap_prioritario === gapAtual);
+  if (!anterior) return;
+
+  const notaAnterior = PERFIL_ATLETA[atletaNome]?.gaps?.[gapAtual]?.nota;
+  // Como as notas são estáticas no perfil, usamos a nota atual como referência
+  // Marco automático: gap saiu de urgente para planejado ou planejado para completo
+  const statusAnterior = perfil.gaps[gapAtual]?.status;
+  if (statusAnterior === 'urgente') {
+    // Detecta se foi marcado como melhorado (avaliação "evoluiu" recente)
+    const recente = dados.filter(d => d.atleta === atletaNome && d.av === 'evoluiu')
+      .sort((a,b) => new Date(b.data) - new Date(a.data)).slice(0,3);
+    if (recente.length >= 2) {
+      clockAdicionarMarco(atletaNome, {
+        tipo: 'auto',
+        categoria: 'evolucao',
+        titulo: `Evolução detectada: ${gapAtual}`,
+        descricao: `Motor detectou padrão de melhora em ${gapAtual}. ${recente.length} treinos seguidos com avaliação positiva.`,
+        gap: gapAtual,
+        semana: novoResultado.semana
+      });
+    }
+  }
+}
+
+function clockAdicionarMarco(atletaNome, marco) {
+  const d = clockLoad();
+  if (!d[atletaNome]) d[atletaNome] = [];
+  const novo = {
+    id: Date.now().toString(),
+    data: new Date().toISOString(),
+    atleta: atletaNome,
+    ...marco
+  };
+  d[atletaNome].unshift(novo);
+  clockSave(d);
+}
+
+function clockRemoverMarco(atletaNome, id) {
+  const d = clockLoad();
+  if (!d[atletaNome]) return;
+  d[atletaNome] = d[atletaNome].filter(m => m.id !== id);
+  clockSave(d);
+  rClock();
+}
+
+// Gera narrativa textual de evolução a partir dos marcos
+function clockNarrativa(atleta) {
+  const entries = clockEntries(atleta);
+  if (!entries.length) return [];
+  // Pega marcos de evolução e milestone
+  return entries
+    .filter(e => ['evolucao','milestone','conquista'].includes(e.categoria))
+    .slice(0, 6)
+    .map(e => {
+      const mes = new Date(e.data).toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
+      return `${mes.charAt(0).toUpperCase() + mes.slice(1)}: ${e.titulo}`;
+    });
+}
+
+// ── Checklist para o dossiê PDF
+function clockChecklist(atleta) {
+  const entries = clockEntries(atleta);
+  const veoJogos = veoJogosDoAtleta(atleta);
+  const bio = bioAthlete(atleta === 'lucas' ? 'Lucas' : 'Miguel');
+  const diagHist = JSON.parse(localStorage.getItem('motor_historico') || '[]').filter(r => r.atleta === atleta);
+
+  return [
+    { label: 'Perfil biométrico (PHV, altura, peso)', ok: !!(bio && bio.records && bio.records.length >= 1), warn: !!(bio && bio.records && bio.records.length >= 1 && bio.records.length < 3) },
+    { label: `${entries.length} marco${entries.length !== 1 ? 's' : ''} no Performance Clock`, ok: entries.length >= 3, warn: entries.length >= 1 && entries.length < 3 },
+    { label: `${diagHist.length} diagnóstico${diagHist.length !== 1 ? 's' : ''} gerado${diagHist.length !== 1 ? 's' : ''}`, ok: diagHist.length >= 4, warn: diagHist.length >= 1 && diagHist.length < 4 },
+    { label: `${veoJogos.length} jogo${veoJogos.length !== 1 ? 's' : ''} registrado${veoJogos.length !== 1 ? 's' : ''} (Veo)`, ok: veoJogos.length >= 3, warn: veoJogos.length >= 1 && veoJogos.length < 3 },
+  ];
+}
+
+// ── Render do módulo Clock
+function rClock() {
+  const p = player;
+  const cor = p === 'lucas' ? 'var(--lucas)' : 'var(--miguel)';
+  const perfil = PERFIL_ATLETA[p];
+  const entries = clockEntries(p);
+  const narrativa = clockNarrativa(p);
+  const checklist = clockChecklist(p);
+  const veoJogos = veoJogosDoAtleta(p);
+  const diagHist = JSON.parse(localStorage.getItem('motor_historico') || '[]').filter(r => r.atleta === p);
+  const bio = bioAthlete(perfil.nome);
+
+  // Stats resumo
+  const totalMarcos = entries.length;
+  const marcosMilestone = entries.filter(e => e.categoria === 'milestone').length;
+  const marcosEvo = entries.filter(e => e.categoria === 'evolucao').length;
+  const semAtl = JSON.parse(localStorage.getItem('motor_historico') || '[]')
+    .filter(r => r.atleta === p)
+    .reduce((mx, r) => Math.max(mx, r.semana||0), 0);
+
+  // Timeline HTML
+  const timelineHTML = entries.length === 0
+    ? `<div class="clock-empty">⬜ nenhum marco registrado ainda<br><br>
+       adicione o primeiro marco manualmente abaixo<br>ou gere um diagnóstico — marcos automáticos serão detectados.</div>`
+    : entries.map(e => {
+        const dt = new Date(e.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+        const tipoCls = e.categoria === 'milestone' ? 'milestone' : e.tipo === 'auto' ? 'auto' : 'manual';
+        const tagTipo = e.tipo === 'auto'
+          ? `<span class="clock-tag auto">auto</span>`
+          : `<span class="clock-tag manual">manual</span>`;
+        const tagCat = e.categoria === 'milestone'
+          ? `<span class="clock-tag milestone">⭐ marco</span>`
+          : e.categoria === 'conquista'
+          ? `<span class="clock-tag milestone">🏆 conquista</span>`
+          : `<span class="clock-tag auto">evolução</span>`;
+        const tagGap = e.gap ? `<span class="clock-tag gap">${e.gap}</span>` : '';
+        const tagSem = e.semana ? `<span class="clock-tag sessao">sem ${e.semana}</span>` : '';
+        return `<div class="clock-entry ${tipoCls}">
+          <div class="clock-card">
+            <div class="clock-card-header">
+              <div class="clock-card-title">${e.titulo}</div>
+              <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                <span class="clock-card-date">${dt}</span>
+                <button class="clock-del" onclick="clockRemoverMarco('${p}','${e.id}')">✕</button>
+              </div>
+            </div>
+            ${e.descricao ? `<div class="clock-card-desc">${e.descricao}</div>` : ''}
+            <div class="clock-card-tags">${tagTipo}${tagCat}${tagGap}${tagSem}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+  // Narrativa HTML
+  const narrativaHTML = narrativa.length === 0
+    ? `<div class="narrativa-vazio">a narrativa de evolução aparece aqui à medida que marcos forem registrados.</div>`
+    : narrativa.map(n => `
+        <div class="narrativa-item">
+          <div class="narrativa-dot"></div>
+          <div class="narrativa-texto">${n}</div>
+        </div>`).join('');
+
+  // Checklist dossiê
+  const checkHTML = checklist.map(c => {
+    const cls = c.ok ? 'ok' : c.warn ? 'warn' : 'empty';
+    const icon = c.ok ? '✓' : c.warn ? '~' : '○';
+    return `<div class="dossie-check-item">
+      <div class="dossie-check-dot ${cls}"></div>
+      <span style="color:${c.ok ? '#4CAF50' : c.warn ? '#ff9800' : 'var(--td)'}">${icon}</span>
+      <span>${c.label}</span>
+    </div>`;
+  }).join('');
+
+  const dossiePronto = checklist.filter(c => c.ok).length >= 2;
+
+  document.getElementById('wrap').innerHTML = `
+    <div class="clock-wrap">
+
+      <!-- HEADER STATS -->
+      <div class="clock-stats">
+        <div class="clock-stat">
+          <div class="clock-stat-val" style="color:${cor};">${totalMarcos}</div>
+          <div class="clock-stat-lbl">marcos registrados</div>
+        </div>
+        <div class="clock-stat">
+          <div class="clock-stat-val" style="color:#ff9800;">${marcosMilestone}</div>
+          <div class="clock-stat-lbl">milestones</div>
+        </div>
+        <div class="clock-stat">
+          <div class="clock-stat-val">${diagHist.length}</div>
+          <div class="clock-stat-lbl">diagnósticos</div>
+        </div>
+        <div class="clock-stat">
+          <div class="clock-stat-val" style="color:#4CAF50;">${veoJogos.length}</div>
+          <div class="clock-stat-lbl">jogos Veo</div>
+        </div>
+      </div>
+
+      <!-- NARRATIVA EVOLUTIVA -->
+      <div class="clock-section" style="color:${cor};">// narrativa de evolução — ${perfil.nome}</div>
+      <div class="narrativa-card">
+        ${narrativaHTML}
+      </div>
+
+      <!-- ADICIONAR MARCO -->
+      <div class="clock-section">// registrar novo marco</div>
+      <div class="clock-add-card">
+        <div class="clock-form-grid">
+          <div class="clock-field">
+            <label class="clock-label">Categoria</label>
+            <select class="clock-select" id="ck_cat">
+              <option value="evolucao">Evolução técnica</option>
+              <option value="milestone">Milestone / Marco especial</option>
+              <option value="conquista">Conquista / Peneira / Convocação</option>
+              <option value="biometria">Biometria / Crescimento</option>
+              <option value="jogo">Destaque em jogo</option>
+            </select>
+          </div>
+          <div class="clock-field">
+            <label class="clock-label">Gap relacionado (opcional)</label>
+            <select class="clock-select" id="ck_gap">
+              <option value="">— nenhum —</option>
+              ${Object.keys(perfil.gaps).map(g => `<option value="${g}">${g}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="clock-field" style="margin-bottom:8px;">
+          <label class="clock-label">Título do marco</label>
+          <input class="clock-input" id="ck_titulo" placeholder='Ex: Primeira assistência em jogo oficial · Movimentação sem bola chegou a 5.0/10'>
+        </div>
+        <div class="clock-field" style="margin-bottom:8px;">
+          <label class="clock-label">Descrição (opcional)</label>
+          <textarea class="clock-textarea" id="ck_desc" placeholder="Contexto, detalhes, o que foi observado..."></textarea>
+        </div>
+        <button class="clock-add-btn" onclick="clockFormSalvar()">+ Registrar Marco</button>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="clock-section">// performance clock — linha do tempo · ${perfil.nome}</div>
+      <div class="clock-timeline">
+        ${timelineHTML}
+      </div>
+
+      <!-- DOSSIÊ ELITE -->
+      <div class="clock-section" style="color:#ff9800;">// dossiê elite — formato peneira</div>
+      <div class="dossie-card">
+        <div class="dossie-info">
+          O dossiê é gerado automaticamente com todo o histórico registrado no sistema.<br>
+          Formato pensado para apresentar a olheiros e bases profissionais.<br>
+          Quanto mais dados no sistema, mais completo e convincente o dossiê.
+        </div>
+        <div class="dossie-checklist">
+          ${checkHTML}
+        </div>
+        <button class="dossie-btn primary" onclick="dossieGerar('${p}')">
+          📄 Gerar Dossiê Elite — ${perfil.nome}
+        </button>
+        <button class="dossie-btn" onclick="dossieImprimir('${p}')">
+          🖨️ Versão Impressão / PDF
+        </button>
+      </div>
+
+    </div>`;
+}
+
+function clockFormSalvar() {
+  const titulo = document.getElementById('ck_titulo')?.value?.trim();
+  if (!titulo) { alert('Digite um título para o marco.'); return; }
+  const cat = document.getElementById('ck_cat')?.value || 'evolucao';
+  const gap = document.getElementById('ck_gap')?.value || '';
+  const desc = document.getElementById('ck_desc')?.value?.trim() || '';
+  clockAdicionarMarco(player, {
+    tipo: 'manual',
+    categoria: cat,
+    titulo,
+    descricao: desc,
+    gap: gap || undefined
+  });
+  rClock();
+}
+
+// ── Gerador do Dossiê Elite (HTML → janela impressão)
+function dossieGerar(atleta) {
+  const perfil = PERFIL_ATLETA[atleta];
+  const cor = atleta === 'lucas' ? '#3b9eff' : '#00e87a';
+  const entries = clockEntries(atleta);
+  const veoJogos = veoJogosDoAtleta(atleta);
+  const diagHist = JSON.parse(localStorage.getItem('motor_historico') || '[]')
+    .filter(r => r.atleta === atleta)
+    .sort((a,b) => new Date(a.geradoEm||0) - new Date(b.geradoEm||0));
+  const bio = bioAthlete(perfil.nome);
+  const ultimo = bio?.records ? [...bio.records].sort((a,b)=>new Date(b.date)-new Date(a.date))[0] : null;
+  const off = ultimo ? calcPHVOffset(ultimo.height, ultimo.weight, bio.dob) : null;
+  const phvLabel = off === null ? 'Não calculado'
+    : off < -1 ? `Pré-PHV (${off > 0 ? '+' : ''}${off}a)`
+    : off <= 1 ? `Circa-PHV (${off > 0 ? '+' : ''}${off}a) — pico de crescimento`
+    : `Pós-PHV (+${off}a)`;
+  const target = bio?.fatherHeight && bio?.motherHeight
+    ? ((parseFloat(bio.fatherHeight) + parseFloat(bio.motherHeight) + 13) / 2).toFixed(1) + ' cm' : '—';
+
+  const idade = bio?.dob
+    ? ((new Date() - new Date(bio.dob)) / (365.25*24*3600*1000)).toFixed(1) + ' anos' : '—';
+
+  const gapsHTML = Object.entries(perfil.gaps)
+    .sort((a,b) => (a[1].nota||0) - (b[1].nota||0))
+    .map(([nome, g]) => {
+      const nota = g.nota !== null && g.nota !== undefined ? g.nota : '—';
+      const pct = nota !== '—' ? Math.round(nota * 10) : 0;
+      const notaColor = nota === '—' ? '#aaa' : nota < 4 ? '#f44336' : nota < 6 ? '#ff9800' : '#4CAF50';
+      return `<tr>
+        <td style="padding:6px 10px;font-size:12px;color:#333;border-bottom:1px solid #eee;">${nome}</td>
+        <td style="padding:6px 10px;text-align:center;font-weight:700;color:${notaColor};border-bottom:1px solid #eee;">${nota}/10</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #eee;">
+          <div style="height:6px;background:#eee;border-radius:3px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${notaColor};border-radius:3px;"></div>
+          </div>
+        </td>
+        <td style="padding:6px 10px;font-size:10px;color:#888;border-bottom:1px solid #eee;text-transform:uppercase;letter-spacing:.5px;">${g.status}</td>
+      </tr>`;
+    }).join('');
+
+  const marcosHTML = entries.length === 0
+    ? '<p style="color:#aaa;font-size:12px;font-style:italic;">Nenhum marco registrado ainda.</p>'
+    : entries.slice(0, 10).map(e => {
+        const dt = new Date(e.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+        const icon = e.categoria === 'milestone' || e.categoria === 'conquista' ? '⭐' : '→';
+        return `<div style="display:flex;gap:10px;margin-bottom:8px;padding:8px 10px;background:#f8f9fa;border-radius:4px;border-left:3px solid ${cor};">
+          <span style="font-size:14px;flex-shrink:0;">${icon}</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#111;margin-bottom:2px;">${e.titulo}</div>
+            ${e.descricao ? `<div style="font-size:11px;color:#666;">${e.descricao}</div>` : ''}
+            <div style="font-size:10px;color:#aaa;margin-top:2px;">${dt}${e.gap ? ` · Gap: ${e.gap}` : ''}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+  const ultimoDiag = diagHist[diagHist.length - 1];
+  const diagHTML = ultimoDiag
+    ? `<div style="background:#f8f9fa;border-radius:4px;padding:12px;border-left:3px solid ${cor};font-size:12px;color:#444;line-height:1.6;">
+        ${ultimoDiag.diagnostico_narrativo || '—'}
+        <div style="margin-top:8px;font-size:10px;color:#aaa;">Gap prioritário: <strong>${ultimoDiag.gap_prioritario||'—'}</strong> · Semana ${ultimoDiag.semana||'—'}</div>
+      </div>`
+    : '<p style="color:#aaa;font-size:12px;font-style:italic;">Gere ao menos um diagnóstico para aparecer aqui.</p>';
+
+  const jogosHTML = veoJogos.length === 0
+    ? '<p style="color:#aaa;font-size:12px;font-style:italic;">Nenhum jogo registrado ainda.</p>'
+    : veoJogos.slice(0, 5).map(j => {
+        const dt = new Date(j.data).toLocaleDateString('pt-BR');
+        const statsStr = Object.entries(j.stats || {}).map(([k,v]) => `${k}: ${v}`).join(' · ');
+        return `<div style="padding:8px 10px;border:1px solid #eee;border-radius:4px;margin-bottom:6px;">
+          <div style="font-size:12px;font-weight:600;color:#333;">${dt} — vs ${j.adversario} &nbsp; ${j.placar||''}</div>
+          ${statsStr ? `<div style="font-size:10px;color:#888;margin-top:2px;">${statsStr}</div>` : ''}
+          ${j.obs ? `<div style="font-size:11px;color:#666;margin-top:4px;font-style:italic;">${j.obs}</div>` : ''}
+        </div>`;
+      }).join('');
+
+  const dataGeracao = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
+
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Dossiê Elite — ${perfil.nome} — Projeto Atleta Elite</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Helvetica Neue',Arial,sans-serif;background:#fff;color:#111;max-width:800px;margin:0 auto;padding:40px 32px;}
+    h1{font-size:28px;font-weight:800;color:${cor};letter-spacing:-0.5px;margin-bottom:4px;}
+    h2{font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#333;font-weight:700;margin:24px 0 10px;padding-bottom:6px;border-bottom:2px solid ${cor};}
+    .capa{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #eee;}
+    .capa-info{flex:1;}
+    .capa-badge{background:${cor};color:#fff;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:2px;margin-bottom:10px;display:inline-block;}
+    .capa-nome{font-size:32px;font-weight:900;letter-spacing:-1px;color:#111;margin-bottom:4px;}
+    .capa-sub{font-size:14px;color:#666;margin-bottom:16px;}
+    .capa-tiles{display:flex;gap:12px;flex-wrap:wrap;}
+    .capa-tile{background:#f8f9fa;border:1px solid #eee;border-radius:4px;padding:10px 14px;text-align:center;min-width:80px;}
+    .capa-tile-val{font-size:20px;font-weight:700;color:#111;}
+    .capa-tile-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#aaa;margin-top:3px;}
+    .rodape{margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:10px;color:#aaa;display:flex;justify-content:space-between;}
+    @media print{body{padding:20px 24px;} button{display:none;}}
+    table{width:100%;border-collapse:collapse;}
+    .print-btn{margin-top:24px;padding:12px 24px;background:${cor};color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+  </style></head><body>
+
+  <!-- CAPA -->
+  <div class="capa">
+    <div class="capa-info">
+      <div class="capa-badge">Projeto Atleta Elite · Dossiê Técnico</div>
+      <div class="capa-nome">${perfil.nome}</div>
+      <div class="capa-sub">${perfil.posicao} · ${perfil.modalidade} · ${idade}</div>
+      <div class="capa-tiles">
+        <div class="capa-tile"><div class="capa-tile-val">${ultimo ? ultimo.height + ' cm' : '—'}</div><div class="capa-tile-lbl">Altura</div></div>
+        <div class="capa-tile"><div class="capa-tile-val">${ultimo ? ultimo.weight + ' kg' : '—'}</div><div class="capa-tile-lbl">Peso</div></div>
+        <div class="capa-tile"><div class="capa-tile-val">${target}</div><div class="capa-tile-lbl">Alvo</div></div>
+        <div class="capa-tile"><div class="capa-tile-val" style="font-size:13px;color:#666;">${phvLabel.split(' ')[0]}</div><div class="capa-tile-lbl">PHV</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATURAÇÃO -->
+  <h2>Biometria & Maturação</h2>
+  <p style="font-size:12px;color:#444;margin-bottom:8px;line-height:1.6;">
+    <strong>PHV:</strong> ${phvLabel}<br>
+    <strong>Altura alvo (mid-parental):</strong> ${target}<br>
+    ${ultimo ? `<strong>Última medição:</strong> ${new Date(ultimo.date).toLocaleDateString('pt-BR')} — ${ultimo.height} cm / ${ultimo.weight} kg` : ''}
+  </p>
+
+  <!-- GAPS TÉCNICOS -->
+  <h2>Mapa de Gaps Técnicos</h2>
+  <table>
+    <thead><tr style="background:#f8f9fa;">
+      <th style="padding:6px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;">Competência</th>
+      <th style="padding:6px 10px;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;">Nota</th>
+      <th style="padding:6px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;">Progresso</th>
+      <th style="padding:6px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;">Status</th>
+    </tr></thead>
+    <tbody>${gapsHTML}</tbody>
+  </table>
+
+  <!-- PERFORMANCE CLOCK -->
+  <h2>Performance Clock — Linha do Tempo</h2>
+  ${marcosHTML}
+
+  <!-- DIAGNÓSTICO MAIS RECENTE -->
+  <h2>Diagnóstico Motor — Semana Atual</h2>
+  ${diagHTML}
+
+  <!-- DADOS DE JOGO (VEO) -->
+  <h2>Dados de Jogo (Veo)</h2>
+  ${jogosHTML}
+
+  <!-- PERFIL PSICOLÓGICO -->
+  <h2>Perfil Psicológico</h2>
+  <p style="font-size:12px;color:#444;line-height:1.6;">
+    ${perfil.psicologico.perfil}<br><br>
+    <strong>Mecanismo:</strong> ${perfil.psicologico.mecanismo || '—'}<br>
+    <strong>Regra de desenvolvimento:</strong> ${perfil.psicologico.regra}
+  </p>
+
+  <div class="rodape">
+    <span>Projeto Atleta Elite — Sistema de Desenvolvimento Técnico</span>
+    <span>Gerado em ${dataGeracao}</span>
+  </div>
+
+  <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+function dossieImprimir(atleta) {
+  dossieGerar(atleta);
+}
+
+// ── MENTAL
+function rMental(){
+  const p = player;
+  const nomeAtleta = p === 'lucas' ? 'Lucas' : 'Miguel';
+  const storeSemanal = 'mental_semanal';
+  const storeDiario = 'diario_cognitivo';
+
+  // Carregar dados
+  let semanal = [];
+  try { semanal = JSON.parse(localStorage.getItem(storeSemanal) || '[]'); } catch(e){}
+  let diario = [];
+  try { diario = JSON.parse(localStorage.getItem(storeDiario) || '[]'); } catch(e){}
+
+  // Filtrar por atleta
+  const semAtleta = semanal.filter(s => s.atleta === p);
+  const diarAtleta = diario.filter(d => d.atleta === p);
+
+  // Calcular semanas disponíveis (últimas 10)
+  const semanas = Array.from({length:10},(_,i)=>`Semana ${i+1}`);
+
+  // Dimensões rastreadas
+  const dims = [
+    {id:'concentracao', icon:'🎯', label:'Concentração'},
+    {id:'coragem',      icon:'🦁', label:'Coragem'},
+    {id:'recuperacao',  icon:'🔄', label:'Recup. Erro'},
+    {id:'comunicacao',  icon:'💬', label:'Comunicação'},
+    {id:'energia',      icon:'⚡', label:'Energia'},
+  ];
+
+  // Score por semana (pai + atleta média)
+  function scoreSemana(sem){
+    const entradas = semAtleta.filter(s => s.semana === sem);
+    if(!entradas.length) return null;
+    let total=0, count=0;
+    entradas.forEach(e=>{
+      if(e.score != null){ total+=e.score; count++; }
+    });
+    return count ? (total/count).toFixed(1) : null;
+  }
+
+  // Últimas 6 semanas com scores
+  const hist6 = semanas.slice(0,6).map(s=>({sem:s, score:scoreSemana(s)}));
+  const maxScore = 10;
+
+  // Dashboard de dimensões — última semana com dados
+  const ultimaEntrada = semAtleta.filter(e=>e.dimensoes).slice(-1)[0];
+  const penultimaEntrada = semAtleta.filter(e=>e.dimensoes).slice(-2,-1)[0];
+
+  // Alertas
+  let alertas = [];
+  const ult2 = semAtleta.slice(-2);
+  if(ult2.length===2 && ult2[0].score!=null && ult2[1].score!=null){
+    const diff = ult2[1].score - ult2[0].score;
+    if(diff <= -1.5) alertas.push(`⚠️ Queda de ${Math.abs(diff).toFixed(1)} pts entre semanas. Considere conversar com ${nomeAtleta}.`);
+  }
+  // Score < 5 por 2 semanas consecutivas
+  const baixas = semAtleta.filter(e=>e.score!=null && e.score < 5);
+  if(baixas.length >= 2){
+    alertas.push(`🔴 Score mental abaixo de 5 em ${baixas.length} registros. Recomendado: conversa pai-atleta esta semana.`);
+  }
+
+  // Exercícios cognitivos por sessão
+  const exerciciosLucas = {
+    S1:[
+      {id:'01',nome:'Varredura Obrigatória Pré-Toque',desc:'2 varreduras obrigatórias antes de cada toque. Olhar: defensor → companheiro → espaço. Executar em todo contato com a bola nos primeiros 20 min.'},
+      {id:'02',nome:'Mapa de Prioridades',desc:'Ordem de leitura fixa: 1º defensor marcando, 2º companheiro mais próximo, 3º espaço livre, 4º saída para frente. Repetir mentalmente antes de receber.'},
+      {id:'03',nome:'Antecipação de Posicionamento',desc:'Trabalha direto o gap 3.0/10. Antes da bola chegar: mover 1 passo na direção do espaço previsto. Não esperar a bola — antecipar 0.5s.'},
+    ],
+    S3:[
+      {id:'04',nome:'Vídeo 10s Antes de Receber',desc:'Protocolo com Futebol Máximo: assistir 10s do vídeo da situação mapeada antes de iniciar o bloco tático. Criar imagem mental da solução correta.'},
+      {id:'05',nome:'3º Homem',desc:'Leitura antecipada: identificar quem é o 3º homem no triângulo. Chegar simultâneo ao passe do 2º companheiro — não após.'},
+      {id:'06',nome:'Checkpoint de Leitura',desc:'3 perguntas pós-sessão: (1) Quantas vezes me movi antes da bola chegar? (2) Identifiquei o espaço certo antes do passe? (3) Mantive scanning mesmo sem a bola?'},
+    ],
+  };
+  const exerciciosMiguel = {
+    S1:[
+      {id:'07',nome:'Varredura de Área antes de Distribuir',desc:'Antes de qualquer toque nos pés: 1 varredura completa (esq → dir). Criar pausa de 1-2s antes do toque para registrar posição de todos.'},
+      {id:'08',nome:'Vocabulário de 4 Palavras-Chave',desc:'LIMPA = companheiro livre para receber. MARCA = adversário na marcação. HORA = momento de sair para o cruzamento. MÊU = bola do goleiro sem disputa.'},
+      {id:'09',nome:'Posicionamento Antecipado',desc:'Leitura do quadril do atacante antes do chute. Posição inicial: 1 passo à frente da linha de gol. Identificar intenção 0.3s antes do contato.'},
+    ],
+    S3:[
+      {id:'10',nome:'Checkpoint de Saídas',desc:'3 perguntas pós-sessão: (1) Verbalizei pelo menos uma vez por situação? (2) Minha posição inicial permitia a saída? (3) Tomei a decisão de sair antes do chute?'},
+    ],
+  };
+  const exercs = p === 'lucas' ? exerciciosLucas : exerciciosMiguel;
+
+  // Estado da aba (pai ou atleta) — salvo em sessionStorage
+  const swKey = `mental_sw_${p}`;
+  let sw = sessionStorage.getItem(swKey) || 'pai';
+
+  // Semana selecionada para questionário
+  const semSelKey = `mental_semsel_${p}`;
+  let semSel = sessionStorage.getItem(semSelKey) || 'Semana 1';
+
+  // Perguntas por perfil
+  const perguntasPai = [
+    {id:'conc', label:'Concentração durante o treino', emojis:['😴','😐','🙂','😤'], valores:[1,2,3,4]},
+    {id:'cor',  label:'Tentativas corajosas (mesmo com erro)', emojis:['❌','➖','✅','🔥'], valores:[1,2,3,4]},
+    {id:'rec',  label:'Como reagiu após errar', emojis:['😞','😐','🙂','💪'], valores:[1,2,3,4]},
+    {id:'com',  label:'Comunicação com os outros', emojis:['🤐','😐','🗣️','📢'], valores:[1,2,3,4]},
+    {id:'ene',  label:'Energia e disposição geral', emojis:['🪫','😐','⚡','🚀'], valores:[1,2,3,4]},
+  ];
+  const perguntasAtleta = [
+    {id:'ani', label:'Como você se sentiu hoje?', emojis:['😩','😐','😊','🤩'], valores:[1,2,3,4]},
+    {id:'con', label:'Você tentou coisas novas mesmo com risco de errar?', emojis:['😬','➖','✅','🔥'], valores:[1,2,3,4]},
+    {id:'err', label:'Quando errou, como ficou?', emojis:['😠','😞','😐','💪'], valores:[1,2,3,4]},
+    {id:'foc', label:'Conseguiu focar no que devia focar?', emojis:['😵','😐','🎯','🧠'], valores:[1,2,3,4]},
+    {id:'sem', label:'No geral, foi uma boa semana?', emojis:['👎','😕','👍','🏆'], valores:[1,2,3,4]},
+  ];
+
+  const pergs = sw === 'pai' ? perguntasPai : perguntasAtleta;
+  const fonte = sw === 'pai' ? 'pai' : 'atleta';
+
+  // Carregar respostas já salvas para semana+fonte
+  const entradaExistente = semAtleta.find(e => e.semana === semSel && e.fonte === fonte);
+  const respostas = entradaExistente ? entradaExistente.respostas : {};
+
+  // Render
+  const wrap = document.getElementById('wrap');
+  wrap.innerHTML = `
+<div class="mental-wrap">
+
+  <!-- SWITCHER -->
+  <div class="mental-switcher">
+    <button class="mental-sw-btn ${sw==='pai'?'on':''}" onclick="mentalSw('pai')">👁️ Olhar do Pai</button>
+    <button class="mental-sw-btn ${sw==='atleta'?'on':''}" onclick="mentalSw('atleta')">⚽ Olhar do Atleta</button>
+  </div>
+
+  <!-- ALERTAS -->
+  ${alertas.map(a=>`<div class="mental-alert">${a}</div>`).join('')}
+
+  <!-- DASHBOARD TENDÊNCIA -->
+  <div class="mental-section-title">📊 Tendência das Últimas 6 Semanas</div>
+  <div class="mental-cards">
+    ${dims.map(d=>{
+      const ultVal = ultimaEntrada?.dimensoes?.[d.id] ?? null;
+      const penVal = penultimaEntrada?.dimensoes?.[d.id] ?? null;
+      const delta = (ultVal!=null && penVal!=null) ? (ultVal - penVal) : null;
+      const deltaStr = delta!=null ? (delta>0?`▲ +${delta.toFixed(1)}`:(delta<0?`▼ ${delta.toFixed(1)}`:'━ igual')) : '—';
+      const deltaClass = delta==null?'eq':(delta>0?'up':(delta<0?'dn':'eq'));
+      return `<div class="mental-card">
+        <div class="mental-card-icon">${d.icon}</div>
+        <div class="mental-card-dim">${d.label}</div>
+        <div class="mental-card-val">${ultVal!=null?ultVal.toFixed(1):'—'}</div>
+        <div class="mental-card-delta ${deltaClass}">${deltaStr}</div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <!-- GRÁFICO HISTÓRICO -->
+  <div class="mental-section-title">📈 Score Semanal</div>
+  <div style="background:var(--card);border:1px solid var(--b);border-radius:4px;padding:14px 16px;margin-bottom:16px;">
+    <div class="mental-hist-bar">
+      ${hist6.map(h=>{
+        const score = h.score ? parseFloat(h.score) : 0;
+        const pct = Math.round((score/maxScore)*100);
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);">${score||'—'}</div>
+          <div class="mental-hb ${h.score?'mental-hb-pai':''}" style="height:${Math.max(pct,4)}%;width:100%;"></div>
+          <div class="mental-hb-lbl">${h.sem.replace('Semana ','S')}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:8px;">👁️ Pai &nbsp;⚽ Atleta &nbsp;(médias por semana)</div>
+  </div>
+
+  <!-- QUESTIONÁRIO SEMANAL -->
+  <div class="mental-section-title">📝 Questionário Semanal — ${sw==='pai'?'Olhar do Pai':'Olhar do Atleta'}</div>
+  <div class="mental-sem-sel">
+    <label>SEMANA:</label>
+    <select id="mentalSemSel" onchange="mentalChangeSem(this.value)">
+      ${semanas.map(s=>`<option value="${s}" ${s===semSel?'selected':''}>${s}</option>`).join('')}
+    </select>
+  </div>
+  <div class="mental-q-wrap" id="mentalQWrap">
+    <div class="mental-q-title">${sw==='pai'
+      ? `Como você observou ${nomeAtleta} esta semana?`
+      : `Como foi sua semana, ${nomeAtleta}?`
+    }</div>
+    ${pergs.map(q=>{
+      const selVal = respostas[q.id] ?? null;
+      return `<div class="mental-q-item">
+        <div class="mental-q-label">${q.label}</div>
+        <div class="mental-emoji-row">
+          ${q.emojis.map((em,i)=>`<button class="mental-emoji-btn ${selVal===q.valores[i]?'sel':''}"
+            onclick="mentalSelResp('${q.id}',${q.valores[i]})">${em}</button>`).join('')}
+        </div>
+        <div class="mental-q-nota">${['Baixo','Regular','Bom','Excelente'][selVal!=null?selVal-1:0]||''}</div>
+      </div>`;
+    }).join('')}
+    ${sw==='pai'?`
+    <div class="mental-q-item">
+      <div class="mental-q-label">Observação livre (opcional)</div>
+      <textarea class="mental-textarea" id="mentalNota" placeholder="O que chamou sua atenção esta semana?">${entradaExistente?.nota||''}</textarea>
+    </div>`:''}
+    <button class="mental-save-btn" onclick="mentalSalvar()">✅ Salvar ${semSel}</button>
+    ${entradaExistente?`<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#4CAF50;margin-top:8px;">✓ Já registrado — Score: ${entradaExistente.score?.toFixed(1)||'—'}/10</div>`:''}
+  </div>
+
+  <!-- DIÁRIO PÓS-TREINO -->
+  <div class="mental-section-title">📔 Diário Pós-Treino — ${nomeAtleta}</div>
+  <div class="mental-q-wrap">
+    <div class="mental-q-title">1 coisa tentada com coragem hoje</div>
+    <textarea class="mental-textarea" id="diarioTxt" placeholder="Ex: tentei o passe em profundidade mesmo com pressão..." style="min-height:70px;"></textarea>
+    <button class="mental-save-btn" onclick="mentalSalvarDiario()" style="margin-top:6px;">✍️ Registrar</button>
+  </div>
+  ${diarAtleta.length?`
+  <div class="mental-hist-list">
+    ${diarAtleta.slice().reverse().slice(0,5).map((d,i)=>`
+    <div class="mental-diario-item">
+      <div class="mental-diario-date">${d.data} · ${d.sessao||'Treino'}</div>
+      <div class="mental-diario-txt">${d.texto}</div>
+    </div>`).join('')}
+  </div>`:'<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--td);padding:8px 0;">Nenhuma entrada ainda. Registre após o próximo treino!</div>'}
+
+  <!-- EXERCÍCIOS COGNITIVOS -->
+  <div class="mental-section-title">🧩 Exercícios Cognitivos — ${nomeAtleta}</div>
+  ${Object.entries(exercs).map(([sess, exs])=>`
+    <div style="margin-bottom:4px;">
+      <span class="mental-badge-sessao mental-badge-${sess.toLowerCase()}">${sess}</span>
+    </div>
+    ${exs.map(ex=>`
+    <div class="mental-ex-card">
+      <div class="mental-ex-id">EXERCÍCIO ${ex.id}</div>
+      <div class="mental-ex-nome">${ex.nome}</div>
+      <div class="mental-ex-desc">${ex.desc}</div>
+    </div>`).join('')}
+  `).join('')}
+
+  <!-- HISTÓRICO COMPLETO -->
+  <div class="mental-section-title">🗂️ Histórico de Registros</div>
+  ${semAtleta.length ? `
+  <div class="mental-hist-list">
+    ${semAtleta.slice().reverse().map((e,i)=>`
+    <div class="mental-hist-item">
+      <div class="mental-hist-meta">
+        <span class="mental-hist-sem">${e.semana}</span>
+        <span class="mental-hist-fonte">${e.fonte==='pai'?'👁️ Pai':'⚽ Atleta'}</span>
+        <span class="mental-hist-score" style="color:${(e.score||0)>=7?'#4CAF50':((e.score||0)>=5?'#ff9800':'#f44336')}">${e.score?.toFixed(1)||'—'}</span>
+        <button class="mental-hist-del" onclick="mentalDel(${semAtleta.length-1-i})">✕</button>
+      </div>
+      ${e.nota?`<div style="font-size:11px;color:var(--ts);margin-top:4px;">${e.nota}</div>`:''}
+    </div>`).join('')}
+  </div>` : `<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);padding:8px 0;">Nenhum registro ainda. Preencha o questionário acima!</div>`}
+
+</div>`;
+
+  // Guardar respostas em memória temporária
+  window._mentalRespostas = Object.assign({}, respostas);
+}
+
+function mentalSw(sw){
+  sessionStorage.setItem(`mental_sw_${player}`, sw);
+  rMental();
+}
+
+function mentalChangeSem(val){
+  sessionStorage.setItem(`mental_semsel_${player}`, val);
+  rMental();
+}
+
+function mentalSelResp(id, val){
+  window._mentalRespostas = window._mentalRespostas || {};
+  window._mentalRespostas[id] = val;
+  // Atualizar visual
+  document.querySelectorAll(`[onclick*="mentalSelResp('${id}'"]`).forEach(b=>{
+    b.classList.remove('sel');
+  });
+  event.target.classList.add('sel');
+}
+
+function mentalSalvar(){
+  const p = player;
+  const storeSemanal = 'mental_semanal';
+  let semanal = [];
+  try { semanal = JSON.parse(localStorage.getItem(storeSemanal) || '[]'); } catch(e){}
+
+  const semSel = sessionStorage.getItem(`mental_semsel_${p}`) || 'Semana 1';
+  const sw = sessionStorage.getItem(`mental_sw_${p}`) || 'pai';
+  const respostas = window._mentalRespostas || {};
+  const nota = sw==='pai' ? (document.getElementById('mentalNota')?.value || '') : '';
+
+  // Calcular score (média das respostas, escala 1-4 → 0-10)
+  const vals = Object.values(respostas).filter(v=>v!=null);
+  const scoreRaw = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : null;
+  const score = scoreRaw != null ? ((scoreRaw-1)/3)*10 : null;
+
+  // Calcular dimensões a partir das respostas
+  const dimMap = sw==='pai'
+    ? {concentracao:'conc', coragem:'cor', recuperacao:'rec', comunicacao:'com', energia:'ene'}
+    : {concentracao:'foc', coragem:'con', recuperacao:'err', comunicacao:'ani', energia:'sem'};
+  const dimensoes = {};
+  Object.entries(dimMap).forEach(([dim,qid])=>{
+    if(respostas[qid]!=null) dimensoes[dim] = ((respostas[qid]-1)/3)*10;
+  });
+
+  // Remover entrada existente para semana+fonte
+  const filtered = semanal.filter(e => !(e.atleta===p && e.semana===semSel && e.fonte===sw));
+
+  const entrada = {
+    atleta: p,
+    semana: semSel,
+    fonte: sw,
+    data: new Date().toLocaleDateString('pt-BR'),
+    respostas,
+    dimensoes,
+    score,
+    nota
+  };
+
+  filtered.push(entrada);
+  localStorage.setItem(storeSemanal, JSON.stringify(filtered));
+
+  // Sincronizar estado mental no motor
+  if(score!=null){
+    const estadoEl = document.getElementById('estadoMental');
+    if(estadoEl){
+      if(score>=7.5) estadoEl.value='alto';
+      else if(score>=5) estadoEl.value='normal';
+      else estadoEl.value='pos_erro';
+    }
+  }
+
+  // Detectar queda > 1.5 pts → marco automático no Clock
+  const semAtleta = filtered.filter(e=>e.atleta===p && e.score!=null).slice(-2);
+  if(semAtleta.length===2){
+    const diff = semAtleta[1].score - semAtleta[0].score;
+    if(diff <= -1.5 && typeof clockSalvarMarco === 'function'){
+      clockSalvarMarco({
+        atleta: p,
+        tipo: 'auto',
+        categoria: 'Mental',
+        titulo: `Queda mental detectada — ${semSel}`,
+        descricao: `Score caiu de ${semAtleta[0].score.toFixed(1)} para ${semAtleta[1].score.toFixed(1)}`,
+        data: new Date().toISOString().split('T')[0]
+      });
+    }
+  }
+
+  rMental();
+  // Flash de confirmação
+  setTimeout(()=>{
+    const btn = document.querySelector('.mental-save-btn');
+    if(btn){ btn.textContent='✅ Salvo!'; btn.style.background='rgba(76,175,80,0.2)'; btn.style.borderColor='#4CAF50'; }
+  }, 100);
+}
+
+function mentalSalvarDiario(){
+  const p = player;
+  const txt = document.getElementById('diarioTxt')?.value?.trim();
+  if(!txt) return;
+  const storeDiario = 'diario_cognitivo';
+  let diario = [];
+  try { diario = JSON.parse(localStorage.getItem(storeDiario) || '[]'); } catch(e){}
+  diario.push({
+    atleta: p,
+    data: new Date().toLocaleDateString('pt-BR'),
+    hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    sessao: 'S1/S3',
+    texto: txt
+  });
+  localStorage.setItem(storeDiario, JSON.stringify(diario));
+  rMental();
+}
+
+function mentalDel(idx){
+  const p = player;
+  const storeSemanal = 'mental_semanal';
+  let semanal = [];
+  try { semanal = JSON.parse(localStorage.getItem(storeSemanal) || '[]'); } catch(e){}
+  const semAtleta = semanal.filter(e=>e.atleta===p);
+  const outros = semanal.filter(e=>e.atleta!==p);
+  semAtleta.splice(idx,1);
+  localStorage.setItem(storeSemanal, JSON.stringify([...outros, ...semAtleta]));
+  rMental();
+}
+
+// ── Hook: detectar marcos automáticos após rodar motor
+// Sobrescreve o final de rodarMotor para chamar clockDetectarMarcos
+const _origRodarMotor = rodarMotor;
+// Patch aplicado inline — clockDetectarMarcos é chamado dentro do try de rodarMotor após salvar histórico
+// (O hook está inserido diretamente no fluxo de rodarMotor através do patch abaixo)
+
+// ══════════════════════════════════════════════════
+// MÓDULO NUTRIÇÃO — FASE 7: PLANO ALIMENTAR + EXAMES
+// ══════════════════════════════════════════════════
+
+function rNutricao() {
+  const p = player;
+  const perfil = PERFIL_ATLETA[p];
+  const cor = p === 'lucas' ? 'var(--lucas)' : 'var(--miguel)';
+  const corHex = p === 'lucas' ? '#3b9eff' : '#00e87a';
+
+  // Ler dados clínicos
+  const bio = bioAthlete(perfil.nome);
+  const ultimo = bio?.records ? [...bio.records].sort((a,b)=>new Date(b.date)-new Date(a.date))[0] : null;
+  const exame = bio?.exames ? [...bio.exames].sort((a,b)=>new Date(b.date)-new Date(a.date))[0] : null;
+
+  // PHV
+  let fasePhv = 'desconhecido', phvOffset = null;
+  if (ultimo && bio?.dob) {
+    const age = (new Date() - new Date(bio.dob)) / (365.25*24*3600*1000);
+    phvOffset = parseFloat((-9.236+(0.0002708*(ultimo.height*ultimo.weight))+(-0.001663*(age*ultimo.height))+(0.007216*(age*ultimo.weight))+(0.02292*(ultimo.weight/ultimo.height*100))).toFixed(2));
+    fasePhv = phvOffset < -1 ? 'pre' : phvOffset <= 1 ? 'circa' : 'pos';
+  }
+
+  // Sono últimas semanas
+  const sonoData = lerSonoDoSaude(perfil.nome);
+  const sonoSemanas = (() => {
+    if (!bio?.sono?.length) return [];
+    return [...bio.sono].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,14);
+  })();
+
+  // Exames — lê ambos os formatos via lerExamesClinicosF7 (retorna objeto flat)
+  const exameFlat = lerExamesClinicosF7(perfil.nome);
+  const ferritina = exameFlat?.ferritina != null ? parseFloat(exameFlat.ferritina) : null;
+  const vitD = exameFlat?.vitaminaD != null ? parseFloat(exameFlat.vitaminaD) : null;
+  const dataExame = exameFlat?.date || null;
+
+  // Planos nutricionais por fase PHV
+  const PLANOS = {
+    pre: {
+      label: 'Pré-PHV',
+      cor: '#00e87a',
+      foco: 'Técnica e fundação metabólica',
+      descricao: 'Fase de crescimento gradual. Prioridade é construir hábitos alimentares sólidos e sustentar energia para o treino técnico.',
+      proteina: { ref: '1.2–1.4g/kg/dia', exemplo: ultimo ? `${Math.round(1.3 * (ultimo.weight||50))}–${Math.round(1.4 * (ultimo.weight||50))}g/dia` : '—' },
+      carboidrato: { ref: '5–6g/kg/dia', exemplo: ultimo ? `${Math.round(5.5 * (ultimo.weight||50))}g/dia` : '—' },
+      gordura: { ref: '1.0–1.2g/kg/dia', exemplo: ultimo ? `${Math.round(1.1 * (ultimo.weight||50))}g/dia` : '—' },
+      micronutrientes: ['Cálcio: 1000mg/dia (leite, iogurte, queijo)', 'Vitamina D: exposição solar 15–20min/dia', 'Ferro: carnes magras, feijão, lentilha'],
+      refeicoes: [
+        { nome: 'Café da manhã', ex: 'Ovos + pão integral + fruta + leite' },
+        { nome: 'Lanche pré-treino (1-2h antes)', ex: 'Banana + pasta de amendoim ou iogurte com granola' },
+        { nome: 'Almoço/Jantar', ex: 'Arroz + feijão + frango ou peixe + legumes + salada' },
+        { nome: 'Recuperação pós-treino (30min)', ex: 'Vitamina de banana com leite + castanhas' },
+      ]
+    },
+    circa: {
+      label: 'Circa-PHV ⚠',
+      cor: '#ff9800',
+      foco: 'Recuperação e proteção do crescimento',
+      descricao: 'Pico de crescimento ósseo e muscular. Demanda calórica e proteica alta. Risco de lesão 31-49% maior — nutrição é proteção.',
+      proteina: { ref: '1.6–1.8g/kg/dia', exemplo: ultimo ? `${Math.round(1.6 * (ultimo.weight||55))}–${Math.round(1.8 * (ultimo.weight||55))}g/dia` : '—' },
+      carboidrato: { ref: '6–8g/kg/dia', exemplo: ultimo ? `${Math.round(7 * (ultimo.weight||55))}g/dia` : '—' },
+      gordura: { ref: '1.2–1.5g/kg/dia', exemplo: ultimo ? `${Math.round(1.3 * (ultimo.weight||55))}g/dia` : '—' },
+      micronutrientes: [
+        'Cálcio: 1300mg/dia — CRÍTICO (ossos em formação acelerada)',
+        'Ferro: 11mg/dia — risco de anemia no pico de crescimento',
+        'Vitamina D: ≥30 ng/mL — monitorar via exame',
+        'Ômega-3: salmão, sardinha, linhaça — anti-inflamatório natural',
+        'Magnésio: banana, abacate, sementes — suporte muscular'
+      ],
+      refeicoes: [
+        { nome: 'Café da manhã', ex: 'Omelete 3 ovos + aveia + fruta + leite integral' },
+        { nome: 'Lanche pré-treino (2h antes)', ex: 'Batata-doce + frango ou iogurte grego + fruta' },
+        { nome: 'Almoço/Jantar', ex: 'Arroz + feijão + 150-200g proteína + legumes refogados + salada com azeite' },
+        { nome: 'Recuperação pós-treino (30min)', ex: 'Shake de proteína (leite + banana + aveia) ou chocolate quente com leite' },
+        { nome: 'Ceia (se acordar tarde)', ex: 'Iogurte grego ou queijo cottage + castanhas' },
+      ]
+    },
+    pos: {
+      label: 'Pós-PHV',
+      cor: '#3b9eff',
+      foco: 'Potência e performance',
+      descricao: 'Crescimento estabilizando. Foco em composição corporal, potência muscular e recuperação de atleta maduro.',
+      proteina: { ref: '1.6–2.0g/kg/dia', exemplo: ultimo ? `${Math.round(1.8 * (ultimo.weight||60))}g/dia` : '—' },
+      carboidrato: { ref: '5–7g/kg/dia', exemplo: ultimo ? `${Math.round(6 * (ultimo.weight||60))}g/dia` : '—' },
+      gordura: { ref: '1.0–1.5g/kg/dia', exemplo: ultimo ? `${Math.round(1.2 * (ultimo.weight||60))}g/dia` : '—' },
+      micronutrientes: ['Creatina: avaliar com médico a partir dos 16 anos', 'Ferro: manter monitoramento', 'Vitamina D: ≥40 ng/mL ideal', 'Eletrólitos: reposição pós-treino intenso'],
+      refeicoes: [
+        { nome: 'Café da manhã', ex: 'Ovos + pão + fruta + leite ou whey protein' },
+        { nome: 'Pré-treino (1-2h)', ex: 'Carboidrato de baixo IG + proteína leve' },
+        { nome: 'Almoço/Jantar', ex: 'Arroz integral + feijão + 200g carne magra + vegetais + azeite' },
+        { nome: 'Pós-treino (30min)', ex: 'Whey ou leite + banana + mel' },
+      ]
+    },
+    desconhecido: {
+      label: 'PHV não calculado',
+      cor: '#7a9bb5',
+      foco: 'Protocolo geral para atleta em desenvolvimento',
+      descricao: 'Insira medidas de altura e peso no saude.html para calcular o PHV e obter um plano personalizado.',
+      proteina: { ref: '1.2–1.6g/kg/dia', exemplo: '—' },
+      carboidrato: { ref: '5–7g/kg/dia', exemplo: '—' },
+      gordura: { ref: '1.0–1.3g/kg/dia', exemplo: '—' },
+      micronutrientes: ['Cálcio: 1000–1300mg/dia', 'Ferro: carnes magras + feijão', 'Vitamina D: exposição solar + exame periódico'],
+      refeicoes: [
+        { nome: 'Refeições principais', ex: 'Arroz + feijão + proteína + vegetais' },
+        { nome: 'Lanches', ex: 'Frutas + oleaginosas + laticínios' },
+      ]
+    }
+  };
+
+  const plano = PLANOS[fasePhv] || PLANOS.desconhecido;
+
+  // ── Gerar HTML de sono (últimas 14 medições como mini barras)
+  const sonoBarras = sonoSemanas.length ? sonoSemanas.slice(0,10).reverse().map(s => {
+    const h = parseFloat(s.hours) || 0;
+    const pct = Math.min(100, Math.round(h / 10 * 100));
+    const cor2 = h >= 9 ? '#00e87a' : h >= 7 ? '#ff9800' : '#f44336';
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:${cor2};">${h}h</div>
+      <div style="width:100%;height:40px;background:var(--card2);border-radius:2px;display:flex;align-items:flex-end;overflow:hidden;">
+        <div style="width:100%;height:${pct}%;background:${cor2};border-radius:2px 2px 0 0;min-height:2px;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--td);">${new Date(s.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</div>
+    </div>`;
+  }).join('') : `<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);padding:12px 0;">Registre sono no saude.html para visualizar aqui.</div>`;
+
+  // ── Status exames
+  const statusFerritina = ferritina === null ? '—' : ferritina < 30 ? `<span style="color:#f44336;font-weight:700;">${ferritina} ng/mL ⚠ BAIXA</span>` : `<span style="color:#4CAF50;">${ferritina} ng/mL ✓</span>`;
+  const statusVitD = vitD === null ? '—' : vitD < 30 ? `<span style="color:#f44336;font-weight:700;">${vitD} ng/mL ⚠ BAIXA</span>` : `<span style="color:#4CAF50;">${vitD} ng/mL ✓</span>`;
+
+  document.getElementById('wrap').innerHTML = `
+  <div style="padding:4px 0 40px;">
+
+    <!-- HEADER FASE PHV -->
+    <div style="background:var(--card);border:1px solid ${plano.cor}33;border-radius:6px;padding:16px 18px;margin-bottom:14px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;width:120px;height:100%;background:linear-gradient(90deg,transparent,${plano.cor}08);pointer-events:none;"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:6px;">// fase de desenvolvimento · ${perfil.nome}</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:${plano.cor};">${plano.label}</div>
+        ${phvOffset !== null ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);">offset: ${phvOffset > 0?'+':''}${phvOffset}a · ${ultimo?.height}cm · ${ultimo?.weight}kg</div>` : ''}
+        <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;color:${plano.cor};padding:3px 10px;border:1px solid ${plano.cor}44;border-radius:2px;">${plano.foco}</div>
+      </div>
+      <div style="font-size:12px;color:var(--ts);margin-top:8px;line-height:1.6;">${plano.descricao}</div>
+      ${fasePhv === 'circa' ? `<div style="margin-top:10px;padding:8px 12px;background:rgba(255,152,0,0.08);border:1px solid rgba(255,152,0,0.3);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#ff9800;">⚠ PROTOCOLO DE LESÃO ATIVO — evitar saltos, sprints máximos e duelos de contato. Motor ajusta carga automaticamente.</div>` : ''}
+    </div>
+
+    <!-- MACRONUTRIENTES -->
+    <div style="background:var(--card);border:1px solid var(--b);border-radius:6px;padding:16px 18px;margin-bottom:14px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:12px;display:flex;align-items:center;gap:8px;">// macronutrientes recomendados <span style="flex:1;height:1px;background:var(--b);display:inline-block;"></span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+        ${[
+          {l:'Proteína',r:plano.proteina.ref,e:plano.proteina.exemplo,c:'#3b9eff'},
+          {l:'Carboidrato',r:plano.carboidrato.ref,e:plano.carboidrato.exemplo,c:'#ff9800'},
+          {l:'Gordura',r:plano.gordura.ref,e:plano.gordura.exemplo,c:'#00e87a'}
+        ].map(m=>`
+          <div style="background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:12px 10px;text-align:center;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:${m.c};letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">${m.l}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tp);margin-bottom:3px;">${m.r}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);">${m.e}</div>
+          </div>`).join('')}
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--td);margin-bottom:8px;text-transform:uppercase;">Micronutrientes prioritários</div>
+      ${plano.micronutrientes.map(m=>`<div style="font-size:11px;color:var(--ts);padding:4px 0 4px 10px;border-left:2px solid ${plano.cor}44;">→ ${m}</div>`).join('')}
+    </div>
+
+    <!-- REFEIÇÕES -->
+    <div style="background:var(--card);border:1px solid var(--b);border-radius:6px;padding:16px 18px;margin-bottom:14px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:12px;display:flex;align-items:center;gap:8px;">// plano de refeições <span style="flex:1;height:1px;background:var(--b);display:inline-block;"></span></div>
+      ${plano.refeicoes.map((r,i)=>`
+        <div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--b);">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${plano.cor};min-width:16px;padding-top:1px;">${i+1}</div>
+          <div style="flex:1;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--tp);margin-bottom:2px;">${r.nome}</div>
+            <div style="font-size:11px;color:var(--ts);">${r.ex}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <!-- EXAMES CLÍNICOS -->
+    <div style="background:var(--card);border:1px solid var(--b);border-radius:6px;padding:16px 18px;margin-bottom:14px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:12px;display:flex;align-items:center;gap:8px;">// exames clínicos <span style="flex:1;height:1px;background:var(--b);display:inline-block;"></span><a href="saude.html" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--acc);text-decoration:none;border:1px solid var(--ab);padding:2px 8px;border-radius:2px;">ver painel →</a></div>
+      ${dataExame ? `<div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-bottom:10px;">Última coleta: ${dataExame}</div>` : ''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div style="background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:12px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Ferritina</div>
+          <div style="font-size:14px;font-family:'Rajdhani',sans-serif;font-weight:700;">${statusFerritina}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:4px;">ref: ≥30 ng/mL</div>
+          ${ferritina !== null && ferritina < 30 ? `<div style="font-size:10px;color:#ff9800;margin-top:6px;">→ Motor adiciona recuperação ativa ao plano</div>` : ''}
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:12px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Vitamina D</div>
+          <div style="font-size:14px;font-family:'Rajdhani',sans-serif;font-weight:700;">${statusVitD}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:4px;">ref: ≥30 ng/mL · ideal: ≥40</div>
+          ${vitD !== null && vitD < 30 ? `<div style="font-size:10px;color:#ff9800;margin-top:6px;">→ Suplementação + exposição solar 15–20min/dia</div>` : ''}
+        </div>
+      </div>
+      ${!exameFlat ? `<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);text-align:center;padding:8px 0;margin-bottom:8px;">Nenhum exame inserido ainda.</div>` : ''}
+      <a href="agente_exames.html?atleta=${p}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;background:rgba(59,158,255,0.08);border:1px solid rgba(59,158,255,0.3);border-radius:4px;color:var(--acc);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(59,158,255,0.16)'" onmouseout="this.style.background='rgba(59,158,255,0.08)'">🔬 Analisar exame com IA →</a>
+    </div>
+
+    <!-- SONO -->
+    <div style="background:var(--card);border:1px solid var(--b);border-radius:6px;padding:16px 18px;margin-bottom:14px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px;display:flex;align-items:center;gap:8px;">// sono — histórico recente <span style="flex:1;height:1px;background:var(--b);display:inline-block;"></span>${sonoData ? `<span style="font-size:9px;color:${sonoData.status==='ok'?'#00e87a':sonoData.status==='warn'?'#ff9800':'#f44336'};">${sonoData.label}</span>` : ''}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-bottom:10px;">Meta: ≥9h (10–13 anos) · Motor reduz carga se média < 7h</div>
+      <div style="display:flex;gap:4px;align-items:flex-end;margin-bottom:4px;">
+        ${sonoBarras}
+      </div>
+    </div>
+
+    <!-- RELATÓRIO MÉDICO PDF -->
+    <div style="background:var(--card);border:1px solid rgba(206,147,216,0.3);border-radius:6px;padding:16px 18px;margin-bottom:14px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#ce93d8;margin-bottom:10px;display:flex;align-items:center;gap:8px;">// relatório médico <span style="flex:1;height:1px;background:rgba(206,147,216,0.2);display:inline-block;"></span></div>
+      <div style="font-size:12px;color:var(--ts);margin-bottom:12px;line-height:1.6;">Gere o relatório clínico em PDF com biometria, PHV, exames e sono. Envie para o pediatra ou nutricionista por WhatsApp ou e-mail.</div>
+      <a href="relatorio_medico.html?atleta=${p}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(206,147,216,0.15);border:1px solid rgba(206,147,216,0.5);border-radius:4px;color:#ce93d8;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(206,147,216,0.25)'" onmouseout="this.style.background='rgba(206,147,216,0.15)'">📄 Gerar Relatório PDF</a>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(206,147,216,0.45);margin-top:8px;line-height:1.5;">Abre em nova aba → Ctrl+P / Cmd+P → Salvar como PDF → enviar</div>
+    </div>
+
+  </div>`;
+}
+
+
+</script>
+</body>
+</html>

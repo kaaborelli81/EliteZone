@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Biometria & Crescimento — Atletas</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg-deep:#060b12;--bg-card:#0c1520;--bg-card2:#0f1a27;
+  --border:rgba(0,255,200,0.10);--text-primary:#e8f4f8;
+  --text-secondary:#7a9bb5;--text-dim:#3a5268;
+  --scanline:rgba(0,255,200,0.06);
+  --lucas:#3b9eff;--lucas-dim:rgba(59,158,255,0.12);--lucas-border:rgba(59,158,255,0.25);
+  --miguel:#00e87a;--miguel-dim:rgba(0,232,122,0.10);--miguel-border:rgba(0,232,122,0.25);
+  --accent:#3b9eff;--accent-dim:rgba(59,158,255,0.12);--accent-border:rgba(59,158,255,0.25);
+  --phv-ok:#00e87a;--phv-warn:#ff9800;--phv-alert:#f44336;
+  --gold:#ffd700;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-deep);color:var(--text-primary);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,255,200,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,0.018) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;z-index:0;}
+.scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--scanline),transparent);animation:scan 9s linear infinite;pointer-events:none;z-index:100;}
+@keyframes scan{0%{transform:translateY(-2px)}100%{transform:translateY(100vh)}}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(6,11,18,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--accent-border);padding:0 20px;height:56px;display:flex;align-items:center;gap:14px;}
+.back-btn{background:none;border:1px solid var(--accent-border);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;padding:6px 10px;border-radius:2px;cursor:pointer;text-transform:uppercase;text-decoration:none;transition:all .2s;}
+.back-btn:hover{background:var(--accent-dim);}
+.topbar-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);}
+.topbar-badge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-dim);padding:3px 8px;border:1px solid var(--border);border-radius:2px;margin-left:auto;}
+
+/* TABS ATLETA */
+.athlete-tabs{display:flex;gap:8px;padding:20px 20px 0;position:relative;z-index:1;}
+.athlete-tab{padding:10px 24px;border-radius:4px 4px 0 0;border:1px solid var(--border);border-bottom:none;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;background:var(--bg-card2);color:var(--text-dim);}
+.athlete-tab.lucas.active{background:var(--lucas-dim);border-color:var(--lucas-border);color:var(--lucas);}
+.athlete-tab.miguel.active{background:var(--miguel-dim);border-color:var(--miguel-border);color:var(--miguel);}
+.athlete-tab:not(.active):hover{background:var(--bg-card);color:var(--text-secondary);}
+.add-athlete-tab{padding:10px 16px;border-radius:4px 4px 0 0;border:1px dashed var(--border);border-bottom:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;background:transparent;color:var(--text-dim);}
+.add-athlete-tab:hover{color:var(--accent);border-color:var(--accent-border);}
+
+/* MAIN WRAP */
+.wrap{padding:0 20px 60px;position:relative;z-index:1;max-width:960px;margin:0 auto;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* ATHLETE HEADER */
+.athlete-header{background:var(--bg-card);border:1px solid var(--border);border-top:none;border-radius:0 4px 4px 4px;padding:20px 24px 16px;margin-bottom:20px;}
+.athlete-meta{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.athlete-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;flex-shrink:0;}
+.lucas .athlete-avatar{background:var(--lucas-dim);border:2px solid var(--lucas);color:var(--lucas);}
+.miguel .athlete-avatar{background:var(--miguel-dim);border:2px solid var(--miguel);color:var(--miguel);}
+.athlete-info{flex:1;}
+.athlete-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.lucas .athlete-name{color:var(--lucas);}
+.miguel .athlete-name{color:var(--miguel);}
+.athlete-pos{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--text-dim);text-transform:uppercase;margin-top:2px;}
+.phv-badge{margin-left:auto;padding:8px 16px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;text-align:center;}
+.phv-badge .phv-label{color:var(--text-dim);margin-bottom:3px;}
+.phv-badge .phv-value{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;}
+.phv-pre{background:rgba(0,232,122,0.10);border:1px solid rgba(0,232,122,0.3);}
+.phv-pre .phv-value{color:var(--phv-ok);}
+.phv-circa{background:rgba(255,152,0,0.10);border:1px solid rgba(255,152,0,0.3);}
+.phv-circa .phv-value{color:var(--phv-warn);}
+.phv-post{background:rgba(244,67,54,0.10);border:1px solid rgba(244,67,54,0.3);}
+.phv-post .phv-value{color:var(--phv-alert);}
+.phv-unknown{background:rgba(58,82,104,0.3);border:1px solid var(--border);}
+.phv-unknown .phv-value{color:var(--text-secondary);font-size:13px;}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:20px;}
+.card-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:14px;}
+.card-accent{border-left:3px solid var(--accent);}
+.lucas-card{border-left:3px solid var(--lucas)!important;}
+.miguel-card{border-left:3px solid var(--miguel)!important;}
+
+/* STAT TILES */
+.stat-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+@media(max-width:600px){.stat-tiles{grid-template-columns:repeat(2,1fr);}}
+.stat-tile{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:14px 12px;text-align:center;}
+.stat-tile .st-val{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--text-primary);line-height:1;}
+.stat-tile .st-unit{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);margin-left:3px;}
+.stat-tile .st-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-secondary);margin-top:5px;}
+.stat-tile .st-delta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--phv-ok);margin-top:2px;}
+
+/* FORM */
+.form-section{margin-bottom:24px;}
+.form-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+@media(max-width:560px){.form-row,.form-row-3{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-secondary);}
+.field input,.field select{background:var(--bg-card2);border:1px solid var(--border);border-radius:3px;padding:9px 12px;color:var(--text-primary);font-family:'Inter',sans-serif;font-size:13px;transition:border-color .2s;width:100%;}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent-border);}
+.field input::placeholder{color:var(--text-dim);}
+.field select option{background:var(--bg-card);}
+.submit-btn{width:100%;background:var(--accent);color:#060b12;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px;border:none;border-radius:3px;cursor:pointer;transition:opacity .2s;margin-top:4px;}
+.submit-btn:hover{opacity:.85;}
+.submit-btn.miguel-btn{background:var(--miguel);}
+
+/* HISTORY TABLE */
+.hist-table{width:100%;border-collapse:collapse;font-size:12px;}
+.hist-table th{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.hist-table td{padding:9px 10px;border-bottom:1px solid rgba(0,255,200,0.05);color:var(--text-secondary);}
+.hist-table tr:last-child td{border-bottom:none;}
+.hist-table tr:hover td{background:rgba(255,255,255,0.02);}
+.hist-table td.val{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text-primary);}
+.hist-table td.delta-pos{color:var(--phv-ok);font-family:'JetBrains Mono',monospace;font-size:10px;}
+.hist-table td.delta-neg{color:var(--phv-alert);font-family:'JetBrains Mono',monospace;font-size:10px;}
+.hist-table td.delta-neu{color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;}
+.del-btn{background:none;border:1px solid rgba(244,67,54,0.2);color:rgba(244,67,54,0.5);font-size:10px;padding:2px 7px;border-radius:2px;cursor:pointer;transition:all .2s;}
+.del-btn:hover{border-color:#f44336;color:#f44336;}
+
+/* PHV EXPLANATION */
+.phv-explain{background:var(--bg-card2);border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:16px;}
+.phv-explain-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+.phv-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+@media(max-width:560px){.phv-phases{grid-template-columns:1fr;}}
+.phv-phase{padding:10px;border-radius:3px;font-size:12px;line-height:1.5;}
+.phv-phase .ph-name{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.phv-phase.pre{background:rgba(0,232,122,0.07);border:1px solid rgba(0,232,122,0.2);}
+.phv-phase.pre .ph-name{color:var(--phv-ok);}
+.phv-phase.circa{background:rgba(255,152,0,0.07);border:1px solid rgba(255,152,0,0.2);}
+.phv-phase.circa .ph-name{color:var(--phv-warn);}
+.phv-phase.post{background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.2);}
+.phv-phase.post .ph-name{color:var(--phv-alert);}
+.phv-phase p{color:var(--text-secondary);font-size:11px;}
+
+/* CHART */
+.chart-wrap{position:relative;width:100%;height:240px;}
+
+/* ALERT */
+.alert{padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:13px;line-height:1.5;}
+.alert-warn{background:rgba(255,152,0,0.10);border:1px solid rgba(255,152,0,0.3);color:#ff9800;}
+.alert-ok{background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.25);color:var(--phv-ok);}
+.alert-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;opacity:.7;margin-bottom:3px;}
+
+/* PARENTS SECTION */
+.parents-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:560px){.parents-row{grid-template-columns:1fr;}}
+.parent-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:3px;padding:14px;}
+.parent-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+.parent-height{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--text-primary);}
+.target-height{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-secondary);margin-top:4px;}
+
+/* SECTION TITLE */
+.section-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:32px;color:var(--text-dim);font-size:13px;}
+.empty-icon{font-size:28px;margin-bottom:10px;opacity:.5;}
+
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-ov.show{display:flex;}
+.modal{background:var(--bg-card);border:1px solid var(--accent-border);border-radius:6px;width:100%;max-width:480px;padding:24px;}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;}
+.modal-btns{display:flex;gap:10px;margin-top:16px;}
+.btn-cancel{flex:1;background:none;border:1px solid var(--border);color:var(--text-secondary);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px;border-radius:3px;cursor:pointer;}
+.btn-cancel:hover{border-color:var(--accent-border);}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<div class="topbar">
+  <a href="painel_motor.html" class="back-btn">← Painel</a>
+  <span class="topbar-title">Biometria</span>
+  <span class="topbar-badge" id="last-update-badge">// módulo de crescimento</span>
+</div>
+
+<div style="padding:0 20px;position:relative;z-index:1;max-width:960px;margin:0 auto;">
+  <div class="athlete-tabs" id="athlete-tabs">
+    <!-- tabs rendered by JS -->
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="panels-container"></div>
+</div>
+
+<!-- MODAL: NOVO ATLETA -->
+<div class="modal-ov" id="modal-new-athlete">
+  <div class="modal">
+    <div class="modal-title">Novo atleta</div>
+    <div class="form-row">
+      <div class="field"><label>Nome</label><input type="text" id="new-name" placeholder="Ex: João"></div>
+      <div class="field"><label>Data de nascimento</label><input type="date" id="new-dob"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Posição</label><input type="text" id="new-pos" placeholder="Ex: Goleiro · Fut7"></div>
+      <div class="field"><label>Cor de destaque</label>
+        <select id="new-color">
+          <option value="lucas">Azul</option>
+          <option value="miguel">Verde</option>
+          <option value="custom-orange">Laranja</option>
+          <option value="custom-pink">Rosa</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Altura pai (cm)</label><input type="number" id="new-father" placeholder="Ex: 178"></div>
+      <div class="field"><label>Altura mãe (cm)</label><input type="number" id="new-mother" placeholder="Ex: 163"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="submit-btn" onclick="createAthlete()">Criar atleta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const KEY = 'biometria_v2';
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(KEY);
+    return s ? JSON.parse(s) : null;
+  } catch(e) { return null; }
+}
+
+function saveState(s) {
+  localStorage.setItem(KEY, JSON.stringify(s));
+}
+
+function defaultState() {
+  return {
+    athletes: [
+      {
+        id: 'lucas',
+        name: 'Lucas',
+        dob: '2012-01-01',
+        position: 'Meio / Ponta esquerda · Fut7 & Futsal',
+        color: 'lucas',
+        fatherHeight: null,
+        motherHeight: null,
+        records: []
+      },
+      {
+        id: 'miguel',
+        name: 'Miguel',
+        dob: '2013-01-01',
+        position: 'Goleiro · Fut7 & Futsal',
+        color: 'miguel',
+        fatherHeight: null,
+        motherHeight: null,
+        records: []
+      }
+    ],
+    activeId: 'lucas'
+  };
+}
+
+let state = loadState() || defaultState();
+
+// ─── PHV CALCULATION ─────────────────────────────────────────────────────────
+// Mirwald et al. (2002) maturity offset equation for males
+function calcPHV(heightCm, weightKg, dob) {
+  const now = new Date();
+  const birth = new Date(dob);
+  const ageYears = (now - birth) / (365.25 * 24 * 3600 * 1000);
+
+  if (!heightCm || !weightKg || ageYears < 8) return null;
+
+  const h = heightCm;
+  const w = weightKg;
+  const age = ageYears;
+
+  // Simplified maturity offset (years from PHV)
+  const offset = -9.236 + (0.0002708 * (h * w))
+    + (-0.001663 * (age * h))
+    + (0.007216 * (age * w))
+    + (0.02292 * (w / h * 100));
+
+  return { offset: parseFloat(offset.toFixed(2)), age: parseFloat(ageYears.toFixed(1)) };
+}
+
+function phvPhase(offset) {
+  if (offset === null) return 'unknown';
+  if (offset < -1) return 'pre';
+  if (offset <= 1) return 'circa';
+  return 'post';
+}
+
+function phvLabel(offset, phase) {
+  if (phase === 'unknown') return { text: 'Dados insuficientes', class: 'phv-unknown' };
+  const sign = offset > 0 ? '+' : '';
+  const labels = {
+    pre: { text: `PRÉ-PHV  ${sign}${offset}a`, class: 'phv-pre' },
+    circa: { text: `CIRCA-PHV  ${sign}${offset}a`, class: 'phv-circa' },
+    post: { text: `PÓS-PHV  ${sign}${offset}a`, class: 'phv-post' }
+  };
+  return labels[phase];
+}
+
+// Mid-parental height target
+function targetHeight(fatherH, motherH, sex = 'male') {
+  if (!fatherH || !motherH) return null;
+  const f = parseFloat(fatherH), m = parseFloat(motherH);
+  return sex === 'male'
+    ? parseFloat(((f + m + 13) / 2).toFixed(1))
+    : parseFloat(((f + m - 13) / 2).toFixed(1));
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function getAge(dob) {
+  const now = new Date(), birth = new Date(dob);
+  return ((now - birth) / (365.25 * 24 * 3600 * 1000)).toFixed(1);
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+
+function colorVars(color) {
+  const map = {
+    lucas: { main: '#3b9eff', dim: 'rgba(59,158,255,0.12)', border: 'rgba(59,158,255,0.25)' },
+    miguel: { main: '#00e87a', dim: 'rgba(0,232,122,0.10)', border: 'rgba(0,232,122,0.25)' },
+    'custom-orange': { main: '#ff9800', dim: 'rgba(255,152,0,0.12)', border: 'rgba(255,152,0,0.28)' },
+    'custom-pink': { main: '#e91e8c', dim: 'rgba(233,30,140,0.12)', border: 'rgba(233,30,140,0.28)' }
+  };
+  return map[color] || map['lucas'];
+}
+
+function renderTabs() {
+  const container = document.getElementById('athlete-tabs');
+  const tabs = state.athletes.map(a => {
+    const cv = colorVars(a.color);
+    const isActive = a.id === state.activeId;
+    return `<button class="athlete-tab ${a.color} ${isActive ? 'active' : ''}"
+      style="--tab-color:${cv.main}"
+      onclick="switchAthlete('${a.id}')">${a.name}</button>`;
+  }).join('');
+  container.innerHTML = tabs + `<button class="add-athlete-tab" onclick="openNewAthleteModal()">+ atleta</button>`;
+}
+
+function renderPanels() {
+  const container = document.getElementById('panels-container');
+  container.innerHTML = state.athletes.map(a => renderAthletePanel(a)).join('');
+}
+
+function renderAthletePanel(a) {
+  const cv = colorVars(a.color);
+  const isActive = a.id === state.activeId;
+  const records = [...a.records].sort((x, y) => new Date(y.date) - new Date(x.date));
+  const latest = records[0];
+  const prev = records[1];
+
+  // PHV calc
+  let phvResult = null, phvInfo = null;
+  if (latest) {
+    phvResult = calcPHV(latest.height, latest.weight, a.dob);
+    if (phvResult) {
+      const phase = phvPhase(phvResult.offset);
+      phvInfo = phvLabel(phvResult.offset, phase);
+    }
+  }
+
+  const target = targetHeight(a.fatherHeight, a.motherHeight);
+  const ageNow = getAge(a.dob);
+
+  // Deltas
+  const deltaH = latest && prev ? (latest.height - prev.height).toFixed(1) : null;
+  const deltaW = latest && prev ? (latest.weight - prev.weight).toFixed(1) : null;
+
+  // Alert logic
+  let alertHtml = '';
+  if (phvResult) {
+    const phase = phvPhase(phvResult.offset);
+    if (phase === 'circa') {
+      alertHtml = `<div class="alert alert-warn">
+        <div class="alert-label">// atenção — pico de crescimento</div>
+        ${a.name} está no período de PHV (±1 ano do pico). Risco de lesão elevado.
+        Reduzir carga de impacto, priorizar técnica e flexibilidade. Medir a cada 6 semanas.
+      </div>`;
+    } else if (phase === 'post' && phvResult.offset < 2) {
+      alertHtml = `<div class="alert alert-warn">
+        <div class="alert-label">// pós-PHV recente</div>
+        ${a.name} passou pelo pico de crescimento recentemente. Janela ideal para ganho de força e potência.
+      </div>`;
+    } else if (phase === 'pre') {
+      alertHtml = `<div class="alert alert-ok">
+        <div class="alert-label">// pré-pico</div>
+        ${a.name} ainda não atingiu o pico de crescimento. Foco em técnica, coordenação e agilidade — janela de ouro.
+      </div>`;
+    }
+  }
+
+  const histRows = records.length === 0
+    ? `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📏</div>Nenhuma medição registrada ainda.</div></td></tr>`
+    : records.map((r, i) => {
+        const nextR = records[i + 1];
+        const dH = nextR ? (r.height - nextR.height).toFixed(1) : null;
+        const dW = nextR ? (r.weight - nextR.weight).toFixed(1) : null;
+        const phvR = calcPHV(r.height, r.weight, a.dob);
+        const phase = phvR ? phvPhase(phvR.offset) : 'unknown';
+        const phvColors = { pre: '#00e87a', circa: '#ff9800', post: '#f44336', unknown: '#3a5268' };
+        return `<tr>
+          <td>${fmtDate(r.date)}</td>
+          <td class="val">${r.height}<span style="font-size:10px;color:var(--text-dim)"> cm</span></td>
+          <td class="${dH !== null ? (parseFloat(dH) > 0 ? 'delta-pos' : 'delta-neu') : 'delta-neu'}">${dH !== null ? (parseFloat(dH) > 0 ? '+' : '') + dH + ' cm' : '—'}</td>
+          <td class="val">${r.weight}<span style="font-size:10px;color:var(--text-dim)"> kg</span></td>
+          <td class="${dW !== null ? (parseFloat(dW) > 0 ? 'delta-pos' : 'delta-neg') : 'delta-neu'}">${dW !== null ? (parseFloat(dW) > 0 ? '+' : '') + dW + ' kg' : '—'}</td>
+          <td style="color:${phvColors[phase]};font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;">${phase === 'unknown' ? '—' : phase}</td>
+          <td><button class="del-btn" onclick="deleteRecord('${a.id}','${r.date}')">×</button></td>
+        </tr>`;
+      }).join('');
+
+  return `
+  <div class="panel ${isActive ? 'active' : ''}" id="panel-${a.id}" data-athlete="${a.id}">
+
+    <!-- ATHLETE HEADER -->
+    <div class="athlete-header ${a.color}" style="border-color:${cv.border};">
+      <div class="athlete-meta">
+        <div class="athlete-avatar">${a.name.charAt(0)}</div>
+        <div class="athlete-info">
+          <div class="athlete-name">${a.name}</div>
+          <div class="athlete-pos">${a.position} &nbsp;·&nbsp; ${ageNow} anos</div>
+        </div>
+        ${phvInfo ? `
+        <div class="phv-badge ${phvInfo.class}">
+          <div class="phv-label">// fase PHV</div>
+          <div class="phv-value">${phvInfo.text}</div>
+        </div>` : `
+        <div class="phv-badge phv-unknown">
+          <div class="phv-label">// fase PHV</div>
+          <div class="phv-value">Registre uma medição</div>
+        </div>`}
+      </div>
+    </div>
+
+    ${alertHtml}
+
+    <!-- STAT TILES -->
+    <div class="stat-tiles">
+      <div class="stat-tile">
+        <div class="st-val">${latest ? latest.height : '—'}<span class="st-unit">cm</span></div>
+        ${deltaH !== null ? `<div class="st-delta">+${deltaH} cm desde última</div>` : ''}
+        <div class="st-lbl">Altura atual</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-val">${latest ? latest.weight : '—'}<span class="st-unit">kg</span></div>
+        ${deltaW !== null ? `<div class="st-delta">${parseFloat(deltaW) > 0 ? '+' : ''}${deltaW} kg</div>` : ''}
+        <div class="st-lbl">Peso atual</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-val">${target ? target : '—'}<span class="st-unit">${target ? 'cm' : ''}</span></div>
+        <div class="st-lbl">Altura alvo</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-val">${records.length}</div>
+        <div class="st-lbl">Medições</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- GRÁFICO -->
+      <div class="card">
+        <div class="card-title">// curva de crescimento</div>
+        <div class="chart-wrap">
+          <canvas id="chart-${a.id}"></canvas>
+        </div>
+      </div>
+
+      <!-- ALTURAS DOS PAIS + ALVO -->
+      <div class="card">
+        <div class="card-title">// dados dos pais e altura alvo</div>
+        <div class="parents-row" style="margin-bottom:14px;">
+          <div class="parent-card">
+            <div class="parent-label">Pai</div>
+            <div class="parent-height" id="father-display-${a.id}">${a.fatherHeight ? a.fatherHeight + ' cm' : '—'}</div>
+          </div>
+          <div class="parent-card">
+            <div class="parent-label">Mãe</div>
+            <div class="parent-height" id="mother-display-${a.id}">${a.motherHeight ? a.motherHeight + ' cm' : '—'}</div>
+          </div>
+        </div>
+        ${target ? `
+        <div style="background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:3px;padding:12px 14px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,215,0,0.6);margin-bottom:4px;">// altura alvo estimada (Khamis-Roche)</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;color:var(--gold);">${target} cm</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:3px;">±5 cm de margem típica</div>
+        </div>` : `
+        <div style="padding:12px;border:1px dashed var(--border);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);text-align:center;">
+          Preencha as alturas dos pais abaixo para calcular a altura alvo
+        </div>`}
+
+        <div class="form-row" style="margin-top:14px;margin-bottom:0;">
+          <div class="field">
+            <label>Altura do pai (cm)</label>
+            <input type="number" id="father-input-${a.id}" value="${a.fatherHeight || ''}" placeholder="Ex: 178" onchange="saveParent('${a.id}')">
+          </div>
+          <div class="field">
+            <label>Altura da mãe (cm)</label>
+            <input type="number" id="mother-input-${a.id}" value="${a.motherHeight || ''}" placeholder="Ex: 163" onchange="saveParent('${a.id}')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHV PHASES EXPLANATION -->
+    <div class="phv-explain">
+      <div class="phv-explain-title">// o que é PHV e por que importa</div>
+      <div class="phv-phases">
+        <div class="phv-phase pre">
+          <div class="ph-name">Pré-PHV</div>
+          <p>Antes do pico de crescimento. Janela ideal para técnica, coordenação e fundamentos. Baixo risco de lesão por crescimento.</p>
+        </div>
+        <div class="phv-phase circa">
+          <div class="ph-name">Circa-PHV  ⚠</div>
+          <p>No pico de crescimento (±1 ano). Risco de lesão elevado. Reduzir carga de impacto. Real Madrid e Man City ajustam treino aqui.</p>
+        </div>
+        <div class="phv-phase post">
+          <div class="ph-name">Pós-PHV</div>
+          <p>Após o pico. Janela para força e potência. Músculo responde melhor ao estímulo. Maior estabilidade articular.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOVA MEDIÇÃO -->
+    <div class="section-title">// nova medição</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="form-row-3">
+        <div class="field">
+          <label>Data</label>
+          <input type="date" id="date-${a.id}" value="${new Date().toISOString().split('T')[0]}">
+        </div>
+        <div class="field">
+          <label>Altura (cm)</label>
+          <input type="number" id="height-${a.id}" placeholder="Ex: 163.5" step="0.1">
+        </div>
+        <div class="field">
+          <label>Peso (kg)</label>
+          <input type="number" id="weight-${a.id}" placeholder="Ex: 52.3" step="0.1">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Observação (opcional)</label>
+        <input type="text" id="obs-${a.id}" placeholder="Ex: Início da temporada, após gripe...">
+      </div>
+      <button class="submit-btn ${a.color === 'miguel' ? 'miguel-btn' : ''}" onclick="addRecord('${a.id}')">
+        Registrar medição
+      </button>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div class="section-title">// histórico de medições</div>
+    <div class="card">
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Altura</th>
+            <th>Δ altura</th>
+            <th>Peso</th>
+            <th>Δ peso</th>
+            <th>PHV fase</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="hist-${a.id}">
+          ${histRows}
+        </tbody>
+      </table>
+    </div>
+
+  </div>`;
+}
+
+// ─── CHARTS ──────────────────────────────────────────────────────────────────
+const charts = {};
+
+function renderCharts() {
+  state.athletes.forEach(a => {
+    const canvas = document.getElementById('chart-' + a.id);
+    if (!canvas) return;
+    if (charts[a.id]) { charts[a.id].destroy(); }
+
+    const records = [...a.records].sort((x, y) => new Date(x.date) - new Date(y.date));
+    if (records.length === 0) {
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#3a5268';
+      ctx.font = '12px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('Sem dados ainda', canvas.width / 2, 120);
+      return;
+    }
+
+    const cv = colorVars(a.color);
+    const labels = records.map(r => fmtDate(r.date));
+    const heights = records.map(r => r.height);
+    const weights = records.map(r => r.weight);
+
+    charts[a.id] = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Altura (cm)',
+            data: heights,
+            borderColor: cv.main,
+            backgroundColor: cv.dim,
+            borderWidth: 2,
+            pointBackgroundColor: cv.main,
+            pointRadius: 4,
+            tension: 0.3,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Peso (kg)',
+            data: weights,
+            borderColor: '#ff9800',
+            backgroundColor: 'rgba(255,152,0,0.08)',
+            borderWidth: 1.5,
+            pointBackgroundColor: '#ff9800',
+            pointRadius: 3,
+            tension: 0.3,
+            borderDash: [4, 3],
+            yAxisID: 'y2'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#3a5268', font: { size: 10, family: 'JetBrains Mono' } },
+            grid: { color: 'rgba(0,255,200,0.05)' }
+          },
+          y: {
+            position: 'left',
+            ticks: { color: cv.main, font: { size: 10 } },
+            grid: { color: 'rgba(0,255,200,0.05)' }
+          },
+          y2: {
+            position: 'right',
+            ticks: { color: '#ff9800', font: { size: 10 } },
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
+  });
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+function switchAthlete(id) {
+  state.activeId = id;
+  saveState(state);
+  renderTabs();
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+}
+
+function addRecord(athleteId) {
+  const a = state.athletes.find(x => x.id === athleteId);
+  if (!a) return;
+  const date = document.getElementById('date-' + athleteId).value;
+  const height = parseFloat(document.getElementById('height-' + athleteId).value);
+  const weight = parseFloat(document.getElementById('weight-' + athleteId).value);
+  const obs = document.getElementById('obs-' + athleteId).value.trim();
+
+  if (!date || isNaN(height) || isNaN(weight)) {
+    alert('Preencha data, altura e peso.');
+    return;
+  }
+  // Remove duplicata mesma data
+  a.records = a.records.filter(r => r.date !== date);
+  a.records.push({ date, height, weight, obs });
+  saveState(state);
+
+  // Clear inputs
+  document.getElementById('height-' + athleteId).value = '';
+  document.getElementById('weight-' + athleteId).value = '';
+  document.getElementById('obs-' + athleteId).value = '';
+
+  fullRender();
+}
+
+function deleteRecord(athleteId, date) {
+  const a = state.athletes.find(x => x.id === athleteId);
+  if (!a) return;
+  if (!confirm('Remover esta medição?')) return;
+  a.records = a.records.filter(r => r.date !== date);
+  saveState(state);
+  fullRender();
+}
+
+function saveParent(athleteId) {
+  const a = state.athletes.find(x => x.id === athleteId);
+  if (!a) return;
+  const f = parseFloat(document.getElementById('father-input-' + athleteId).value);
+  const m = parseFloat(document.getElementById('mother-input-' + athleteId).value);
+  if (!isNaN(f)) a.fatherHeight = f;
+  if (!isNaN(m)) a.motherHeight = m;
+  saveState(state);
+  fullRender();
+}
+
+function openNewAthleteModal() {
+  document.getElementById('modal-new-athlete').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal-new-athlete').classList.remove('show');
+}
+
+function createAthlete() {
+  const name = document.getElementById('new-name').value.trim();
+  const dob = document.getElementById('new-dob').value;
+  const pos = document.getElementById('new-pos').value.trim();
+  const color = document.getElementById('new-color').value;
+  const father = parseFloat(document.getElementById('new-father').value);
+  const mother = parseFloat(document.getElementById('new-mother').value);
+
+  if (!name || !dob) { alert('Nome e data de nascimento são obrigatórios.'); return; }
+
+  const id = name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+  state.athletes.push({
+    id, name, dob,
+    position: pos || '',
+    color,
+    fatherHeight: isNaN(father) ? null : father,
+    motherHeight: isNaN(mother) ? null : mother,
+    records: []
+  });
+  state.activeId = id;
+  saveState(state);
+  closeModal();
+  fullRender();
+}
+
+function fullRender() {
+  renderTabs();
+  renderPanels();
+  renderCharts();
+  document.getElementById('last-update-badge').textContent =
+    '// atualizado ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// Click outside modal
+document.getElementById('modal-new-athlete').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+fullRender();
+</script>
+</body>
+</html>

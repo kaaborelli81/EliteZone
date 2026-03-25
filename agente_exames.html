@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Agente de Exames — Projeto Atleta Elite</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#F2F0EB;--surface:#FFFFFF;--surface2:#F8F7F4;--surface3:#EEECEA;
+  --border:#E0DDD8;--border2:#D0CCC6;
+  --text:#1A1714;--text2:#5A544D;--text3:#9A9490;
+  --lucas:#2563EB;--lucas-dim:rgba(37,99,235,0.08);--lucas-border:rgba(37,99,235,0.2);
+  --miguel:#059669;--miguel-dim:rgba(5,150,105,0.08);--miguel-border:rgba(5,150,105,0.2);
+  --ok:#16A34A;--ok-bg:#F0FDF4;--ok-border:#BBF7D0;
+  --warn:#D97706;--warn-bg:#FFFBEB;--warn-border:#FDE68A;
+  --alert:#DC2626;--alert-bg:#FEF2F2;--alert-border:#FECACA;
+  --info:#2563EB;--info-bg:#EFF6FF;--info-border:#BFDBFE;
+  --rx:#7C3AED;--rx-bg:rgba(124,58,237,0.06);--rx-border:rgba(124,58,237,0.2);
+  --radius:12px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh;}
+
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(242,240,235,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px;}
+.back{background:var(--surface);border:1px solid var(--border2);color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.5px;padding:6px 12px;border-radius:6px;cursor:pointer;text-decoration:none;transition:all .15s;}
+.back:hover{border-color:var(--text3);color:var(--text);}
+.top-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
+.top-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);padding:3px 8px;border:1px solid var(--border);border-radius:4px;margin-left:auto;background:var(--surface);}
+
+/* WRAP */
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px 80px;}
+
+/* SECTION TITLES */
+.sec-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin:24px 0 10px;}
+.sec-title:first-child{margin-top:0;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;}
+.card-sm{padding:14px 18px;}
+
+/* API KEY */
+.api-row{display:flex;gap:10px;align-items:center;}
+.api-row input{flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px 14px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);outline:none;transition:.15s;}
+.api-row input:focus{border-color:var(--info);background:var(--surface);}
+.api-saved{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ok);background:var(--ok-bg);padding:4px 10px;border-radius:4px;border:1px solid var(--ok-border);display:none;}
+
+/* ATHLETE SELECTOR */
+.ath-row{display:flex;gap:8px;margin-bottom:16px;}
+.ath-btn{padding:8px 22px;border-radius:8px;border:1.5px solid var(--border);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:var(--surface2);color:var(--text3);transition:all .15s;}
+.ath-btn.lucas.on{background:var(--lucas-dim);border-color:var(--lucas-border);color:var(--lucas);}
+.ath-btn.miguel.on{background:var(--miguel-dim);border-color:var(--miguel-border);color:var(--miguel);}
+
+/* UPLOAD AREA */
+.upload-area{border:2px dashed var(--border2);border-radius:var(--radius);padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);position:relative;}
+.upload-area:hover,.upload-area.drag{border-color:var(--info);background:var(--info-bg);}
+.upload-area.has-file{border-color:var(--ok);border-style:solid;background:var(--ok-bg);}
+.upload-icon{font-size:36px;margin-bottom:12px;}
+.upload-main{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.upload-sub{font-size:12px;color:var(--text3);}
+.upload-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
+.file-preview{display:none;align-items:center;gap:12px;margin-top:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--ok-border);border-radius:var(--radius-sm);}
+.file-preview.show{display:flex;}
+.file-icon{font-size:24px;}
+.file-info{flex:1;text-align:left;}
+.file-name{font-size:13px;font-weight:600;color:var(--text);}
+.file-size{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.file-remove{background:none;border:1px solid var(--alert-border);color:var(--alert);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;}
+
+/* BUTTONS */
+.btn{padding:11px 22px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:#1D4ED8;color:#fff;}
+.btn-primary:hover{background:#1e40af;}
+.btn-primary:disabled{background:var(--border2);color:var(--text3);cursor:not-allowed;}
+.btn-ok{background:var(--ok);color:#fff;}
+.btn-ok:hover{background:#15803d;}
+.btn-cancel{background:var(--surface);border:1px solid var(--border2);color:var(--text2);}
+.btn-cancel:hover{border-color:var(--text3);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+.btn-icon{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:none;border:1px solid var(--border);cursor:pointer;font-size:14px;color:var(--text3);}
+.btn-icon:hover{background:var(--surface2);color:var(--text);}
+
+/* SPINNER */
+.spin-wrap{text-align:center;padding:40px 20px;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--info);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-label{font-size:13px;color:var(--text2);}
+.spin-sub{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:4px;}
+
+/* RESULT SECTION */
+.result-hidden{display:none;}
+
+/* STATUS PILLS */
+.status-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+.pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pill-ok{background:var(--ok-bg);color:var(--ok);}.pill-ok .pill-dot{background:var(--ok);}
+.pill-warn{background:var(--warn-bg);color:var(--warn);}.pill-warn .pill-dot{background:var(--warn);}
+.pill-alert{background:var(--alert-bg);color:var(--alert);}.pill-alert .pill-dot{background:var(--alert);}
+.pill-info{background:var(--info-bg);color:var(--info);}.pill-info .pill-dot{background:var(--info);}
+.pill-rx{background:var(--rx-bg);color:var(--rx);}.pill-rx .pill-dot{background:var(--rx);}
+
+/* EXAM CARDS GRID */
+.exam-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+@media(max-width:600px){.exam-grid{grid-template-columns:1fr;}}
+.exam-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;}
+.exam-card.status-alert{border-left:3px solid var(--alert);}
+.exam-card.status-warn{border-left:3px solid var(--warn);}
+.exam-card.status-ok{border-left:3px solid var(--ok);}
+.exam-card.status-info{border-left:3px solid var(--info);}
+.exam-card.status-rx{border-left:3px solid var(--rx);}
+.exam-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;}
+.exam-val{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1;color:var(--text);}
+.exam-unit{font-size:12px;color:var(--text3);font-weight:400;margin-left:3px;}
+.exam-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-top:2px;}
+.exam-bar-wrap{height:5px;background:var(--border);border-radius:3px;margin:8px 0;}
+.exam-bar{height:100%;border-radius:3px;transition:width .4s;}
+.exam-status-lbl{font-size:11px;font-weight:600;margin-top:4px;}
+.exam-status-lbl.alert{color:var(--alert);}
+.exam-status-lbl.warn{color:var(--warn);}
+.exam-status-lbl.ok{color:var(--ok);}
+.exam-status-lbl.info{color:var(--info);}
+.exam-status-lbl.rx{color:var(--rx);}
+.exam-note{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.45;}
+.exam-prev{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-top:4px;}
+
+/* CHAINS */
+.chains-wrap{margin-bottom:16px;}
+.chain-card{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;}
+.chain-card.critical{background:var(--alert-bg);border-color:var(--alert-border);}
+.chain-title{font-size:13px;font-weight:700;color:var(--warn);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.chain-card.critical .chain-title{color:var(--alert);}
+.chain-text{font-size:12px;color:var(--text2);line-height:1.55;}
+
+/* NARRATIVE */
+.narr-card{border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;}
+.narr-pai{background:#EFF6FF;border:1px solid #BFDBFE;}
+.narr-med{background:#F5F3FF;border:1px solid #DDD6FE;}
+.narr-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.narr-pai .narr-label{color:#1D4ED8;}
+.narr-med .narr-label{color:#6D28D9;}
+.narr-text{font-size:13px;line-height:1.65;color:var(--text);}
+
+/* RX CARD */
+.rx-card{background:var(--rx-bg);border:1px solid var(--rx-border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;}
+.rx-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:var(--rx);text-transform:uppercase;margin-bottom:12px;}
+.rx-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media(max-width:480px){.rx-grid{grid-template-columns:1fr;}}
+.rx-field{background:var(--surface);border:1px solid var(--rx-border);border-radius:6px;padding:10px 14px;}
+.rx-fl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--rx);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+.rx-fv{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--text);}
+
+/* CONFIRM SECTION */
+.confirm-box{background:var(--surface);border:2px solid var(--warn-border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.confirm-title{font-size:14px;font-weight:700;color:var(--warn);margin-bottom:8px;}
+.confirm-text{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;}
+.confirm-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* HISTORY CHARTS */
+.chart-wrap{height:200px;position:relative;margin-top:10px;}
+.chart-legend{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap;}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);}
+.chart-legend-dot{width:8px;height:8px;border-radius:50%;}
+
+/* HISTORY TABLE */
+.htable{width:100%;border-collapse:collapse;font-size:12px;}
+.htable th{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;}
+.htable td{padding:8px 10px;border-bottom:1px solid var(--border);}
+.htable tr:last-child td{border-bottom:none;}
+.htable .vl{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;}
+.htable .del-btn{background:none;border:1px solid var(--alert-border);color:var(--alert);border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;}
+.empty-msg{text-align:center;padding:24px;color:var(--text3);font-size:12px;}
+
+/* TABS */
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto;}
+.tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;transition:.15s;}
+.tab.on{color:var(--lucas);border-bottom-color:var(--lucas);}
+
+/* FORM FIELDS */
+.f{margin-bottom:12px;}
+.f label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;font-family:'JetBrains Mono',monospace;}
+.f input,.f select,.f textarea{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:.15s;}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--info);background:var(--surface);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:500px){.g2,.g3{grid-template-columns:1fr;}}
+
+/* ALERT BANNER */
+.alert-banner{padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;}
+.alert-banner.error{background:var(--alert-bg);border:1px solid var(--alert-border);color:var(--alert);}
+.alert-banner.success{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok);}
+.alert-banner.info{background:var(--info-bg);border:1px solid var(--info-border);color:var(--info);}
+
+/* STEP INDICATOR */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:24px;}
+.step{display:flex;align-items:center;gap:8px;flex:1;}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;background:var(--border);color:var(--text3);flex-shrink:0;transition:.3s;}
+.step-num.active{background:var(--info);color:#fff;}
+.step-num.done{background:var(--ok);color:#fff;}
+.step-label{font-size:11px;font-weight:600;color:var(--text3);transition:.3s;}
+.step-label.active,.step-label.done{color:var(--text);}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 4px;}
+@media(max-width:500px){.step-label{display:none;}}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.toggle-lbl{font-size:13px;color:var(--text2);}
+
+/* SCROLLABLE SUMMARY */
+.summary-scroll{max-height:400px;overflow-y:auto;padding-right:4px;}
+.summary-scroll::-webkit-scrollbar{width:4px;}
+.summary-scroll::-webkit-scrollbar-track{background:transparent;}
+.summary-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back">← Início</a>
+  <span class="top-title">Agente de Exames</span>
+  <span class="top-badge" id="topBadge">FASE 9</span>
+</div>
+
+<div class="wrap">
+
+  <!-- STEP INDICATOR -->
+  <div class="steps">
+    <div class="step" id="s1">
+      <div class="step-num active" id="sn1">1</div>
+      <div class="step-label active" id="sl1">Configurar</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="s2">
+      <div class="step-num" id="sn2">2</div>
+      <div class="step-label" id="sl2">Upload</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="s3">
+      <div class="step-num" id="sn3">3</div>
+      <div class="step-label" id="sl3">Análise IA</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="s4">
+      <div class="step-num" id="sn4">4</div>
+      <div class="step-label" id="sl4">Confirmar</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="s5">
+      <div class="step-num" id="sn5">5</div>
+      <div class="step-label" id="sl5">Histórico</div>
+    </div>
+  </div>
+
+  <!-- STEP 1: CONFIG -->
+  <div id="step1">
+    <div class="sec-title">API Key Anthropic</div>
+    <div class="card">
+      <div class="api-row">
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-..." />
+        <button class="btn btn-primary" onclick="saveApiKey()">Salvar</button>
+        <span class="api-saved" id="apiSaved">✓ Salva</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;">A chave é salva localmente e nunca enviada a nenhum servidor além da Anthropic.</div>
+    </div>
+
+    <div class="sec-title">Atleta</div>
+    <div class="ath-row">
+      <button class="ath-btn lucas on" id="athLucas" onclick="selectAth('lucas')">Lucas</button>
+      <button class="ath-btn miguel" id="athMiguel" onclick="selectAth('miguel')">Miguel</button>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="goStep(2)" style="flex:1;">Próximo: Upload →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: UPLOAD -->
+  <div id="step2" style="display:none;">
+    <div class="sec-title">Tipo de documento</div>
+    <div class="ath-row" style="gap:8px;margin-bottom:16px;">
+      <button class="ath-btn on" id="typeLab" onclick="selectType('lab')" style="color:var(--info);background:var(--info-bg);border-color:var(--info-border);">🧪 Exames laboratoriais</button>
+      <button class="ath-btn" id="typeRx" onclick="selectType('rx')" style="">🦴 RX · Idade óssea</button>
+    </div>
+
+    <div class="sec-title">Carregar arquivo</div>
+    <div class="upload-area" id="uploadArea"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="handleDrop(event)">
+      <div class="upload-icon">📄</div>
+      <div class="upload-main">Clique ou arraste o arquivo aqui</div>
+      <div class="upload-sub">PDF ou JPEG/PNG — max 20 MB</div>
+      <input type="file" class="upload-input" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this.files[0])">
+    </div>
+
+    <div class="file-preview" id="filePreview">
+      <div class="file-icon" id="fileIcon">📄</div>
+      <div class="file-info">
+        <div class="file-name" id="fileName">—</div>
+        <div class="file-size" id="fileSize">—</div>
+      </div>
+      <button class="file-remove" onclick="removeFile()">Remover</button>
+    </div>
+
+    <div id="step2Alert" style="margin-top:10px;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn btn-cancel" onclick="goStep(1)">← Voltar</button>
+      <button class="btn btn-primary" id="analyzeBtn" onclick="runAnalysis()" disabled style="flex:1;">
+        <span id="analyzeBtnTxt">🔬 Analisar com IA</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: LOADING -->
+  <div id="step3" style="display:none;">
+    <div class="spin-wrap">
+      <div class="spinner"></div>
+      <div class="spin-label" id="spinLabel">Enviando documento para a IA...</div>
+      <div class="spin-sub" id="spinSub">claude-sonnet-4-6 · visão multimodal</div>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESULTS + CONFIRM -->
+  <div id="step4" style="display:none;">
+    <div id="resultsWrap"></div>
+
+    <div class="confirm-box" id="confirmBox">
+      <div class="confirm-title">⚠ Confirmar antes de salvar</div>
+      <div class="confirm-text">
+        Revise os valores acima. A IA interpreta laudos com alta precisão, mas pode haver erros em documentos mal digitalizados.<br>
+        <strong>Ao confirmar, todos os valores serão salvos no biometria_v2 e ficarão disponíveis no Motor e no Painel Médico.</strong>
+      </div>
+      <div class="confirm-actions">
+        <button class="btn btn-ok" onclick="confirmSave()">✓ Confirmar e salvar</button>
+        <button class="btn btn-cancel" onclick="resetForNewUpload()">← Refazer upload</button>
+        <button class="btn btn-cancel btn-sm" onclick="editManually()">✏ Editar manualmente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: HISTORY -->
+  <div id="step5" style="display:none;">
+    <div id="saveSuccessMsg" class="alert-banner success" style="display:none;">
+      ✓ Exames salvos com sucesso no biometria_v2.
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab on" id="tabGraficos" onclick="showHistTab('graficos')">Gráficos</button>
+      <button class="tab" id="tabTabela" onclick="showHistTab('tabela')">Histórico</button>
+      <button class="tab" id="tabManual" onclick="showHistTab('manual')">Entrada manual</button>
+    </div>
+
+    <div id="histGraficos"></div>
+    <div id="histTabela" style="display:none;"></div>
+    <div id="histManual" style="display:none;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn btn-cancel" onclick="resetForNewUpload()">+ Novo exame</button>
+      <button class="btn btn-primary" onclick="window.location.href='saude.html'" style="flex:1;">Ver Painel de Saúde →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ────────────────────────────────────────────────────────────────────────────
+//  STATE
+// ────────────────────────────────────────────────────────────────────────────
+let currentAth = 'lucas';
+let currentType = 'lab';
+let currentFile = null;
+let currentBase64 = null;
+let currentMime = null;
+let analysisResult = null;
+let histCharts = {};
+
+// ────────────────────────────────────────────────────────────────────────────
+//  ATHLETIC PERFORMANCE REFERENCES (definidas no Apêndice Chat 10)
+// ────────────────────────────────────────────────────────────────────────────
+const EXAM_REFS = {
+  'Ferritina': {
+    unit: 'ng/mL',
+    min: 0, max: 200,
+    zones: [
+      {label:'Deficiência atlética', max:30, color:'#DC2626', status:'alert'},
+      {label:'Subótimo atlético',    max:50, color:'#D97706', status:'warn'},
+      {label:'Zona de performance',  max:120,color:'#16A34A', status:'ok'},
+      {label:'Acima do ideal',       max:200,color:'#D97706', status:'warn'}
+    ],
+    note: 'Lab marca como normal até 7 ng/mL — critério inadequado para atleta. Mínimo atlético: 50 ng/mL.',
+    athletic: true
+  },
+  'Ferro sérico': {
+    unit: 'µg/dL',
+    min: 0, max: 200,
+    zones: [
+      {label:'Subótimo atlético', max:80, color:'#D97706', status:'warn'},
+      {label:'Zona de performance',max:150,color:'#16A34A', status:'ok'},
+      {label:'Acima do ideal',    max:200,color:'#D97706', status:'warn'}
+    ],
+    note: 'Queda progressiva é sinal de alerta mesmo dentro da referência do lab.',
+    athletic: true
+  },
+  'Vitamina D': {
+    unit: 'ng/mL',
+    min: 0, max: 100,
+    zones: [
+      {label:'Insuficiência',     max:30, color:'#DC2626', status:'alert'},
+      {label:'Subótimo atlético', max:50, color:'#D97706', status:'warn'},
+      {label:'Performance ótima', max:80, color:'#16A34A', status:'ok'},
+      {label:'Acima do ideal',    max:100,color:'#D97706', status:'warn'}
+    ],
+    note: 'Meta atlética: 50–80 ng/mL. Labs usam referência clínica (30+), insuficiente para otimização.',
+    athletic: true
+  },
+  'TSH': {
+    unit: 'µUI/mL',
+    min: 0, max: 6,
+    zones: [
+      {label:'Ideal esportivo',   max:2.5,color:'#16A34A', status:'ok'},
+      {label:'Atenção — investigar',max:4.17,color:'#D97706',status:'warn'},
+      {label:'Elevado',           max:6,  color:'#DC2626', status:'alert'}
+    ],
+    note: 'TSH esportivo ideal <2.5 µUI/mL. Subida progressiva = investigar cadeia ferro→deiodinase→tireoide.',
+    athletic: true
+  },
+  'Vitamina B6': {
+    unit: 'µg/L',
+    min: 0, max: 300,
+    zones: [
+      {label:'Deficiente',    max:20, color:'#D97706', status:'warn'},
+      {label:'Normal atlético',max:200,color:'#16A34A', status:'ok'},
+      {label:'Elevado — fisiológico pós-exercício', max:300, color:'#2563EB', status:'info'}
+    ],
+    note: 'Elevado pós-exercício: liberação muscular, fisiológico. Tóxico apenas >200 µg/L de forma crônica em repouso.',
+    athletic: true
+  },
+  'Magnésio': {
+    unit: 'mg/dL',
+    min: 0, max: 3.5,
+    zones: [
+      {label:'Subótimo atlético', max:2.2, color:'#D97706', status:'warn'},
+      {label:'Performance ótima', max:2.5, color:'#16A34A', status:'ok'},
+      {label:'Elevado',           max:3.5, color:'#D97706', status:'warn'}
+    ],
+    note: 'Piso atlético 2,2 mg/dL — superior ao clínico (1,6). Cofator essencial para ativar vitamina D3.',
+    athletic: true
+  },
+  'Vitamina C': {
+    unit: 'mg/dL',
+    min: 0, max: 3,
+    zones: [
+      {label:'Insuficiente atlético', max:0.8, color:'#D97706', status:'warn'},
+      {label:'Performance',           max:2,   color:'#16A34A', status:'ok'},
+      {label:'Elevado',               max:3,   color:'#D97706', status:'warn'}
+    ],
+    note: 'Meta atlética >0,8 mg/dL. Labs usam 0,2 como mínimo — inadequado para alta demanda oxidativa.',
+    athletic: true
+  },
+  'IGF-1': {
+    unit: 'ng/mL',
+    min: 0, max: 800,
+    zones: [
+      {label:'Baixo para fase de crescimento', max:200, color:'#D97706', status:'warn'},
+      {label:'Adequado', max:500, color:'#16A34A', status:'ok'},
+      {label:'Elevado',  max:800, color:'#D97706', status:'warn'}
+    ],
+    note: 'Mediador central do GH. Primeiro exame a dosar na consulta com endocrinologista.',
+    athletic: true
+  },
+  'PCR': {
+    unit: 'mg/dL',
+    min: 0, max: 2,
+    zones: [
+      {label:'Excelente — sem inflamação', max:0.1, color:'#16A34A', status:'ok'},
+      {label:'Normal',    max:0.5, color:'#16A34A', status:'ok'},
+      {label:'Atenção',   max:1,   color:'#D97706', status:'warn'},
+      {label:'Inflamação',max:2,   color:'#DC2626', status:'alert'}
+    ],
+    note: 'PCR: quanto menor melhor. Inflamação crônica afeta absorção de ferro.',
+    athletic: true
+  },
+  'Vitamina B12': {
+    unit: 'pg/mL',
+    min: 0, max: 1200,
+    zones: [
+      {label:'Deficiente',      max:300, color:'#DC2626', status:'alert'},
+      {label:'Subótimo',        max:500, color:'#D97706', status:'warn'},
+      {label:'Adequado atlético',max:900,color:'#16A34A', status:'ok'},
+      {label:'Elevado',         max:1200,color:'#D97706',status:'warn'}
+    ],
+    note: 'B12 abaixo de 300 pg/mL compromete síntese de DNA e hemoglobina.',
+    athletic: false
+  },
+  'Zinco': {
+    unit: 'µg/dL',
+    min: 0, max: 200,
+    zones: [
+      {label:'Deficiente', max:70,  color:'#DC2626', status:'alert'},
+      {label:'Subótimo',   max:90,  color:'#D97706', status:'warn'},
+      {label:'Adequado',   max:150, color:'#16A34A', status:'ok'},
+      {label:'Elevado',    max:200, color:'#D97706', status:'warn'}
+    ],
+    note: 'Cofator em mais de 300 enzimas. Fundamental para crescimento e imunidade.',
+    athletic: false
+  },
+  'Selênio': {
+    unit: 'µg/L',
+    min: 0, max: 200,
+    zones: [
+      {label:'Deficiente',      max:60,  color:'#DC2626', status:'alert'},
+      {label:'Subótimo',        max:100, color:'#D97706', status:'warn'},
+      {label:'Adequado atlético',max:150,color:'#16A34A', status:'ok'},
+      {label:'Elevado',         max:200, color:'#D97706', status:'warn'}
+    ],
+    note: 'Cofator obrigatório da deiodinase DIO1 — conversão T4→T3. TSH subindo + T3 baixo = investigar selênio.',
+    athletic: true
+  },
+  'Fosfatase alcalina': {
+    unit: 'U/L',
+    min: 0, max: 600,
+    zones: [
+      {label:'Baixa para crescimento ativo', max:100, color:'#D97706', status:'warn'},
+      {label:'Normal adolescente — crescimento ativo', max:400, color:'#16A34A', status:'ok'},
+      {label:'Elevada',max:600, color:'#D97706', status:'warn'}
+    ],
+    note: 'Elevada em adolescentes é normal — reflete turnover ósseo ativo em crescimento.',
+    athletic: false
+  },
+  'Testosterona Total': {
+    unit: 'ng/dL',
+    min: 0, max: 1200,
+    zones: [
+      {label:'Baixo para fase puberal', max:200, color:'#D97706', status:'warn'},
+      {label:'Pico puberal — janela de crescimento', max:800, color:'#16A34A', status:'ok'},
+      {label:'Elevado', max:1200, color:'#D97706', status:'warn'}
+    ],
+    note: 'Testosterona alta + PHV ativo = janela máxima de desenvolvimento. Cada mês conta.',
+    athletic: true
+  },
+  'Cálcio': {
+    unit: 'mg/dL',
+    min: 0, max: 12,
+    zones: [
+      {label:'Baixo',    max:8.5, color:'#DC2626', status:'alert'},
+      {label:'Normal',   max:10.5,color:'#16A34A', status:'ok'},
+      {label:'Elevado',  max:12,  color:'#D97706', status:'warn'}
+    ],
+    note: 'Fundamental para contração muscular e saúde óssea.',
+    athletic: false
+  },
+  'Folato': {
+    unit: 'ng/mL',
+    min: 0, max: 25,
+    zones: [
+      {label:'Deficiente', max:4,  color:'#DC2626', status:'alert'},
+      {label:'Subótimo',   max:7,  color:'#D97706', status:'warn'},
+      {label:'Adequado',   max:25, color:'#16A34A', status:'ok'}
+    ],
+    note: 'Essencial para síntese de DNA — fundamental em atletas jovens em fase de crescimento.',
+    athletic: false
+  }
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+//  STORAGE — biometria_v2
+// ────────────────────────────────────────────────────────────────────────────
+function loadBio(){
+  try{return JSON.parse(localStorage.getItem('biometria_v2'))||{athletes:[]};}
+  catch{return {athletes:[]};}
+}
+function saveBio(data){localStorage.setItem('biometria_v2',JSON.stringify(data));}
+
+function getAthlete(id){
+  const bio = loadBio();
+  return bio.athletes.find(a=>a.id===id);
+}
+
+function ensureAthlete(id){
+  const bio = loadBio();
+  let a = bio.athletes.find(x=>x.id===id);
+  if(!a){
+    a = {id, name: id==='lucas'?'Lucas':'Miguel', exames:[], records:[], sono:[], notas:[]};
+    bio.athletes.push(a);
+    saveBio(bio);
+  }
+  return a;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  API KEY
+// ────────────────────────────────────────────────────────────────────────────
+function saveApiKey(){
+  const input = document.getElementById('apiKeyInput');
+  const k = input.value.trim();
+  // If the field shows bullets (already saved), skip re-saving
+  if(!k || k.startsWith('•')){ alert('Cole a API key no campo.'); return; }
+  if(!k.startsWith('sk-')){ alert('API key inválida. Deve começar com sk-'); return; }
+  localStorage.setItem('pae_api_key', k);
+  localStorage.removeItem('ae_api_key'); // migrar chave antiga
+  document.getElementById('apiSaved').style.display='inline';
+  input.value = '•'.repeat(24);
+}
+function getApiKey(){
+  return localStorage.getItem('pae_api_key') || localStorage.getItem('ae_api_key') || '';
+}
+function initApiKey(){
+  const k = getApiKey();
+  if(k){
+    document.getElementById('apiKeyInput').placeholder = '•'.repeat(24) + ' (salva)';
+    document.getElementById('apiSaved').style.display='inline';
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  ATHLETE / TYPE SELECTION
+// ────────────────────────────────────────────────────────────────────────────
+function selectAth(id){
+  currentAth = id;
+  document.getElementById('athLucas').className = 'ath-btn lucas' + (id==='lucas'?' on':'');
+  document.getElementById('athMiguel').className = 'ath-btn miguel' + (id==='miguel'?' on':'');
+  document.getElementById('topBadge').textContent = id.toUpperCase() + ' · FASE 9';
+}
+function selectType(t){
+  currentType = t;
+  document.getElementById('typeLab').className = 'ath-btn' + (t==='lab'?' on':'');
+  document.getElementById('typeRx').className = 'ath-btn' + (t==='rx'?' on':'');
+  if(t==='lab'){
+    document.getElementById('typeLab').style.cssText='color:var(--info);background:var(--info-bg);border-color:var(--info-border);';
+    document.getElementById('typeRx').style.cssText='color:var(--text3);background:var(--surface2);border-color:var(--border);';
+  } else {
+    document.getElementById('typeRx').style.cssText='color:var(--rx);background:var(--rx-bg);border-color:var(--rx-border);';
+    document.getElementById('typeLab').style.cssText='color:var(--text3);background:var(--surface2);border-color:var(--border);';
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  FILE HANDLING
+// ────────────────────────────────────────────────────────────────────────────
+function handleFile(file){
+  if(!file) return;
+  const maxMB = 20;
+  if(file.size > maxMB*1024*1024){
+    showAlert('step2Alert','error',`Arquivo muito grande. Máximo: ${maxMB} MB.`);
+    return;
+  }
+  currentFile = file;
+  currentMime = file.type;
+
+  // Detect type from file
+  if(file.name.toLowerCase().includes('rx') || file.name.toLowerCase().includes('raio')){
+    selectType('rx');
+  }
+
+  const icons = {'application/pdf':'📑','image/jpeg':'🖼','image/png':'🖼','image/jpg':'🖼'};
+  document.getElementById('fileIcon').textContent = icons[file.type]||'📄';
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = (file.size/1024).toFixed(1) + ' KB';
+  document.getElementById('filePreview').classList.add('show');
+  document.getElementById('uploadArea').classList.add('has-file');
+  document.getElementById('analyzeBtn').disabled = false;
+  document.getElementById('analyzeBtnTxt').textContent = '🔬 Analisar com IA';
+  document.getElementById('step2Alert').innerHTML = '';
+
+  // Read to base64
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    currentBase64 = dataUrl.split(',')[1];
+  };
+  reader.readAsDataURL(file);
+}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('uploadArea').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if(file) handleFile(file);
+}
+function removeFile(){
+  currentFile = null; currentBase64 = null; currentMime = null;
+  document.getElementById('filePreview').classList.remove('show');
+  document.getElementById('uploadArea').classList.remove('has-file');
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('fileInput').value = '';
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  STEP NAVIGATION
+// ────────────────────────────────────────────────────────────────────────────
+function goStep(n){
+  for(let i=1;i<=5;i++) document.getElementById('step'+i).style.display = (i===n)?'block':'none';
+  for(let i=1;i<=5;i++){
+    const num = document.getElementById('sn'+i);
+    const lbl = document.getElementById('sl'+i);
+    if(i < n){ num.className='step-num done'; num.textContent='✓'; lbl.className='step-label done'; }
+    else if(i===n){ num.className='step-num active'; num.textContent=i; lbl.className='step-label active'; }
+    else { num.className='step-num'; num.textContent=i; lbl.className='step-label'; }
+  }
+  if(n===5) setTimeout(renderHistory, 50);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  BUILD SYSTEM PROMPT
+// ────────────────────────────────────────────────────────────────────────────
+function buildSystemPrompt(){
+  const athName = currentAth==='lucas' ? 'Lucas (13 anos, menino, meio/ponta esquerda, futebol)' : 'Miguel (12 anos, menino, goleiro, futebol)';
+  if(currentType === 'rx'){
+    return `Você é um especialista em medicina esportiva e radiologia pediátrica. Analise esta imagem de RX de mãos e punhos bilaterais para avaliação de idade óssea do atleta ${athName}.
+
+Retorne SOMENTE um objeto JSON com esta estrutura exata (sem texto antes ou depois, sem markdown):
+{
+  "tipo": "rx",
+  "data_coleta": "YYYY-MM-DD ou null se não encontrado",
+  "bone_age_anos": número com 1 decimal,
+  "bone_age_texto": "ex: 13,5 anos",
+  "metodo": "Greulich-Pyle ou TW3",
+  "classificacao_maturacional": "early|on-time|late",
+  "risser_grade": número 0-5 ou null,
+  "placas_epifisarias": "abertas|parcialmente fechadas|fechadas",
+  "janela_crescimento_anos": número estimado,
+  "diferenca_bone_age_cronologica": número (positivo=advanced, negativo=delayed),
+  "efeito_rae_suspeito": true|false,
+  "rae_explicacao": "texto breve sobre efeito RAE se relevante",
+  "alerta_phv": "texto breve ou null",
+  "interpretacao_pai": "parágrafo em linguagem simples para o pai, 3-4 frases",
+  "interpretacao_medico": "parágrafo técnico para o médico/endocrinologista, com terminologia precisa"
+}`;
+  }
+
+  const refsText = Object.entries(EXAM_REFS).map(([n,r])=>`- ${n}: ${r.zones.map(z=>`<${z.max} ${r.unit} = ${z.label}`).join(', ')}`).join('\n');
+
+  return `Você é um especialista em medicina esportiva pediátrica. Analise este laudo de exames do atleta ${athName}.
+
+REFERÊNCIAS DE PERFORMANCE ATLÉTICA (use estas, NÃO as do laboratório):
+${refsText}
+
+Extraia TODOS os valores do laudo e retorne SOMENTE um objeto JSON com esta estrutura exata (sem texto antes ou depois, sem markdown):
+{
+  "tipo": "lab",
+  "data_coleta": "YYYY-MM-DD",
+  "laboratorio": "nome do lab ou null",
+  "exames": [
+    {
+      "nome": "nome padronizado do exame",
+      "valor": número,
+      "unidade": "unidade",
+      "referencia_lab": "referência do próprio laboratório",
+      "status_lab": "normal|alto|baixo",
+      "status_atletico": "ok|warn|alert|info",
+      "status_label": "rótulo descritivo do status atlético",
+      "tendencia": null
+    }
+  ],
+  "cadeias_fisiologicas": [
+    {
+      "nome": "Nome da cadeia",
+      "severidade": "critica|importante",
+      "marcadores_envolvidos": ["exame1", "exame2"],
+      "descricao": "descrição da relação fisiológica"
+    }
+  ],
+  "interpretacao_pai": "parágrafo em linguagem simples para o pai (3-4 frases, sem jargão)",
+  "interpretacao_medico": "parágrafo técnico para o médico (terminologia precisa, cita os valores e as cadeias)",
+  "exames_adicionais_sugeridos": ["lista de exames ainda não dosados mas relevantes"],
+  "alertas_criticos": ["lista de alertas que exigem ação imediata"]
+}
+
+REGRAS IMPORTANTES:
+1. Para B6 elevado pós-exercício: status_atletico = "info", não "alert".
+2. Para PCR: quanto menor, melhor. PCR <0.1 = excelente.
+3. Para Fosfatase Alcalina elevada em adolescente: é normal em crescimento ativo, status_atletico = "ok".
+4. Detecte padrões: ferro caindo + TSH subindo = cadeia deiodinase. Vitamina D baixa + magnésio no piso = cadeia ativação D3.
+5. Se um exame tem referência diferente do lab, marque status_atletico com base nas REFERÊNCIAS ATLÉTICAS acima.
+6. Extraia TODOS os exames presentes no laudo.`;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  RUN ANALYSIS
+// ────────────────────────────────────────────────────────────────────────────
+async function runAnalysis(){
+  const apiKey = getApiKey();
+  if(!apiKey){ alert('Configure a API Key primeiro (Passo 1).'); return; }
+  if(!currentBase64){ alert('Faça upload de um arquivo primeiro.'); return; }
+
+  goStep(3);
+  setSpinLabel('Enviando documento para Claude...','Aguarde — análise multimodal em andamento');
+
+  const systemPrompt = buildSystemPrompt();
+  let userContent = [];
+
+  // Attach file
+  if(currentMime === 'application/pdf'){
+    userContent.push({
+      type: 'document',
+      source: { type: 'base64', media_type: 'application/pdf', data: currentBase64 }
+    });
+  } else {
+    const mime = currentMime || 'image/jpeg';
+    userContent.push({
+      type: 'image',
+      source: { type: 'base64', media_type: mime, data: currentBase64 }
+    });
+  }
+  userContent.push({ type: 'text', text: currentType==='rx' ?
+    'Analise este RX de mãos e punhos e retorne o JSON conforme instruído.' :
+    'Analise este laudo laboratorial completo e retorne o JSON conforme instruído.'
+  });
+
+  try {
+    setSpinLabel('Processando com visão multimodal...','Extraindo valores e interpretando...');
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userContent }]
+      })
+    });
+
+    if(!resp.ok){
+      const err = await resp.json().catch(()=>({error:{message:resp.statusText}}));
+      throw new Error(err?.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const rawText = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+
+    // Parse JSON (strip possible markdown fences)
+    let clean = rawText.trim().replace(/^```json\s*/,'').replace(/\s*```$/,'').trim();
+    const parsed = JSON.parse(clean);
+    analysisResult = parsed;
+
+    // Enrich lab exames with EXAM_REFS
+    if(parsed.tipo === 'lab' && parsed.exames){
+      parsed.exames = parsed.exames.map(ex => enrichExame(ex));
+    }
+
+    // Build historical trend
+    if(parsed.tipo === 'lab'){
+      const ath = getAthlete(currentAth);
+      if(ath && ath.exames){
+        parsed.exames = parsed.exames.map(ex => {
+          const hist = ath.exames.filter(e=>e.name===ex.nome).sort((a,b)=>new Date(a.date)-new Date(b.date));
+          if(hist.length >= 2){
+            const prev = hist[hist.length-1];
+            ex.valor_anterior = prev.value;
+            ex.data_anterior = prev.date;
+            const delta = ex.valor - prev.value;
+            const pct = (delta/prev.value)*100;
+            ex.tendencia = delta > 0 ? `↑ ${Math.abs(pct).toFixed(0)}% vs ${fmtDate(prev.date)}` : `↓ ${Math.abs(pct).toFixed(0)}% vs ${fmtDate(prev.date)}`;
+          }
+          return ex;
+        });
+      }
+    }
+
+    goStep(4);
+    document.getElementById('confirmBox').style.display = 'block';
+    renderResults(parsed);
+
+  } catch(e){
+    goStep(2);
+    showAlert('step2Alert','error',`Erro na análise: ${e.message}`);
+  }
+}
+
+function setSpinLabel(main, sub){
+  document.getElementById('spinLabel').textContent = main;
+  document.getElementById('spinSub').textContent = sub;
+}
+
+function enrichExame(ex){
+  const ref = EXAM_REFS[ex.nome];
+  if(!ref) return ex;
+  // Determine zone
+  const zone = ref.zones.find(z => ex.valor <= z.max) || ref.zones[ref.zones.length-1];
+  ex.status_atletico = zone.status;
+  ex.status_label = zone.label;
+  ex.bar_color = zone.color;
+  ex.bar_pct = Math.min(100, (ex.valor / ref.max) * 100);
+  ex.note = ref.note;
+  return ex;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  RENDER RESULTS
+// ────────────────────────────────────────────────────────────────────────────
+function renderResults(r){
+  const wrap = document.getElementById('resultsWrap');
+
+  if(r.tipo === 'rx'){
+    wrap.innerHTML = renderRX(r);
+  } else {
+    wrap.innerHTML = renderLab(r);
+  }
+}
+
+function renderLab(r){
+  const exames = r.exames || [];
+  const chains = r.cadeias_fisiologicas || [];
+  const alertas = r.alertas_criticos || [];
+  const sugeridos = r.exames_adicionais_sugeridos || [];
+
+  // Status pills
+  const alertCount = exames.filter(e=>e.status_atletico==='alert').length;
+  const warnCount = exames.filter(e=>e.status_atletico==='warn').length;
+  const okCount = exames.filter(e=>e.status_atletico==='ok').length;
+  const infoCount = exames.filter(e=>e.status_atletico==='info').length;
+
+  let pillsHTML = `<div class="status-row">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-right:4px;">${exames.length} marcadores</span>`;
+  if(alertCount) pillsHTML += `<span class="pill pill-alert"><span class="pill-dot"></span>${alertCount} Deficiência atlética</span>`;
+  if(warnCount) pillsHTML += `<span class="pill pill-warn"><span class="pill-dot"></span>${warnCount} Subótimo</span>`;
+  if(okCount) pillsHTML += `<span class="pill pill-ok"><span class="pill-dot"></span>${okCount} Performance</span>`;
+  if(infoCount) pillsHTML += `<span class="pill pill-info"><span class="pill-dot"></span>${infoCount} Info esportivo</span>`;
+  pillsHTML += `</div>`;
+
+  // Header info
+  let headerHTML = `
+    <div class="sec-title">Resultado da análise</div>
+    <div class="card card-sm" style="margin-bottom:12px;">
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        <div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);display:block;text-transform:uppercase;letter-spacing:0.5px;">Atleta</span>
+        <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:${currentAth==='lucas'?'var(--lucas)':'var(--miguel)'};">${currentAth==='lucas'?'LUCAS':'MIGUEL'}</span></div>
+        <div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);display:block;text-transform:uppercase;letter-spacing:0.5px;">Coleta</span>
+        <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;">${r.data_coleta ? fmtDate(r.data_coleta) : '—'}</span></div>
+        ${r.laboratorio?`<div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);display:block;text-transform:uppercase;letter-spacing:0.5px;">Laboratório</span>
+        <span style="font-size:13px;font-weight:500;">${r.laboratorio}</span></div>`:''}
+      </div>
+    </div>`;
+
+  // Critical alerts
+  let alertHTML = '';
+  if(alertas.length){
+    alertHTML = `<div class="sec-title">⚠ Alertas críticos</div>` +
+      alertas.map(a=>`<div class="alert-banner error">⚠ ${a}</div>`).join('');
+  }
+
+  // Exam cards
+  let examHTML = `<div class="sec-title">Marcadores — interpretação atlética</div><div class="exam-grid">`;
+  examHTML += exames.map(ex => {
+    const stClass = ex.status_atletico || 'info';
+    const barColor = ex.bar_color || '#9A9490';
+    const barPct = ex.bar_pct || 50;
+    const tendEl = ex.tendencia ? `<div class="exam-prev">${ex.tendencia}</div>` : '';
+    return `<div class="exam-card status-${stClass}">
+      <div class="exam-name">${ex.nome}</div>
+      <div>
+        <span class="exam-val">${ex.valor}</span>
+        <span class="exam-unit">${ex.unidade||''}</span>
+      </div>
+      ${ex.data_coleta||r.data_coleta?`<div class="exam-date">${fmtDate(ex.data_coleta||r.data_coleta)}</div>`:''}
+      <div class="exam-bar-wrap"><div class="exam-bar" style="width:${barPct}%;background:${barColor};"></div></div>
+      <div class="exam-status-lbl ${stClass}">${ex.status_label||''}</div>
+      ${ex.note?`<div class="exam-note">${ex.note}</div>`:''}
+      ${tendEl}
+    </div>`;
+  }).join('');
+  examHTML += '</div>';
+
+  // Physiological chains
+  let chainsHTML = '';
+  if(chains.length){
+    chainsHTML = `<div class="sec-title">🔗 Cadeias fisiológicas detectadas</div><div class="chains-wrap">`;
+    chainsHTML += chains.map(c=>`<div class="chain-card ${c.severidade==='critica'?'critical':''}">
+      <div class="chain-title">⚡ ${c.nome}</div>
+      <div class="chain-text">${c.descricao}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+        ${(c.marcadores_envolvidos||[]).map(m=>`<span class="pill pill-warn"><span class="pill-dot"></span>${m}</span>`).join('')}
+      </div>
+    </div>`).join('');
+    chainsHTML += '</div>';
+  }
+
+  // Narratives
+  let narrHTML = `<div class="sec-title">Interpretações</div>
+    <div class="narr-card narr-pai">
+      <div class="narr-label">Para o pai</div>
+      <div class="narr-text">${r.interpretacao_pai||'—'}</div>
+    </div>
+    <div class="narr-card narr-med">
+      <div class="narr-label">Para o médico / endocrinologista</div>
+      <div class="narr-text">${r.interpretacao_medico||'—'}</div>
+    </div>`;
+
+  // Suggested exams
+  let sugeridosHTML = '';
+  if(sugeridos.length){
+    sugeridosHTML = `<div class="sec-title">Exames adicionais sugeridos</div>
+    <div class="card card-sm">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${sugeridos.map(s=>`<span class="pill pill-info"><span class="pill-dot"></span>${s}</span>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  return headerHTML + pillsHTML + alertHTML + examHTML + chainsHTML + narrHTML + sugeridosHTML;
+}
+
+function renderRX(r){
+  const classMap = {
+    'early': {label:'Early Maturing', color:'var(--warn)', bg:'var(--warn-bg)', border:'var(--warn-border)'},
+    'on-time': {label:'On-Time Maturing', color:'var(--ok)', bg:'var(--ok-bg)', border:'var(--ok-border)'},
+    'late': {label:'Late Maturing', color:'var(--info)', bg:'var(--info-bg)', border:'var(--info-border)'}
+  };
+  const cls = classMap[r.classificacao_maturacional] || classMap['on-time'];
+
+  return `
+    <div class="sec-title">RX — Idade Óssea</div>
+    <div class="rx-card">
+      <div class="rx-title">🦴 Análise Greulich-Pyle — ${currentAth==='lucas'?'LUCAS':'MIGUEL'}</div>
+      <div class="rx-grid">
+        <div class="rx-field">
+          <div class="rx-fl">Bone Age estimado</div>
+          <div class="rx-fv">${r.bone_age_texto || r.bone_age_anos + ' anos'}</div>
+        </div>
+        <div class="rx-field">
+          <div class="rx-fl">Classificação maturacional</div>
+          <div class="rx-fv" style="color:${cls.color};">${cls.label}</div>
+        </div>
+        <div class="rx-field">
+          <div class="rx-fl">Placas epifisárias</div>
+          <div class="rx-fv">${r.placas_epifisarias || '—'}</div>
+        </div>
+        <div class="rx-field">
+          <div class="rx-fl">Janela de crescimento</div>
+          <div class="rx-fv">${r.janela_crescimento_anos ? r.janela_crescimento_anos + ' anos' : '—'}</div>
+        </div>
+        ${r.risser_grade!==null&&r.risser_grade!==undefined?`<div class="rx-field">
+          <div class="rx-fl">Risser Grade</div>
+          <div class="rx-fv">${r.risser_grade}</div>
+        </div>`:''}
+        <div class="rx-field">
+          <div class="rx-fl">Diferença bone age / cronológica</div>
+          <div class="rx-fv" style="color:${r.diferenca_bone_age_cronologica>0?'var(--warn)':'var(--ok)'};">${r.diferenca_bone_age_cronologica>0?'+':''}${r.diferenca_bone_age_cronologica} anos</div>
+        </div>
+      </div>
+    </div>
+
+    ${r.efeito_rae_suspeito?`<div class="alert-banner info">ℹ <strong>Efeito RAE:</strong> ${r.rae_explicacao||'Possível efeito de idade relativa detectado.'}</div>`:''}
+    ${r.alerta_phv?`<div class="alert-banner error">⚠ <strong>PHV:</strong> ${r.alerta_phv}</div>`:''}
+
+    <div class="narr-card narr-pai" style="margin-top:16px;">
+      <div class="narr-label">Para o pai</div>
+      <div class="narr-text">${r.interpretacao_pai||'—'}</div>
+    </div>
+    <div class="narr-card narr-med">
+      <div class="narr-label">Para o médico</div>
+      <div class="narr-text">${r.interpretacao_medico||'—'}</div>
+    </div>`;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  SAVE
+// ────────────────────────────────────────────────────────────────────────────
+function confirmSave(){
+  if(!analysisResult){ alert('Sem dados para salvar.'); return; }
+  const bio = loadBio();
+  let ath = bio.athletes.find(a=>a.id===currentAth);
+  if(!ath){
+    ath = {id:currentAth, name:currentAth==='lucas'?'Lucas':'Miguel', exames:[], records:[], sono:[], notas:[]};
+    bio.athletes.push(ath);
+  }
+  if(!ath.exames) ath.exames = [];
+
+  const r = analysisResult;
+
+  if(r.tipo === 'lab'){
+    (r.exames||[]).forEach(ex => {
+      ath.exames.push({
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        date: ex.data_coleta || r.data_coleta,
+        name: ex.nome,
+        value: ex.valor,
+        unit: ex.unidade || '',
+        obs: ex.status_label || '',
+        source: 'agente_ia'
+      });
+    });
+  } else if(r.tipo === 'rx'){
+    // Save bone age as a special exam entry
+    ath.exames.push({
+      id: Date.now().toString(),
+      date: r.data_coleta,
+      name: 'Bone Age (RX)',
+      value: r.bone_age_anos,
+      unit: 'anos',
+      obs: `${r.classificacao_maturacional} — Placas: ${r.placas_epifisarias}`,
+      source: 'agente_ia',
+      rx_data: r
+    });
+  }
+
+  saveBio(bio);
+
+  document.getElementById('confirmBox').style.display = 'none';
+  goStep(5);
+  document.getElementById('saveSuccessMsg').style.display = 'flex';
+  setTimeout(()=>document.getElementById('saveSuccessMsg').style.display='none', 4000);
+}
+
+function editManually(){
+  goStep(5);
+  // Small delay to ensure DOM is visible before rendering charts
+  setTimeout(()=>showHistTab('manual'), 50);
+}
+
+function resetForNewUpload(){
+  // Clear file state
+  currentFile = null;
+  currentBase64 = null;
+  currentMime = null;
+  analysisResult = null;
+  // Reset upload UI
+  document.getElementById('filePreview').classList.remove('show');
+  document.getElementById('uploadArea').classList.remove('has-file');
+  if(document.getElementById('fileInput')) document.getElementById('fileInput').value = '';
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('step2Alert').innerHTML = '';
+  goStep(2);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  HISTORY
+// ────────────────────────────────────────────────────────────────────────────
+const CHART_COLORS = {
+  'Ferritina': '#DC2626',
+  'Vitamina D': '#F59E0B',
+  'Ferro sérico': '#B45309',
+  'TSH': '#7C3AED',
+  'Vitamina B6': '#2563EB',
+  'Magnésio': '#059669',
+  'IGF-1': '#0891B2',
+  'PCR': '#16A34A',
+  'Testosterona Total': '#D97706'
+};
+const TOP_EXAMES = ['Ferritina','Vitamina D','Ferro sérico','TSH','Magnésio','Vitamina C','PCR','IGF-1','Testosterona Total'];
+
+function renderHistory(){
+  renderHistGraficos();
+  renderHistTabela();
+  renderHistManual();
+}
+
+function renderHistGraficos(){
+  const ath = getAthlete(currentAth);
+  if(!ath || !ath.exames || !ath.exames.length){
+    document.getElementById('histGraficos').innerHTML = '<div class="empty-msg">Sem exames salvos ainda.</div>';
+    return;
+  }
+
+  // Group by exam name
+  const groups = {};
+  ath.exames.forEach(e => {
+    if(!groups[e.name]) groups[e.name] = [];
+    groups[e.name].push(e);
+  });
+
+  // Sort names: priority first
+  const names = [...TOP_EXAMES.filter(n=>groups[n]), ...Object.keys(groups).filter(n=>!TOP_EXAMES.includes(n))];
+
+  let html = '';
+  names.forEach(name => {
+    const entries = groups[name].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const ref = EXAM_REFS[name];
+    html += `<div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">${name}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);">${entries.length} medição${entries.length>1?'ões':''}</div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart_${name.replace(/\s/g,'_').replace(/[^a-z0-9_]/gi,'')}" height="200"></canvas></div>
+    </div>`;
+  });
+
+  document.getElementById('histGraficos').innerHTML = html || '<div class="empty-msg">Sem exames salvos.</div>';
+
+  // Draw charts
+  names.forEach(name => {
+    const entries = groups[name].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const cid = 'chart_'+name.replace(/\s/g,'_').replace(/[^a-z0-9_]/gi,'');
+    const canvas = document.getElementById(cid);
+    if(!canvas) return;
+
+    const key = 'chart_idx_' + names.indexOf(name);
+    if(histCharts[key]) histCharts[key].destroy();
+
+    const color = CHART_COLORS[name] || '#2563EB';
+    const ref = EXAM_REFS[name];
+    const datasets = [{
+      label: name,
+      data: entries.map(e=>e.value),
+      borderColor: color,
+      backgroundColor: color+'22',
+      borderWidth: 2.5,
+      pointBackgroundColor: entries.map(e => {
+        if(!ref) return color;
+        const zone = ref.zones.find(z=>e.value<=z.max)||ref.zones[ref.zones.length-1];
+        return zone.color;
+      }),
+      pointRadius: 5,
+      tension: 0.35,
+      fill: true
+    }];
+
+    // Add reference lines as annotations-like horizontal datasets
+    if(ref){
+      // Add performance zone as a shaded band (approximate with line datasets)
+      const perfZone = ref.zones.find(z=>z.status==='ok');
+      if(perfZone){
+        const prevZone = ref.zones[ref.zones.indexOf(perfZone)-1];
+        const lower = prevZone ? prevZone.max : 0;
+        datasets.push({
+          label:'Meta performance',
+          data: entries.map(()=>perfZone.max),
+          borderColor: '#16A34A66',
+          borderWidth: 1.5,
+          borderDash: [6,4],
+          pointRadius: 0,
+          fill: false
+        });
+        if(lower>0) datasets.push({
+          label:'Mínimo atlético',
+          data: entries.map(()=>lower),
+          borderColor: '#D9770688',
+          borderWidth: 1.5,
+          borderDash: [4,4],
+          pointRadius: 0,
+          fill: false
+        });
+      }
+    }
+
+    histCharts[key] = new Chart(canvas, {
+      type: 'line',
+      data: { labels: entries.map(e=>fmtDate(e.date)), datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} ${entries[0]?.unit||''}` } }
+        },
+        scales: {
+          x: { ticks: { color:'#9A9490', font:{size:10,family:'DM Sans'} }, grid:{color:'rgba(0,0,0,0.04)'} },
+          y: { ticks: { color:'#5A544D', font:{size:10} }, grid:{color:'rgba(0,0,0,0.06)'} }
+        }
+      }
+    });
+  });
+}
+
+function renderHistTabela(){
+  const ath = getAthlete(currentAth);
+  if(!ath || !ath.exames || !ath.exames.length){
+    document.getElementById('histTabela').innerHTML = '<div class="empty-msg">Sem exames salvos.</div>';
+    return;
+  }
+  const sorted = [...ath.exames].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('histTabela').innerHTML = `
+    <div class="card">
+      <table class="htable">
+        <thead><tr><th>Data</th><th>Exame</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${sorted.map(e=>{
+            const ref = EXAM_REFS[e.name];
+            const zone = ref ? (ref.zones.find(z=>e.value<=z.max)||ref.zones[ref.zones.length-1]) : null;
+            const stLbl = zone ? zone.label : '—';
+            const stColor = zone ? zone.color : 'var(--text3)';
+            return `<tr>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:10px;">${fmtDate(e.date)}</td>
+              <td style="font-weight:500;">${e.name}</td>
+              <td class="vl">${e.value}<span style="font-size:10px;color:var(--text3);font-family:'DM Sans'"> ${e.unit||''}</span></td>
+              <td style="font-size:11px;font-weight:600;color:${stColor};">${stLbl}</td>
+              <td><button class="del-btn" onclick="delExame('${e.id}')">×</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function delExame(eid){
+  if(!confirm('Remover este exame?')) return;
+  const bio = loadBio();
+  const ath = bio.athletes.find(a=>a.id===currentAth);
+  if(ath) ath.exames = ath.exames.filter(e=>e.id!==eid);
+  saveBio(bio);
+  renderHistory();
+}
+
+function renderHistManual(){
+  document.getElementById('histManual').innerHTML = `
+    <div class="sec-title">Entrada manual de exame</div>
+    <div class="card">
+      <div class="g2">
+        <div class="f"><label>Data da coleta</label><input type="date" id="manDate" value="${new Date().toISOString().split('T')[0]}"></div>
+        <div class="f"><label>Nome do exame</label>
+          <select id="manName" onchange="fillUnit()">
+            <option value="">Selecione...</option>
+            ${Object.keys(EXAM_REFS).map(n=>`<option value="${n}">${n}</option>`).join('')}
+            <option value="__outro__">Outro</option>
+          </select>
+        </div>
+      </div>
+      <div id="manOutroWrap" style="display:none;" class="f"><label>Nome personalizado</label><input type="text" id="manOutro" placeholder="Ex: Transferrina"></div>
+      <div class="g2">
+        <div class="f"><label>Valor</label><input type="number" id="manVal" step="any" placeholder="Ex: 25.3"></div>
+        <div class="f"><label>Unidade</label><input type="text" id="manUnit" placeholder="Ex: ng/mL"></div>
+      </div>
+      <div class="f"><label>Observação (opcional)</label><input type="text" id="manObs" placeholder="Ex: Pré-suplementação"></div>
+      <button class="btn btn-primary" onclick="saveManual()">Salvar exame</button>
+    </div>
+    <div id="manMsg"></div>`;
+}
+
+function fillUnit(){
+  const name = document.getElementById('manName').value;
+  const outro = document.getElementById('manOutroWrap');
+  if(name === '__outro__'){
+    outro.style.display = 'block';
+    document.getElementById('manUnit').value = '';
+  } else {
+    outro.style.display = 'none';
+    const ref = EXAM_REFS[name];
+    if(ref) document.getElementById('manUnit').value = ref.unit;
+  }
+}
+
+function saveManual(){
+  let name = document.getElementById('manName').value;
+  if(name === '__outro__') name = document.getElementById('manOutro').value.trim();
+  const date = document.getElementById('manDate').value;
+  const val = parseFloat(document.getElementById('manVal').value);
+  const unit = document.getElementById('manUnit').value.trim();
+  const obs = document.getElementById('manObs').value.trim();
+  if(!name || !date || isNaN(val)){
+    showAlert('manMsg','error','Preencha nome, data e valor.'); return;
+  }
+  const bio = loadBio();
+  let ath = bio.athletes.find(a=>a.id===currentAth);
+  if(!ath){ ath={id:currentAth,name:currentAth,exames:[],records:[],sono:[],notas:[]}; bio.athletes.push(ath); }
+  if(!ath.exames) ath.exames = [];
+  ath.exames.push({id:Date.now().toString(),date,name,value:val,unit,obs,source:'manual'});
+  saveBio(bio);
+  showAlert('manMsg','success','Exame salvo com sucesso.');
+  document.getElementById('manVal').value='';
+  document.getElementById('manObs').value='';
+  renderHistory();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  TAB SWITCHING
+// ────────────────────────────────────────────────────────────────────────────
+function showHistTab(t){
+  ['graficos','tabela','manual'].forEach(x=>{
+    document.getElementById('hist'+x.charAt(0).toUpperCase()+x.slice(1)).style.display = x===t?'block':'none';
+    document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).className = 'tab'+(x===t?' on':'');
+  });
+  if(t==='graficos') renderHistGraficos();
+  if(t==='tabela') renderHistTabela();
+  if(t==='manual') renderHistManual();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  HELPERS
+// ────────────────────────────────────────────────────────────────────────────
+function fmtDate(d){
+  if(!d) return '—';
+  const parts = d.split('-');
+  if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return d;
+}
+
+function showAlert(containerId, type, msg){
+  document.getElementById(containerId).innerHTML =
+    `<div class="alert-banner ${type}"><span>${msg}</span></div>`;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  INIT
+// ────────────────────────────────────────────────────────────────────────────
+initApiKey();
+selectType('lab');
+
+// Pré-seleciona atleta se vier da URL (?atleta=lucas ou ?atleta=miguel)
+(function(){
+  const param = new URLSearchParams(window.location.search).get('atleta');
+  if(param === 'miguel') selectAth('miguel');
+  else selectAth('lucas'); // padrão
+})();
+</script>
+</body>
+</html>

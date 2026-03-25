@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Painel de Saúde — Lucas & Miguel</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#F2F0EB;
+  --surface:#FFFFFF;
+  --surface2:#F8F7F4;
+  --surface3:#EEECEA;
+  --border:#E0DDD8;
+  --border2:#D0CCC6;
+  --text:#1A1714;
+  --text2:#5A544D;
+  --text3:#9A9490;
+  --lucas:#2563EB;
+  --lucas-dim:rgba(37,99,235,0.08);
+  --lucas-border:rgba(37,99,235,0.2);
+  --miguel:#059669;
+  --miguel-dim:rgba(5,150,105,0.08);
+  --miguel-border:rgba(5,150,105,0.2);
+  --ok:#16A34A;
+  --ok-bg:#F0FDF4;
+  --ok-border:#BBF7D0;
+  --warn:#D97706;
+  --warn-bg:#FFFBEB;
+  --warn-border:#FDE68A;
+  --alert:#DC2626;
+  --alert-bg:#FEF2F2;
+  --alert-border:#FECACA;
+  --info:#2563EB;
+  --info-bg:#EFF6FF;
+  --info-border:#BFDBFE;
+  --gold:#B45309;
+  --gold-bg:#FFFBEB;
+  --med:#7C3AED;
+  --med-bg:rgba(124,58,237,0.06);
+  --med-border:rgba(124,58,237,0.2);
+  --radius:12px;
+  --radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden;}
+
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(242,240,235,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px;}
+.back{background:var(--surface);border:1px solid var(--border2);color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.5px;padding:6px 12px;border-radius:6px;cursor:pointer;text-decoration:none;transition:all .15s;}
+.back:hover{border-color:var(--text3);color:var(--text);}
+.top-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
+.top-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);padding:3px 8px;border:1px solid var(--border);border-radius:4px;margin-left:auto;background:var(--surface);}
+
+/* ACCESS TABS */
+.access-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:0;position:sticky;top:56px;z-index:40;overflow-x:auto;}
+.acc-tab{padding:14px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;}
+.acc-tab.on{color:var(--lucas);border-bottom-color:var(--lucas);}
+.acc-tab:hover:not(.on){color:var(--text2);}
+.acc-tab.med-tab.on{color:var(--med);border-bottom-color:var(--med);}
+
+/* ATHLETE SELECTOR */
+.ath-sel{display:flex;gap:8px;padding:20px 20px 0;max-width:900px;margin:0 auto;}
+.ath-btn{padding:8px 20px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:var(--surface2);color:var(--text3);transition:all .15s;}
+.ath-btn.lucas.on{background:var(--lucas-dim);border-color:var(--lucas-border);color:var(--lucas);}
+.ath-btn.miguel.on{background:var(--miguel-dim);border-color:var(--miguel-border);color:var(--miguel);}
+.ath-btn:not(.on):hover{color:var(--text2);}
+
+.wrap{padding:0 20px 60px;max-width:900px;margin:0 auto;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* ATHLETE HEADER */
+.ath-hd{background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 var(--radius) var(--radius) var(--radius);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.ath-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;flex-shrink:0;}
+.lucas .ath-av{background:var(--lucas-dim);border:2px solid var(--lucas-border);color:var(--lucas);}
+.miguel .ath-av{background:var(--miguel-dim);border:2px solid var(--miguel-border);color:var(--miguel);}
+.ath-nm{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+.lucas .ath-nm{color:var(--lucas);}
+.miguel .ath-nm{color:var(--miguel);}
+.ath-pos{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-top:2px;letter-spacing:0.5px;}
+.phv-badge{margin-left:auto;padding:10px 16px;border-radius:var(--radius-sm);font-family:'JetBrains Mono',monospace;font-size:9px;text-align:center;border:1px solid var(--border);}
+.phv-badge .pbl{color:var(--text3);font-size:8px;margin-bottom:3px;letter-spacing:0.5px;}
+.phv-badge .pbv{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;}
+.phv-pre{background:var(--ok-bg);border-color:var(--ok-border)!important;}.phv-pre .pbv{color:var(--ok);}
+.phv-circa{background:var(--warn-bg);border-color:var(--warn-border)!important;}.phv-circa .pbv{color:var(--warn);}
+.phv-post{background:var(--alert-bg);border-color:var(--alert-border)!important;}.phv-post .pbv{color:var(--alert);}
+.phv-unk{background:var(--surface2);}.phv-unk .pbv{color:var(--text3);font-size:11px;}
+
+/* STATUS DOTS ROW — novo */
+.status-row{display:flex;align-items:center;gap:6px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;flex-wrap:wrap;}
+.status-row-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;}
+.sdot{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:default;transition:all .15s;}
+.sdot:hover{filter:brightness(0.95);}
+.sdot-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sdot-ok{background:var(--ok-bg);color:var(--ok);}
+.sdot-ok .sdot-dot{background:var(--ok);}
+.sdot-warn{background:var(--warn-bg);color:var(--warn);}
+.sdot-warn .sdot-dot{background:var(--warn);}
+.sdot-alert{background:var(--alert-bg);color:var(--alert);}
+.sdot-alert .sdot-dot{background:var(--alert);}
+.sdot-info{background:var(--info-bg);color:var(--info);}
+.sdot-info .sdot-dot{background:var(--info);}
+.sdot-neutral{background:var(--surface2);color:var(--text3);}
+.sdot-neutral .sdot-dot{background:var(--text3);}
+
+/* SEC WRAP */
+.sec-wrap{display:none;}.sec-wrap.active{display:block;}
+
+/* TILES */
+.tiles4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:560px){.tiles4{grid-template-columns:repeat(2,1fr);}}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center;}
+.tv{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+.tu{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400;color:var(--text3);margin-left:2px;}
+.tl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;text-transform:uppercase;color:var(--text3);margin-top:5px;}
+.td2{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;margin-top:2px;}
+.td-ok{color:var(--ok);}
+.td-warn{color:var(--warn);}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;}
+.ct{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;}
+
+/* CHART */
+.chart-wrap{position:relative;width:100%;height:200px;}
+
+/* FORM */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:540px){.g2,.g3{grid-template-columns:1fr;}}
+.f{display:flex;flex-direction:column;gap:5px;}
+.f label{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--text2);}
+.f input,.f select,.f textarea{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color .15s;width:100%;}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--lucas);box-shadow:0 0 0 3px var(--lucas-dim);}
+.f input::placeholder,.f textarea::placeholder{color:var(--text3);}
+.f textarea{resize:vertical;min-height:50px;}
+.f select option{background:var(--surface);}
+.sbtn{width:100%;background:var(--lucas);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.3px;padding:10px;border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:4px;transition:all .15s;}
+.sbtn:hover{opacity:.9;}
+.sbtn.mig{background:var(--miguel);}
+
+/* TABLE */
+.ht{width:100%;border-collapse:collapse;font-size:12px;}
+.ht th{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--text3);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.ht td{padding:10px 10px;border-bottom:1px solid var(--border);color:var(--text2);}
+.ht tr:last-child td{border-bottom:none;}
+.ht tr:hover td{background:var(--surface2);}
+.ht td.vl{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text);}
+.ht td.dp{font-size:11px;font-weight:500;color:var(--ok);}
+.ht td.dn{font-size:11px;font-weight:500;color:var(--alert);}
+.ht td.dz{font-size:11px;color:var(--text3);}
+.del{background:none;border:1px solid var(--alert-border);color:var(--alert);font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.del:hover{background:var(--alert-bg);}
+
+/* ── BLOOD EXAM CARDS — novo design com barra ── */
+.exam-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px;}
+@media(max-width:540px){.exam-grid{grid-template-columns:1fr;}}
+.exam-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:box-shadow .15s;}
+.exam-tile:hover{box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.exam-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.exam-name{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
+.exam-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.exam-val-row{display:flex;align-items:baseline;gap:4px;margin-bottom:6px;}
+.exam-val{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;line-height:1;}
+.exam-unit{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text3);}
+.exam-bar-wrap{height:4px;background:var(--surface3);border-radius:2px;margin-bottom:8px;overflow:hidden;}
+.exam-bar{height:100%;border-radius:2px;transition:width .4s ease;}
+.exam-status{font-size:12px;font-weight:500;margin-bottom:4px;}
+.exam-note{font-size:11px;color:var(--text3);line-height:1.4;}
+.exam-trend{font-size:11px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+/* status colors */
+.exam-ok .exam-dot{background:var(--ok);}
+.exam-ok .exam-val{color:var(--ok);}
+.exam-ok .exam-bar{background:var(--ok);}
+.exam-ok .exam-status{color:var(--ok);}
+.exam-ok{border-color:var(--ok-border);}
+.exam-warn .exam-dot{background:var(--warn);}
+.exam-warn .exam-val{color:var(--warn);}
+.exam-warn .exam-bar{background:var(--warn);}
+.exam-warn .exam-status{color:var(--warn);}
+.exam-warn{border-color:var(--warn-border);}
+.exam-alert .exam-dot{background:var(--alert);}
+.exam-alert .exam-val{color:var(--alert);}
+.exam-alert .exam-bar{background:var(--alert);}
+.exam-alert .exam-status{color:var(--alert);}
+.exam-alert{border-color:var(--alert-border);}
+.exam-info .exam-dot{background:var(--info);}
+.exam-info .exam-val{color:var(--info);}
+.exam-info .exam-bar{background:var(--info);}
+.exam-info .exam-status{color:var(--info);}
+.exam-info{border-color:var(--info-border);}
+
+/* SLEEP */
+.sleep-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px;}
+.sleep-day{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 4px;text-align:center;}
+.sleep-day .sd-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text3);margin-bottom:4px;}
+.sleep-day .sd-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;}
+.sleep-day.ok{background:var(--ok-bg);border-color:var(--ok-border);}.sleep-day.ok .sd-val{color:var(--ok);}
+.sleep-day.warn{background:var(--warn-bg);border-color:var(--warn-border);}.sleep-day.warn .sd-val{color:var(--warn);}
+.sleep-day.bad{background:var(--alert-bg);border-color:var(--alert-border);}.sleep-day.bad .sd-val{color:var(--alert);}
+.sleep-day.empty .sd-val{color:var(--text3);}
+
+/* ALERT BANNER */
+.alert-banner{padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:14px;font-size:13px;line-height:1.5;}
+.al-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;text-transform:uppercase;opacity:.8;margin-bottom:4px;}
+.aw{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn);}
+.ao{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok);}
+
+/* PARENTS */
+.p-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+@media(max-width:440px){.p-row{grid-template-columns:1fr;}}
+.p-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;}
+.p-lbl{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--text3);margin-bottom:4px;}
+.p-val{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--text);}
+
+/* MED NOTE */
+.note-list{display:flex;flex-direction:column;gap:8px;}
+.note-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+.note-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:4px;}
+.note-type{font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.3px;text-transform:uppercase;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:6px;}
+.nt-consulta{background:var(--med-bg);color:var(--med);border:1px solid var(--med-border);}
+.nt-exame{background:var(--info-bg);color:var(--info);border:1px solid var(--info-border);}
+.nt-fisio{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border);}
+.nt-obs{background:var(--surface3);color:var(--text2);border:1px solid var(--border);}
+.note-text{font-size:13px;color:var(--text2);line-height:1.5;}
+.sec-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin:18px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+/* PHV PHASES */
+.phv-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:540px){.phv-phases{grid-template-columns:1fr;}}
+.ph{padding:12px 14px;border-radius:var(--radius-sm);}
+.ph-nm{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;margin-bottom:4px;}
+.ph-txt{font-size:12px;color:var(--text2);line-height:1.5;}
+.ph-pre{background:var(--ok-bg);border:1px solid var(--ok-border);}.ph-pre .ph-nm{color:var(--ok);}
+.ph-circ{background:var(--warn-bg);border:1px solid var(--warn-border);}.ph-circ .ph-nm{color:var(--warn);}
+.ph-post{background:var(--alert-bg);border:1px solid var(--alert-border);}.ph-post .ph-nm{color:var(--alert);}
+
+.empty-st{text-align:center;padding:28px;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="painel_motor.html" class="back">← Painel</a>
+  <span class="top-title">Saúde</span>
+  <span class="top-badge" id="top-badge">// painel clínico</span>
+</div>
+
+<div class="access-bar">
+  <button class="acc-tab on" onclick="setSection('crescimento')">Crescimento</button>
+  <button class="acc-tab" onclick="setSection('exames')">Exames</button>
+  <button class="acc-tab" onclick="setSection('sono')">Sono</button>
+  <button class="acc-tab med-tab" onclick="setSection('medico')">Médico</button>
+</div>
+
+<div class="ath-sel" id="ath-sel"></div>
+<div class="wrap">
+  <div id="panels"></div>
+</div>
+
+<script>
+const KEY='biometria_v2';
+function load(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
+function save(s){localStorage.setItem(KEY,JSON.stringify(s));}
+function defaults(){
+  return{athletes:[
+    {id:'lucas',name:'Lucas',dob:'2012-05-12',position:'Meio / Ponta esquerda · Fut7 & Futsal',color:'lucas',fatherHeight:null,motherHeight:null,records:[],exames:[],sono:[],notas:[]},
+    {id:'miguel',name:'Miguel',dob:'2013-09-13',position:'Goleiro · Fut7 & Futsal',color:'miguel',fatherHeight:null,motherHeight:null,records:[],exames:[],sono:[],notas:[]}
+  ],activeId:'lucas',section:'crescimento'};
+}
+
+let state=load()||defaults();
+state.athletes.forEach(a=>{
+  if(!a.exames)a.exames=[];
+  if(!a.sono)a.sono=[];
+  if(!a.notas)a.notas=[];
+});
+
+function phvOffset(h,w,dob){
+  if(!h||!w||!dob)return null;
+  const age=(new Date()-new Date(dob))/(365.25*24*3600*1000);
+  if(age<8)return null;
+  return parseFloat((-9.236+(0.0002708*(h*w))+(-0.001663*(age*h))+(0.007216*(age*w))+(0.02292*(w/h*100))).toFixed(2));
+}
+function phvPhase(o){if(o===null)return'unk';if(o<-1)return'pre';if(o<=1)return'circa';return'post';}
+function targetH(f,m){return f&&m?((parseFloat(f)+parseFloat(m)+13)/2).toFixed(1):null;}
+function ageYrs(dob){return((new Date()-new Date(dob))/(365.25*24*3600*1000)).toFixed(1);}
+function fmtD(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+
+// ── REFERÊNCIAS DE PERFORMANCE ATLÉTICA (não de laboratório clínico)
+const EXAM_REFS={
+  'Ferritina':     {unit:'ng/mL', low:30,  high:120, opt:[50,100],  perf_min:50,  note:'Deficiência atlética <50. Lab diz "normal" acima de 12.', trend_key:'ferritina'},
+  'Vitamina D':    {unit:'ng/mL', low:30,  high:100, opt:[50,80],   perf_min:50,  note:'Zona atlética: 50–80. Lab aceita >20.', trend_key:'vitamina_d'},
+  'Ferro':         {unit:'µg/dL', low:65,  high:175, opt:[80,150],  perf_min:80,  note:'Queda progressiva compromete VO2max e sprint.', trend_key:'ferro'},
+  'Hemoglobina':   {unit:'g/dL',  low:12.5,high:16,  opt:[13.5,15.5],perf_min:13.5,note:'Transporte de oxigênio ao músculo.', trend_key:'hemoglobina'},
+  'Hematócrito':   {unit:'%',     low:38,  high:50,  opt:[40,46],   perf_min:40,  note:'', trend_key:'hematocrito'},
+  'Vitamina B6':   {unit:'µg/L',  low:20,  high:200, opt:[40,100],  perf_min:40,  note:'Elevado pós-exercício é fisiológico (liberação muscular).', trend_key:'b6'},
+  'Vitamina B12':  {unit:'pg/mL', low:300, high:950, opt:[400,800], perf_min:400, note:'Síntese de hemácias e função neurológica.', trend_key:'b12'},
+  'Vitamina C':    {unit:'mg/dL', low:0.4, high:2.1, opt:[0.8,2.0], perf_min:0.8, note:'Antioxidante. Síntese de colágeno em tendões.', trend_key:'vitc'},
+  'Zinco':         {unit:'µg/dL', low:70,  high:120, opt:[80,110],  perf_min:80,  note:'Síntese proteica e imunidade.', trend_key:'zinco'},
+  'Magnésio':      {unit:'mg/dL', low:1.9, high:2.6, opt:[2.2,2.5], perf_min:2.2, note:'Cofator de 300+ enzimas. Necessário para ativar vitamina D.', trend_key:'magnesio'},
+  'TSH':           {unit:'µUI/mL',low:0.5, high:2.5, opt:[0.8,2.0], perf_min:0.8, note:'Esportivo: ideal <2.5. Subindo progressivamente.', trend_key:'tsh'},
+  'Testosterona':  {unit:'ng/dL', low:200, high:900, opt:[350,800], perf_min:350, note:'Indicador puberal e anabólico.', trend_key:'testosterona'},
+  'PCR':           {unit:'mg/dL', low:0,   high:0.1, opt:[0,0.05],  perf_min:0,   note:'Inflamação sistêmica. Quanto menor melhor.', trend_key:'pcr'},
+  'Ácido Fólico':  {unit:'ng/mL', low:5.4, high:20,  opt:[8,15],    perf_min:8,   note:'Síntese de hemácias junto com B12.', trend_key:'folato'},
+  'Cálcio':        {unit:'mg/dL', low:9.0, high:10.5,opt:[9.2,10.2],perf_min:9.2, note:'Fundamental para PHV e mineralização óssea.', trend_key:'calcio'},
+  'Selênio':       {unit:'µg/L',  low:60,  high:150, opt:[80,120],  perf_min:80,  note:'Cofator da deiodinase — conversão T4→T3.', trend_key:'selenio'},
+  'IGF-1':         {unit:'ng/mL', low:150, high:600, opt:[250,500], perf_min:250, note:'Mediador do GH. Essencial para crescimento e desenvolvimento.', trend_key:'igf1'},
+  'Outro':         {unit:'',      low:null,high:null, opt:null,      perf_min:null,note:'', trend_key:null}
+};
+
+// Importância para alertas visuais
+const EXAM_PRIORITY={
+  'Ferritina':'critical','Ferro':'critical','Vitamina D':'high','TSH':'high',
+  'Vitamina B6':'info','Hemoglobina':'high','Magnésio':'medium','Vitamina C':'medium',
+  'Testosterona':'info','PCR':'info','IGF-1':'critical'
+};
+
+function examStatus(name,val){
+  const r=EXAM_REFS[name];
+  if(!r||r.opt===null||val===null||val===undefined)return'exam-info';
+  // Para PCR, menor é melhor
+  if(name==='PCR'){
+    if(val<=r.opt[1])return'exam-ok';
+    if(val<=r.high)return'exam-warn';
+    return'exam-alert';
+  }
+  if(val<r.low)return'exam-alert';
+  if(val>r.high&&name!=='Vitamina B6')return'exam-warn';
+  if(name==='Vitamina B6')return'exam-info'; // elevado pós-exercício é fisiológico
+  if(r.perf_min&&val<r.perf_min)return'exam-warn'; // abaixo do mínimo atlético
+  if(val>=r.opt[0]&&val<=r.opt[1])return'exam-ok';
+  return'exam-warn';
+}
+
+function examBarPct(name,val){
+  const r=EXAM_REFS[name];
+  if(!r||!r.opt||val===null)return 0;
+  if(name==='PCR')return Math.max(0,Math.min(100,100-(val/r.high*100)));
+  const max=r.high||r.opt[1]*1.2;
+  return Math.max(4,Math.min(100,Math.round(val/max*100)));
+}
+
+function examStatusLabel(name,val,cls){
+  const r=EXAM_REFS[name];
+  if(!r||r.opt===null)return cls==='exam-info'?'ℹ Contexto esportivo':'—';
+  if(name==='Vitamina B6'&&cls==='exam-info')return'ℹ Elevado — contexto esportivo';
+  if(cls==='exam-ok')return'✓ Zona de performance';
+  if(cls==='exam-warn'){
+    if(r.perf_min&&val<r.perf_min)return'⚠ Abaixo do mínimo atlético';
+    return'⚠ Atenção';
+  }
+  if(cls==='exam-alert')return'⚠ Deficiência atlética';
+  return'—';
+}
+
+const charts={};
+
+function setAthlete(id){state.activeId=id;save(state);renderAll();}
+function setSection(s){state.section=s;save(state);
+  document.querySelectorAll('.acc-tab').forEach((t,i)=>{
+    const sections=['crescimento','exames','sono','medico'];
+    t.classList.toggle('on',sections[i]===s);
+  });
+  document.querySelectorAll('.sec-wrap').forEach(w=>w.classList.remove('active'));
+  document.querySelectorAll('.sec-wrap.sec-'+s).forEach(w=>w.classList.add('active'));
+}
+
+function renderAll(){
+  renderAthleteSelector();
+  renderPanels();
+  renderCharts();
+  document.getElementById('top-badge').textContent='// '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+
+function renderAthleteSelector(){
+  const el=document.getElementById('ath-sel');
+  el.innerHTML=state.athletes.map(a=>`
+    <button class="ath-btn ${a.color} ${a.id===state.activeId?'on':''}" onclick="setAthlete('${a.id}')">${a.name}</button>
+  `).join('');
+}
+
+function renderPanels(){
+  const container=document.getElementById('panels');
+  container.innerHTML=state.athletes.map(a=>renderPanel(a)).join('');
+  document.querySelectorAll('.sec-wrap').forEach(w=>w.classList.remove('active'));
+  document.querySelectorAll('.sec-wrap.sec-'+state.section).forEach(w=>{
+    if(w.closest('[data-id="'+state.activeId+'"]'))w.classList.add('active');
+  });
+}
+
+function renderPanel(a){
+  const recs=[...a.records].sort((x,y)=>new Date(y.date)-new Date(x.date));
+  const lat=recs[0],prev=recs[1];
+  const off=lat?phvOffset(lat.height,lat.weight,a.dob):null;
+  const phase=phvPhase(off);
+  const target=targetH(a.fatherHeight,a.motherHeight);
+  const dH=lat&&prev?(lat.height-prev.height).toFixed(1):null;
+  const dW=lat&&prev?(lat.weight-prev.weight).toFixed(1):null;
+  const phvLabels={pre:`Pré-PHV  ${off!==null?(off>0?'+':'')+off+'a':''}`,circa:`Circa-PHV  ${off!==null?(off>0?'+':'')+off+'a':''}`,post:`Pós-PHV  ${off!==null?(off>0?'+':'')+off+'a':''}`,unk:'Registre medição'};
+  const phvClass={pre:'phv-pre',circa:'phv-circa',post:'phv-post',unk:'phv-unk'};
+
+  let alertHtml='';
+  if(phase==='circa')alertHtml=`<div class="alert-banner aw"><div class="al-lbl">atenção — pico de crescimento</div>${a.name} está no pico de crescimento. Risco de lesão elevado. Reduzir carga de impacto, priorizar técnica. Medir a cada 6 semanas.</div>`;
+  else if(phase==='pre')alertHtml=`<div class="alert-banner ao"><div class="al-lbl">pré-pico</div>Janela de ouro para técnica e coordenação. Baixo risco de lesão por crescimento.</div>`;
+
+  // ── LATEST EXAMS com novo card design
+  const examsByName={};
+  (a.exames||[]).sort((x,y)=>new Date(y.date)-new Date(x.date)).forEach(e=>{
+    if(!examsByName[e.name])examsByName[e.name]=e;
+  });
+
+  // ── STATUS DOTS para o resumo de topo
+  const statusDots=Object.values(examsByName).map(e=>{
+    const cls=examStatus(e.name,e.value);
+    const dotClass={
+      'exam-ok':'sdot-ok','exam-warn':'sdot-warn',
+      'exam-alert':'sdot-alert','exam-info':'sdot-info',''  :'sdot-neutral'
+    }[cls]||'sdot-neutral';
+    const prio=EXAM_PRIORITY[e.name]||'';
+    const showDot=prio==='critical'||prio==='high'||(cls==='exam-alert')||(cls==='exam-warn');
+    if(!showDot)return'';
+    return`<span class="sdot ${dotClass}" title="${e.name}: ${e.value} ${e.unit||EXAM_REFS[e.name]?.unit||''}">
+      <span class="sdot-dot"></span>${e.name}
+    </span>`;
+  }).filter(Boolean).join('');
+
+  const statusRowHtml=statusDots?`
+    <div class="status-row">
+      <span class="status-row-label">Alertas</span>
+      ${statusDots}
+    </div>`:'';
+
+  const examTiles=Object.values(examsByName).map(e=>{
+    const cls=examStatus(e.name,e.value);
+    const ref=EXAM_REFS[e.name];
+    const pct=examBarPct(e.name,e.value);
+    const statusLabel=examStatusLabel(e.name,e.value,cls);
+    const unit=e.unit||(ref?.unit||'');
+    return`<div class="exam-tile ${cls}">
+      <div class="exam-header">
+        <div class="exam-name">${e.name}</div>
+        <div class="exam-dot"></div>
+      </div>
+      <div class="exam-val-row">
+        <span class="exam-val">${e.value}</span>
+        <span class="exam-unit">${unit}</span>
+      </div>
+      <div class="exam-bar-wrap"><div class="exam-bar" style="width:${pct}%"></div></div>
+      <div class="exam-status">${statusLabel}</div>
+      <div class="exam-note">${ref?.note||''}</div>
+      <div class="exam-trend">${fmtD(e.date)}</div>
+    </div>`;
+  }).join('')||`<div class="empty-st">Nenhum exame registrado ainda.</div>`;
+
+  // ── SLEEP
+  const DAYS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  const sonoMap={};
+  (a.sono||[]).forEach(s=>{sonoMap[s.date]=s.hours;});
+  const today=new Date();
+  const sleepTiles=[0,1,2,3,4,5,6].map(i=>{
+    const d=new Date(today);d.setDate(d.getDate()-(6-i));
+    const iso=d.toISOString().split('T')[0];
+    const h=sonoMap[iso];
+    const cls=h===undefined?'empty':h>=8?'ok':h>=6?'warn':'bad';
+    const dayLabel=DAYS[d.getDay()===0?6:d.getDay()-1];
+    return`<div class="sleep-day ${cls}"><div class="sd-lbl">${dayLabel}</div><div class="sd-val">${h!==undefined?h+'h':'—'}</div></div>`;
+  }).join('');
+  const sonoAvg=(a.sono||[]).length?((a.sono||[]).reduce((s,x)=>s+x.hours,0)/(a.sono||[]).length).toFixed(1):null;
+
+  const noteItems=(a.notas||[]).slice().reverse().slice(0,8).map(n=>`
+    <div class="note-item">
+      <div class="note-date">${fmtD(n.date)}</div>
+      <span class="note-type nt-${n.type}">${n.type}</span>
+      <div class="note-text">${n.text}</div>
+    </div>`).join('')||`<div class="empty-st">Nenhuma anotação médica ainda.</div>`;
+
+  return`
+  <div class="panel ${a.id===state.activeId?'active':''}" data-id="${a.id}">
+
+    <div class="ath-hd ${a.color}">
+      <div class="ath-av">${a.name.charAt(0)}</div>
+      <div>
+        <div class="ath-nm">${a.name}</div>
+        <div class="ath-pos">${a.position} · ${ageYrs(a.dob)} anos</div>
+      </div>
+      <div class="phv-badge ${phvClass[phase]}">
+        <div class="pbl">Fase PHV</div>
+        <div class="pbv">${phvLabels[phase]}</div>
+      </div>
+    </div>
+
+    ${alertHtml}
+
+    <!-- ── CRESCIMENTO ── -->
+    <div class="sec-wrap sec-crescimento">
+      <div class="tiles4">
+        <div class="tile">
+          <div class="tv">${lat?lat.height:'—'}<span class="tu">cm</span></div>
+          ${dH!==null?`<div class="td2 td-ok">+${dH}cm</div>`:''}
+          <div class="tl">Altura</div>
+        </div>
+        <div class="tile">
+          <div class="tv">${lat?lat.weight:'—'}<span class="tu">kg</span></div>
+          ${dW!==null?`<div class="td2 ${parseFloat(dW)>0?'td-ok':'td-warn'}">${parseFloat(dW)>0?'+':''}${dW}kg</div>`:''}
+          <div class="tl">Peso</div>
+        </div>
+        <div class="tile">
+          <div class="tv" style="font-size:${target?'22px':'14px'};color:var(--gold)">${target?target:'—'}<span class="tu">${target?'cm':''}</span></div>
+          <div class="tl">Altura alvo</div>
+        </div>
+        <div class="tile">
+          <div class="tv">${recs.length}</div>
+          <div class="tl">Medições</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Curva de crescimento</div>
+        <div class="chart-wrap"><canvas id="chart-${a.id}"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Dados dos pais — altura alvo estimada</div>
+        <div class="p-row">
+          <div class="p-card"><div class="p-lbl">Pai</div><div class="p-val" id="fv-${a.id}">${a.fatherHeight?a.fatherHeight+' cm':'—'}</div></div>
+          <div class="p-card"><div class="p-lbl">Mãe</div><div class="p-val" id="mv-${a.id}">${a.motherHeight?a.motherHeight+' cm':'—'}</div></div>
+        </div>
+        ${target?`<div style="background:var(--gold-bg);border:1px solid #FDE68A;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:500;color:var(--gold);margin-bottom:4px;">Altura alvo (mid-parental height)</div>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--gold);">${target} cm</span>
+          <span style="font-size:12px;color:var(--text3);margin-left:8px;">±5 cm de margem</span>
+        </div>`:''}
+        <div class="g2">
+          <div class="f"><label>Altura do pai (cm)</label><input type="number" id="fi-${a.id}" value="${a.fatherHeight||''}" placeholder="Ex: 178" onchange="savePar('${a.id}')"></div>
+          <div class="f"><label>Altura da mãe (cm)</label><input type="number" id="mi-${a.id}" value="${a.motherHeight||''}" placeholder="Ex: 163" onchange="savePar('${a.id}')"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Fases PHV — o que fazer em cada uma</div>
+        <div class="phv-phases">
+          <div class="ph ph-pre"><div class="ph-nm">Pré-PHV</div><div class="ph-txt">Técnica, coordenação e fundamentos. Janela de ouro. Baixo risco de lesão por crescimento.</div></div>
+          <div class="ph ph-circ"><div class="ph-nm">Circa-PHV ⚠</div><div class="ph-txt">Pico de crescimento (±1 ano). Risco de lesão 31–49% acima. Reduzir impacto, priorizar técnica.</div></div>
+          <div class="ph ph-post"><div class="ph-nm">Pós-PHV</div><div class="ph-txt">Janela para força e potência. Músculo mais responsivo. Maior estabilidade articular.</div></div>
+        </div>
+      </div>
+
+      <div class="sec-title">Nova medição</div>
+      <div class="card">
+        <div class="g3">
+          <div class="f"><label>Data</label><input type="date" id="md-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="f"><label>Altura (cm)</label><input type="number" id="mh-${a.id}" placeholder="163.5" step="0.1"></div>
+          <div class="f"><label>Peso (kg)</label><input type="number" id="mw-${a.id}" placeholder="52.3" step="0.1"></div>
+        </div>
+        <div class="f" style="margin-bottom:10px;"><label>Observação</label><input type="text" id="mo-${a.id}" placeholder="Ex: Início da temporada, após resfriado..."></div>
+        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addMed('${a.id}')">Registrar medição</button>
+      </div>
+
+      <div class="sec-title">Histórico</div>
+      <div class="card">
+        <table class="ht">
+          <thead><tr><th>Data</th><th>Altura</th><th>Δ</th><th>Peso</th><th>Δ</th><th>PHV</th><th>Obs</th><th></th></tr></thead>
+          <tbody id="hist-${a.id}">
+            ${recs.length===0?`<tr><td colspan="8"><div class="empty-st">Sem medições ainda.</div></td></tr>`:
+            recs.map((r,i)=>{
+              const nx=recs[i+1];
+              const dh=nx?(r.height-nx.height).toFixed(1):null;
+              const dw=nx?(r.weight-nx.weight).toFixed(1):null;
+              const o=phvOffset(r.height,r.weight,a.dob);
+              const ph=phvPhase(o);
+              const phColors={pre:'var(--ok)',circa:'var(--warn)',post:'var(--alert)',unk:'var(--text3)'};
+              const phLabels={pre:'Pré',circa:'Circa',post:'Pós',unk:'—'};
+              return`<tr>
+                <td>${fmtD(r.date)}</td>
+                <td class="vl">${r.height}<span style="font-size:10px;color:var(--text3)">cm</span></td>
+                <td class="${dh!==null?(parseFloat(dh)>0?'dp':'dz'):'dz'}">${dh!==null?(parseFloat(dh)>0?'+':'')+dh:'—'}</td>
+                <td class="vl">${r.weight}<span style="font-size:10px;color:var(--text3)">kg</span></td>
+                <td class="${dw!==null?(parseFloat(dw)>0?'dp':'dn'):'dz'}">${dw!==null?(parseFloat(dw)>0?'+':'')+dw:'—'}</td>
+                <td style="font-size:11px;font-weight:600;color:${phColors[ph]}">${phLabels[ph]}</td>
+                <td style="font-size:12px;color:var(--text3)">${r.obs||''}</td>
+                <td><button class="del" onclick="delMed('${a.id}','${r.date}')">×</button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── EXAMES ── -->
+    <div class="sec-wrap sec-exames">
+
+      ${statusRowHtml}
+
+      <div class="card">
+        <div class="ct">Últimos exames — referências de performance atlética</div>
+        <div class="exam-grid">${examTiles}</div>
+      </div>
+
+      <div class="sec-title">Registrar novo exame</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:var(--radius);margin-bottom:12px;flex-wrap:wrap;">
+        <span style="font-size:22px;">🔬</span>
+        <div style="flex:1;min-width:180px;">
+          <div style="font-size:13px;font-weight:600;color:var(--info);margin-bottom:2px;">Analisar laudo com IA</div>
+          <div style="font-size:11px;color:var(--text2);">Suba o PDF do laboratório ou JPEG do RX — a IA extrai e interpreta todos os valores com referências atléticas.</div>
+        </div>
+        <a href="agente_exames.html?atleta=${a.id}" style="padding:9px 18px;background:var(--info);color:#fff;border-radius:var(--radius-sm);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-decoration:none;white-space:nowrap;display:inline-block;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Usar Agente →</a>
+      </div>
+      <div class="card">
+        <div class="g3">
+          <div class="f"><label>Data do exame</label><input type="date" id="ed-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="f"><label>Exame</label>
+            <select id="en-${a.id}" onchange="updateExamUnit('${a.id}')">
+              ${Object.keys(EXAM_REFS).map(k=>`<option value="${k}">${k}</option>`).join('')}
+            </select>
+          </div>
+          <div class="f"><label>Valor</label><input type="number" id="ev-${a.id}" placeholder="Ex: 45.2" step="0.1"></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Unidade</label><input type="text" id="eu-${a.id}" placeholder="ng/mL"></div>
+          <div class="f"><label>Laboratório / observação</label><input type="text" id="eo-${a.id}" placeholder="Ex: CERPE, 12/01/2026"></div>
+        </div>
+        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addExame('${a.id}')">Registrar exame</button>
+      </div>
+
+      <div class="sec-title">Histórico de exames</div>
+      <div class="card">
+        <table class="ht">
+          <thead><tr><th>Data</th><th>Exame</th><th>Valor</th><th>Unidade</th><th>Status</th><th>Obs</th><th></th></tr></thead>
+          <tbody id="exam-hist-${a.id}">
+            ${(a.exames||[]).length===0?`<tr><td colspan="7"><div class="empty-st">Sem exames registrados.</div></td></tr>`:
+            [...(a.exames||[])].sort((x,y)=>new Date(y.date)-new Date(x.date)).map(e=>{
+              const cls=examStatus(e.name,e.value);
+              const colors={'exam-ok':'var(--ok)','exam-warn':'var(--warn)','exam-alert':'var(--alert)','exam-info':'var(--info)',''  :'var(--text)'};
+              const lbls={'exam-ok':'✓ OK','exam-warn':'⚠ Atenção','exam-alert':'⚠ Deficiência','exam-info':'ℹ Info',''  :'—'};
+              return`<tr>
+                <td>${fmtD(e.date)}</td>
+                <td style="font-weight:500">${e.name}</td>
+                <td class="vl" style="color:${colors[cls]||'var(--text)'}">${e.value}</td>
+                <td style="font-size:11px;color:var(--text3)">${e.unit||''}</td>
+                <td style="font-size:11px;font-weight:500;color:${colors[cls]}">${lbls[cls]||'—'}</td>
+                <td style="font-size:12px;color:var(--text3)">${e.obs||''}</td>
+                <td><button class="del" onclick="delExame('${a.id}','${e.id}')">×</button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SONO ── -->
+    <div class="sec-wrap sec-sono">
+      <div class="card">
+        <div class="ct">Últimos 7 dias</div>
+        <div class="sleep-week">${sleepTiles}</div>
+        ${sonoAvg?`<div style="font-size:13px;color:var(--text2);">Média: <span style="color:${parseFloat(sonoAvg)>=8?'var(--ok)':parseFloat(sonoAvg)>=6?'var(--warn)':'var(--alert)'};font-weight:600;">${sonoAvg}h</span> &nbsp;·&nbsp; <span style="color:var(--text3)">Recomendado para atleta 12–14 anos: 9–10h</span></div>`:''}
+      </div>
+
+      <div class="sec-title">Registrar sono</div>
+      <div class="card">
+        <div class="g2">
+          <div class="f"><label>Data</label><input type="date" id="sd-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="f"><label>Horas dormidas</label><input type="number" id="sh-${a.id}" placeholder="Ex: 8.5" step="0.5" min="0" max="14"></div>
+        </div>
+        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addSono('${a.id}')">Registrar</button>
+      </div>
+
+      <div class="sec-title">Histórico de sono</div>
+      <div class="card">
+        <table class="ht">
+          <thead><tr><th>Data</th><th>Horas</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            ${(a.sono||[]).length===0?`<tr><td colspan="4"><div class="empty-st">Sem registros de sono.</div></td></tr>`:
+            [...(a.sono||[])].sort((x,y)=>new Date(y.date)-new Date(x.date)).slice(0,30).map(s=>{
+              const st=s.hours>=9?'ok':s.hours>=6?'warn':'bad';
+              const stLbl={ok:'Adequado',warn:'Atenção',bad:'Insuficiente'};
+              const stC={ok:'var(--ok)',warn:'var(--warn)',bad:'var(--alert)'};
+              return`<tr>
+                <td>${fmtD(s.date)}</td>
+                <td class="vl">${s.hours}<span style="font-size:10px;color:var(--text3)">h</span></td>
+                <td style="font-size:12px;font-weight:500;color:${stC[st]}">${stLbl[st]}</td>
+                <td><button class="del" onclick="delSono('${a.id}','${s.date}')">×</button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── MÉDICO ── -->
+    <div class="sec-wrap sec-medico">
+      <div class="card">
+        <div class="ct">Anotações médicas e consultas</div>
+        <div class="note-list">${noteItems}</div>
+      </div>
+
+      <div class="sec-title">Nova anotação</div>
+      <div class="card">
+        <div class="g2">
+          <div class="f"><label>Data</label><input type="date" id="nd-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="f"><label>Tipo</label>
+            <select id="nt-${a.id}">
+              <option value="consulta">Consulta</option>
+              <option value="exame">Exame</option>
+              <option value="fisio">Fisioterapia</option>
+              <option value="obs">Observação</option>
+            </select>
+          </div>
+        </div>
+        <div class="f" style="margin-bottom:10px;"><label>Anotação</label>
+          <textarea id="ntxt-${a.id}" placeholder="Ex: Endocrinologista — ferritina 25,3 ng/mL, prescreveu ferro bisglicinato 25mg dias alternados + vitamina D3 4.000 UI..."></textarea>
+        </div>
+        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addNota('${a.id}')">Salvar anotação</button>
+      </div>
+
+      <div style="padding:16px;background:var(--med-bg);border:1px solid var(--med-border);border-radius:var(--radius);margin-top:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--med);margin-bottom:8px;">Compartilhar com médico</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;">
+          Para compartilhar este painel com o pediatra ou nutricionista, exporte como PDF ou use o painel médico compartilhável (medico.html) disponível na aba Nutrição do Motor de Diagnóstico.
+        </div>
+        <button class="sbtn" style="background:var(--med-bg);color:var(--med);border:1px solid var(--med-border);" onclick="window.print()">Exportar PDF para médico</button>
+      </div>
+    </div>
+
+  </div>`;
+}
+
+// ── CHARTS
+function renderCharts(){
+  state.athletes.forEach(a=>{
+    const canvas=document.getElementById('chart-'+a.id);
+    if(!canvas)return;
+    if(charts[a.id]){charts[a.id].destroy();}
+    const recs=[...a.records].sort((x,y)=>new Date(x.date)-new Date(y.date));
+    if(!recs.length){
+      const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#9A9490';ctx.font='12px DM Sans';
+      ctx.textAlign='center';ctx.fillText('Sem dados ainda',canvas.offsetWidth/2||160,100);
+      return;
+    }
+    const cMap={lucas:'#2563EB',miguel:'#059669'};
+    const c=cMap[a.color]||'#2563EB';
+    charts[a.id]=new Chart(canvas,{
+      type:'line',
+      data:{
+        labels:recs.map(r=>fmtD(r.date)),
+        datasets:[
+          {label:'Altura (cm)',data:recs.map(r=>r.height),borderColor:c,backgroundColor:c+'18',borderWidth:2,pointBackgroundColor:c,pointRadius:4,tension:0.35,yAxisID:'y'},
+          {label:'Peso (kg)',data:recs.map(r=>r.weight),borderColor:'#D97706',backgroundColor:'#D9770618',borderWidth:1.5,pointBackgroundColor:'#D97706',pointRadius:3,tension:0.35,borderDash:[4,3],yAxisID:'y2'}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:'#9A9490',font:{size:10,family:'DM Sans'}},grid:{color:'rgba(0,0,0,0.04)'}},
+          y:{position:'left',ticks:{color:c,font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},
+          y2:{position:'right',ticks:{color:'#D97706',font:{size:10}},grid:{drawOnChartArea:false}}
+        }
+      }
+    });
+  });
+}
+
+// ── ACTIONS
+function savePar(id){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  const f=parseFloat(document.getElementById('fi-'+id).value);
+  const m=parseFloat(document.getElementById('mi-'+id).value);
+  if(!isNaN(f))a.fatherHeight=f;if(!isNaN(m))a.motherHeight=m;
+  save(state);renderAll();
+}
+function updateExamUnit(id){
+  const name=document.getElementById('en-'+id).value;
+  const ref=EXAM_REFS[name];
+  document.getElementById('eu-'+id).value=ref?.unit||'';
+}
+function addMed(id){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  const date=document.getElementById('md-'+id).value;
+  const height=parseFloat(document.getElementById('mh-'+id).value);
+  const weight=parseFloat(document.getElementById('mw-'+id).value);
+  const obs=document.getElementById('mo-'+id).value.trim();
+  if(!date||isNaN(height)||isNaN(weight)){alert('Preencha data, altura e peso.');return;}
+  a.records=a.records.filter(r=>r.date!==date);
+  a.records.push({date,height,weight,obs});
+  save(state);
+  document.getElementById('mh-'+id).value='';
+  document.getElementById('mw-'+id).value='';
+  document.getElementById('mo-'+id).value='';
+  renderAll();
+}
+function delMed(id,date){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  if(!confirm('Remover medição?'))return;
+  a.records=a.records.filter(r=>r.date!==date);
+  save(state);renderAll();
+}
+function addExame(id){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  const date=document.getElementById('ed-'+id).value;
+  const name=document.getElementById('en-'+id).value;
+  const value=parseFloat(document.getElementById('ev-'+id).value);
+  const unit=document.getElementById('eu-'+id).value.trim();
+  const obs=document.getElementById('eo-'+id).value.trim();
+  if(!date||!name||isNaN(value)){alert('Preencha data, nome e valor.');return;}
+  if(!a.exames)a.exames=[];
+  a.exames.push({id:Date.now().toString(),date,name,value,unit,obs});
+  save(state);
+  document.getElementById('ev-'+id).value='';document.getElementById('eo-'+id).value='';
+  renderAll();
+}
+function delExame(id,eid){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  if(!confirm('Remover exame?'))return;
+  a.exames=a.exames.filter(e=>e.id!==eid);
+  save(state);renderAll();
+}
+function addSono(id){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  const date=document.getElementById('sd-'+id).value;
+  const hours=parseFloat(document.getElementById('sh-'+id).value);
+  if(!date||isNaN(hours)){alert('Preencha data e horas.');return;}
+  if(!a.sono)a.sono=[];
+  a.sono=a.sono.filter(s=>s.date!==date);
+  a.sono.push({date,hours});
+  save(state);
+  document.getElementById('sh-'+id).value='';
+  renderAll();
+}
+function delSono(id,date){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  if(!confirm('Remover registro?'))return;
+  a.sono=a.sono.filter(s=>s.date!==date);
+  save(state);renderAll();
+}
+function addNota(id){
+  const a=state.athletes.find(x=>x.id===id);if(!a)return;
+  const date=document.getElementById('nd-'+id).value;
+  const type=document.getElementById('nt-'+id).value;
+  const text=document.getElementById('ntxt-'+id).value.trim();
+  if(!date||!text){alert('Preencha data e anotação.');return;}
+  if(!a.notas)a.notas=[];
+  a.notas.push({id:Date.now().toString(),date,type,text});
+  save(state);
+  document.getElementById('ntxt-'+id).value='';
+  renderAll();
+}
+
+// ── INIT
+renderAll();
+setSection(state.section||'crescimento');
+</script>
+</body>
+</html>

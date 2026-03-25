@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Médico — Projeto Atleta Elite</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bege:#F5F0E8;--bege-md:#EDE7D9;--bege-dk:#D6CDB8;
+  --tinta:#1C1C1C;--sub:#665E50;--fraco:#9A9080;--linha:#D6CDB8;
+  --lucas:#2C4A6E;--lucas-lt:#EBF0F7;--lucas-md:#C5D5E8;
+  --miguel:#2C5E3F;--miguel-lt:#EBF3EE;--miguel-md:#B8D9C4;
+  --crit:#8B1A1A;--crit-lt:#FDF0F0;--crit-bd:#E8BCBC;
+  --warn:#7A4A00;--warn-lt:#FBF3E6;--warn-bd:#E8D0A0;
+  --info:#1A4A7A;--info-lt:#EFF5FC;--info-bd:#B8D0E8;
+  --ok:#2C5E3F;--ok-lt:#EBF3EE;--ok-bd:#B8D9C4;
+  --neutro:#5A5248;--neutro-lt:#F2EFE8;--neutro-bd:#D6CDB8;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bege-md);font-family:'DM Sans',sans-serif;font-weight:400;color:var(--tinta);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.topbar{background:var(--tinta);padding:10px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.topbar-lbl{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.topbar-btns{display:flex;gap:8px}
+.btn{padding:6px 18px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:2px;cursor:pointer;border:none;transition:opacity .15s;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{opacity:.8}
+.btn-p{background:#fff;color:var(--tinta)}
+.btn-g{background:transparent;color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.2)}
+.folha{width:794px;background:var(--bege);margin:32px auto;box-shadow:0 2px 28px rgba(0,0,0,.13)}
+.inner{padding:54px 58px}
+.doc-header{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:14px;border-bottom:1.5px solid var(--tinta);margin-bottom:40px}
+.doc-title{font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
+.doc-date{font-size:11px;font-weight:300;color:var(--fraco)}
+.atleta-block{margin-bottom:52px}
+.atleta-block+.atleta-block{padding-top:48px;border-top:1.5px solid var(--linha)}
+.atleta-id{display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--linha);margin-bottom:28px}
+.atleta-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.atleta-nome{font-size:22px;font-weight:600;letter-spacing:-.4px}
+.atleta-nome.lucas{color:var(--lucas)}
+.atleta-nome.miguel{color:var(--miguel)}
+.atleta-meta{font-size:11px;font-weight:300;color:var(--fraco)}
+.phv-tag{margin-left:auto;font-size:10px;font-weight:500;letter-spacing:.5px;padding:4px 12px;border-radius:2px}
+.phv-pre{background:var(--ok-lt);color:var(--ok);border:1px solid var(--ok-bd)}
+.phv-circa{background:var(--warn-lt);color:var(--warn);border:1px solid var(--warn-bd)}
+.phv-pos{background:var(--info-lt);color:var(--info);border:1px solid var(--info-bd)}
+.phv-none{background:var(--neutro-lt);color:var(--neutro);border:1px solid var(--neutro-bd)}
+.rae-tag{font-size:10px;font-weight:500;letter-spacing:.5px;padding:4px 12px;border-radius:2px;margin-left:6px}
+.rae-q1{background:#EBF7EB;color:#1B5E20;border:1px solid #A5D6A7}
+.rae-q2{background:#E8F0F7;color:var(--lucas);border:1px solid var(--lucas-md)}
+.rae-q3{background:#FBF3E6;color:var(--warn);border:1px solid var(--warn-bd)}
+.rae-q4{background:var(--crit-lt);color:var(--crit);border:1px solid var(--crit-bd)}
+.rae-nd{background:var(--neutro-lt);color:var(--neutro);border:1px solid var(--neutro-bd)}
+.bio-row{display:flex;border:1px solid var(--linha);border-radius:2px;overflow:hidden;margin-bottom:32px}
+.bio-tile{flex:1;padding:14px 16px;border-right:1px solid var(--linha)}
+.bio-tile:last-child{border-right:none}
+.bio-val{font-size:20px;font-weight:600;line-height:1;margin-bottom:4px}
+.bio-unit{font-size:10px;font-weight:300;color:var(--fraco)}
+.bio-lbl{font-size:8px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco)}
+.sec{margin-bottom:28px}
+.sec-titulo{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--fraco);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sec-titulo::after{content:'';flex:1;height:1px;background:var(--linha)}
+.alerta{padding:11px 14px;margin-bottom:5px;border-radius:2px;font-size:12px;line-height:1.7}
+.alerta:last-child{margin-bottom:0}
+.alerta-crit{background:var(--crit-lt);border:1px solid var(--crit-bd);color:#5C1010}
+.alerta-crit .al-titulo{font-weight:600;color:var(--crit);margin-bottom:3px}
+.alerta-warn{background:var(--warn-lt);border:1px solid var(--warn-bd);color:#5C3800}
+.alerta-warn .al-titulo{font-weight:600;color:var(--warn);margin-bottom:3px}
+.alerta-info{background:var(--info-lt);border:1px solid var(--info-bd);color:#103060}
+.alerta-info .al-titulo{font-weight:600;color:var(--info);margin-bottom:3px}
+.alerta-ok{background:var(--ok-lt);border:1px solid var(--ok-bd);color:#1A3D28}
+.alertas-grupo+.alertas-grupo{margin-top:6px}
+table{width:100%;border-collapse:collapse}
+th{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco);text-align:left;padding:6px 10px;border-bottom:1px solid var(--linha)}
+td{padding:8px 10px;font-size:12px;border-bottom:1px solid var(--bege-md);color:var(--tinta);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.tn{font-variant-numeric:tabular-nums;font-weight:500}
+.tc-ok{color:var(--ok)}
+.tc-warn{color:var(--warn);font-weight:500}
+.tc-crit{color:var(--crit);font-weight:600}
+.tc-mid{color:#7A5200}
+.exames-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
+.exames-grid-3{grid-template-columns:1fr 1fr 1fr}
+.exame-card{background:#fff;border:1px solid var(--linha);border-radius:3px;padding:14px 16px}
+.ex-nome{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco);margin-bottom:6px}
+.ex-valor-wrap{display:flex;align-items:baseline;gap:5px;margin-bottom:2px}
+.ex-valor{font-size:26px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.ex-valor.vc{color:var(--crit)}
+.ex-valor.vw{color:var(--warn)}
+.ex-valor.vm{color:#7A5200}
+.ex-valor.vo{color:var(--ok)}
+.ex-valor.vi{color:var(--info)}
+.ex-valor.vn{color:var(--neutro)}
+.ex-unidade{font-size:11px;font-weight:300;color:var(--fraco)}
+.ex-barra-wrap{height:4px;background:var(--bege-md);border-radius:2px;margin:8px 0}
+.ex-barra{height:4px;border-radius:2px;min-width:4px}
+.ex-status{font-size:11px;font-weight:600;margin-bottom:5px}
+.ex-status.sc{color:var(--crit)}
+.ex-status.sw{color:var(--warn)}
+.ex-status.sm{color:#7A5200}
+.ex-status.so{color:var(--ok)}
+.ex-status.si{color:var(--info)}
+.ex-status.sn{color:var(--neutro)}
+.ex-interp{font-size:11px;color:var(--sub);line-height:1.6}
+.ex-tendencia{font-size:10px;color:var(--fraco);margin-top:5px;font-variant-numeric:tabular-nums}
+.grupo-exames{margin-bottom:22px}
+.grupo-titulo{font-size:8px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--fraco);margin-bottom:10px;padding-bottom:6px;border-bottom:1px dashed var(--linha)}
+.doc-footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--linha);display:flex;justify-content:space-between;align-items:center}
+.ft{font-size:9px;font-weight:300;color:var(--fraco);line-height:1.7}
+.ftag{font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--fraco)}
+.sem{text-align:center;padding:80px 40px;color:var(--fraco)}
+.sem h2{font-size:16px;font-weight:500;margin-bottom:10px}
+.sem p{font-size:12px;line-height:1.7}
+@media print{
+  body{background:var(--bege)!important}
+  .topbar{display:none!important}
+  .folha{width:100%!important;box-shadow:none!important;margin:0!important}
+  .inner{padding:14mm 16mm!important}
+  .atleta-block{page-break-inside:avoid}
+  .sec{page-break-inside:avoid}
+  .exame-card{page-break-inside:avoid;break-inside:avoid}
+  .exames-grid,.exames-grid-3{break-inside:avoid}
+  @page{size:A4;margin:8mm}
+}
+@media(max-width:840px){
+  .folha{width:100%;margin:0;box-shadow:none}
+  .inner{padding:28px 22px}
+  .bio-row{flex-wrap:wrap}
+  .exames-grid,.exames-grid-3{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-lbl">Relatório Médico · Projeto Atleta Elite</span>
+  <div class="topbar-btns">
+    <a href="rae.html" class="btn btn-g">Efeito RAE →</a>
+    <button class="btn btn-p" onclick="window.print()">Imprimir / Salvar PDF</button>
+    <button class="btn btn-g" onclick="window.close()">Fechar</button>
+  </div>
+</div>
+
+<div class="folha">
+  <div class="inner" id="doc">
+    <div class="sem"><h2>Gerando…</h2></div>
+  </div>
+</div>
+
+<script>
+// ── RAE ──────────────────────────────────────────────────────────────────────
+function calcQuartil(dobStr,corte){
+  if(!dobStr)return null;
+  const dob=new Date(dobStr);
+  const[cMes,cDia]=corte.split('-').map(Number);
+  const mesNasc=dob.getMonth()+1;
+  const diaNasc=dob.getDate();
+  let offset=(mesNasc-cMes+12)%12;
+  if(mesNasc===cMes&&diaNasc<cDia)offset=11;
+  if(mesNasc===cMes&&diaNasc>=cDia)offset=0;
+  if(offset<3)return 1;if(offset<6)return 2;if(offset<9)return 3;return 4;
+}
+function classMatural(boneAge,idCrono){
+  if(boneAge==null)return null;
+  const d=boneAge-idCrono;
+  if(d>1.0)return'early';if(d<-1.0)return'late';return'ontime';
+}
+function raeTag(bio){
+  const q=calcQuartil(bio.dob,'01-01');
+  if(!q)return'';
+  const age=bio.dob?(Date.now()-new Date(bio.dob))/(365.25*24*3600*1000):null;
+  // bone age salvo pelo agente como entrada name='Bone Age (RX)' em bio.exames[]
+  let boneAge=null;
+  if(bio.exames&&bio.exames.length){
+    const rxEntries=bio.exames.filter(e=>e.name==='Bone Age (RX)'&&e.value!=null);
+    if(rxEntries.length){
+      rxEntries.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+      boneAge=parseFloat(rxEntries[0].value);
+    }
+  }
+  const mat=(boneAge!=null&&age)?classMatural(boneAge,age):null;
+  const qLabel=['','Q1','Q2','Q3','Q4'][q];
+  const qDesc=['','Vantagem alta','Vantagem mod.','Desvantagem mod.','Desvantagem alta'][q];
+  const qCls=['','rae-q1','rae-q2','rae-q3','rae-q4'][q];
+  const matLabel=mat==='early'?' \xb7 Early':mat==='late'?' \xb7 Late':mat==='ontime'?' \xb7 On-time':'';
+  return`<span class="rae-tag ${qCls}" title="Efeito RAE \xb7 Corte 01/Jan \xb7 ${qDesc}${mat?' \xb7 '+mat:' \xb7 Bone age pendente'}">RAE ${qLabel}${matLabel}</span>`;
+}
+
+function bioData(){try{const s=localStorage.getItem('biometria_v2');return s?JSON.parse(s):null}catch(e){return null}}
+function bioAthlete(n){const d=bioData();return d?.athletes?.find(a=>a.name.toLowerCase()===n.toLowerCase())||null}
+function calcPHV(h,w,dob){
+  if(!h||!w||!dob)return null;
+  const age=(Date.now()-new Date(dob))/(365.25*24*3600*1000);
+  if(age<8)return null;
+  return parseFloat((-9.236+(0.0002708*(h*w))+(-0.001663*(age*h))+(0.007216*(age*w))+(0.02292*(w/h*100))).toFixed(2));
+}
+function fmtD(s){return s?new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}):'—'}
+function idad(dob){return dob?((Date.now()-new Date(dob))/(365.25*24*3600*1000)).toFixed(1)+'a':'—'}
+function altAlvo(fh,mh){return(fh&&mh)?((+fh+ +mh+13)/2).toFixed(0)+' cm':'—'}
+
+const NOME_TO_KEY={
+  'Ferritina':'ferritina','Ferro sérico':'ferro','Vitamina D':'vitaminaD',
+  'TSH':'tsh','Hemoglobina':'hemoglobina','Hematócrito':'hematocrito',
+  'Magnésio':'magnesio','Zinco':'zinco','Vitamina B12':'vitaminaB12',
+  'Vitamina B6':'vitaminaB6','CPK':'cpk','PCR':'pcr','PCR ultra-sensível':'pcr',
+  'Cálcio':'calcio','Fósforo':'fosforo','IGF-1':'igf1','Testosterona':'testosterona',
+  'Vitamina C':'vitaminaC','Transferrina':'transferrina','Selênio':'selenio',
+  'Vitamina A':'vitaminaA','Ácido Fólico':'acidoFolico','Ácido fólico':'acidoFolico',
+  'FSH':'fsh','LH':'lh','T4 livre':'t4livre','T4 Livre':'t4livre',
+  'T3 total':'t3total','T3 Total':'t3total','Testosterona total':'testosterona',
+  'Fosfatase alcalina':'fosfataseAlcalina','Fosfatase Alcalina':'fosfataseAlcalina',
+  'TGO':'tgo','TGP':'tgp','Creatinina':'creatinina','Ureia':'ureia',
+  'Glicose':'glicose','Insulina':'insulina','Cortisol':'cortisol',
+};
+
+const EXAM_DEF={
+  ferritina:{l:'Ferritina',u:'ng/mL',
+    status(v){
+      if(v<30)return{c:'vc',s:'sc',lbl:'Deficiência grave',bar:15,cor:'#8B1A1A'};
+      if(v<50)return{c:'vc',s:'sc',lbl:'Deficiência atlética',bar:25,cor:'#8B1A1A'};
+      if(v<80)return{c:'vm',s:'sm',lbl:'Zona mínima — monitorar',bar:55,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:80,cor:'#2C5E3F'};
+    },
+    interp(v,trend){
+      if(v<30)return`Criticamente baixo — estoques de ferro no limite. VO2max e sprint repeatability comprometidos. Ação imediata.${trend?'\nTendência: '+trend:''}`;
+      if(v<50)return`Lab considera normal (ref: 7–140), medicina esportiva: abaixo de 50 já compromete recuperação. Avaliar ferro quelado.${trend?'\nTendência: '+trend:''}`;
+      if(v<80)return`Zona atlética mínima. Alvo de performance: 80+ ng/mL.${trend?'\nTendência: '+trend:''}`;
+      return`Adequado para performance.${trend?'\nTendência: '+trend:''}`;
+    }},
+  ferro:{l:'Ferro sérico',u:'µg/dL',
+    status(v){
+      if(v<65)return{c:'vc',s:'sc',lbl:'Queda progressiva — crítico',bar:20,cor:'#8B1A1A'};
+      if(v<70)return{c:'vw',s:'sw',lbl:'Limítrofe',bar:38,cor:'#7A4A00'};
+      if(v<100)return{c:'vm',s:'sm',lbl:'Abaixo do ideal',bar:55,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:75,cor:'#2C5E3F'};
+    },
+    interp(v,trend){
+      if(v<65)return`Abaixo da referência do próprio lab. Com ferritina baixa = esvaziamento dos estoques. Avaliar dieta, absorção e possível sangramento oculto.${trend?'\nTendência: '+trend:''}`;
+      if(v<70)return`Abaixo do mínimo atlético (70 µg/dL). Monitorar com ferritina.${trend?'\nTendência: '+trend:''}`;
+      return`Dentro da faixa. Monitorar tendência.${trend?'\nTendência: '+trend:''}`;
+    }},
+  vitaminaD:{l:'Vitamina D',u:'ng/mL',
+    status(v){
+      if(v<20)return{c:'vc',s:'sc',lbl:'Deficiência grave',bar:10,cor:'#8B1A1A'};
+      if(v<40)return{c:'vw',s:'sw',lbl:'Zona de insuficiência atlética',bar:28,cor:'#7A4A00'};
+      if(v<55)return{c:'vm',s:'sm',lbl:'Insuficiente para atleta',bar:46,cor:'#7A5200'};
+      if(v<=80)return{c:'vo',s:'so',lbl:'Zona atlética adequada',bar:75,cor:'#2C5E3F'};
+      return{c:'vi',s:'si',lbl:'Acima do ideal — monitorar',bar:88,cor:'#1A4A7A'};
+    },
+    interp(v,trend){
+      if(v<20)return`Deficiência grave. Suplementação urgente: colecalciferol + K2.${trend?'\nTendência: '+trend:''}`;
+      if(v<40)return`Nunca atingiu a zona de performance (50–80 ng/mL). Impacto em síntese proteica muscular e saúde óssea em PHV ativo. Considerar colecalciferol 2000–4000 UI/dia + K2.${trend?'\nTendência: '+trend:''}`;
+      if(v<55)return`Mínimo atlético atingido, mas abaixo do ideal (55–80 ng/mL). Manter suplementação.${trend?'\nTendência: '+trend:''}`;
+      if(v<=80)return`Zona atlética. Manter suplementação.${trend?'\nTendência: '+trend:''}`;
+      return`Acima do ideal — monitorar (toxicidade >100 ng/mL).${trend?'\nTendência: '+trend:''}`;
+    }},
+  tsh:{l:'TSH',u:'µUI/mL',
+    status(v){
+      if(v>4.0)return{c:'vc',s:'sc',lbl:'Hipotireoidismo — ação urgente',bar:92,cor:'#8B1A1A'};
+      if(v>3.0)return{c:'vw',s:'sw',lbl:'Acima do ótimo atlético',bar:72,cor:'#7A4A00'};
+      if(v>2.5)return{c:'vm',s:'sm',lbl:'Limítrofe — monitorar',bar:58,cor:'#7A5200'};
+      if(v>=0.5)return{c:'vo',s:'so',lbl:'Dentro do ótimo atlético',bar:35,cor:'#2C5E3F'};
+      return{c:'vw',s:'sw',lbl:'Baixo — avaliar',bar:10,cor:'#7A4A00'};
+    },
+    interp(v,trend){
+      if(v>4.0)return`Solicitar T4 livre, anti-TPO e anti-TG com urgência.${trend?'\nTendência: '+trend:''}`;
+      if(v>3.0)return`Dentro da ref do lab mas acima do ótimo atlético (<2,5). Tireoide trabalhando mais para manter T4. Solicitar T4 livre, anti-TPO e anti-TG.${trend?'\nTendência: '+trend:''}`;
+      if(v>2.5)return`Limítrofe — com tendência de subida, monitorar.${trend?'\nTendência: '+trend:''}`;
+      return`Dentro da zona atlética ótima (0,5–2,5).${trend?'\nTendência: '+trend:''}`;
+    }},
+  t4livre:{l:'T4 Livre',u:'ng/dL',
+    status(v){
+      if(v<0.83)return{c:'vc',s:'sc',lbl:'Hipotireoidismo',bar:15,cor:'#8B1A1A'};
+      if(v<0.95)return{c:'vm',s:'sm',lbl:'Terço inferior — monitorar',bar:38,cor:'#7A5200'};
+      if(v<=1.43)return{c:'vo',s:'so',lbl:'Dentro da referência',bar:65,cor:'#2C5E3F'};
+      return{c:'vw',s:'sw',lbl:'Acima — avaliar',bar:85,cor:'#7A4A00'};
+    },
+    interp(v,trend){
+      if(v<0.83)return`T4 livre baixo com TSH elevado = hipotireoidismo primário. Avaliação urgente.`;
+      if(v<0.95)return`Terço inferior da referência. Com TSH subindo, tireoide trabalhando mais para manter T4. Monitorar conversão T4→T3.${trend?'\nTendência: '+trend:''}`;
+      return`Dentro da referência.${trend?'\nTendência: '+trend:''}`;
+    }},
+  t3total:{l:'T3 Total',u:'ng/dL',
+    status(v){
+      if(v<86)return{c:'vw',s:'sw',lbl:'Baixo — investigar',bar:20,cor:'#7A4A00'};
+      if(v<110)return{c:'vm',s:'sm',lbl:'Terço inferior',bar:38,cor:'#7A5200'};
+      if(v<=192)return{c:'vo',s:'so',lbl:'Dentro da referência',bar:65,cor:'#2C5E3F'};
+      return{c:'vw',s:'sw',lbl:'Acima',bar:85,cor:'#7A4A00'};
+    },
+    interp(v,trend){
+      if(v<110)return`T3 baixo + TSH alto = padrão de demanda elevada. Deficiência de selênio ou ferro compromete conversão T4→T3.${trend?'\nTendência: '+trend:''}`;
+      return`Dentro da referência.${trend?'\nTendência: '+trend:''}`;
+    }},
+  hemoglobina:{l:'Hemoglobina',u:'g/dL',
+    status(v){
+      if(v<12)return{c:'vc',s:'sc',lbl:'Anemia',bar:15,cor:'#8B1A1A'};
+      if(v<13.5)return{c:'vw',s:'sw',lbl:'Abaixo do mínimo atlético',bar:32,cor:'#7A4A00'};
+      if(v<15)return{c:'vo',s:'so',lbl:'Adequado',bar:65,cor:'#2C5E3F'};
+      return{c:'vo',s:'so',lbl:'Bom',bar:80,cor:'#2C5E3F'};
+    },
+    interp(v,trend){
+      if(v<12)return`Anemia — investigar causa (ferro, B12, folato).${trend?'\nTendência: '+trend:''}`;
+      if(v<13.5)return`Abaixo do mínimo atlético para capacidade aeróbica ótima.${trend?'\nTendência: '+trend:''}`;
+      return`Adequado.${trend?'\nTendência: '+trend:''}`;
+    }},
+  hematocrito:{l:'Hematócrito',u:'%',
+    status(v){
+      if(v<40)return{c:'vw',s:'sw',lbl:'Abaixo do mínimo atlético',bar:30,cor:'#7A4A00'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:65,cor:'#2C5E3F'};
+    },
+    interp(v){return v<40?`Abaixo do mínimo atlético — avaliar junto com hemoglobina e ferro.`:`Adequado.`}},
+  magnesio:{l:'Magnésio',u:'mg/dL',
+    status(v){
+      if(v<1.8)return{c:'vc',s:'sc',lbl:'Deficiência',bar:18,cor:'#8B1A1A'};
+      if(v<2.1)return{c:'vm',s:'sm',lbl:'Terço inferior — monitorar',bar:40,cor:'#7A5200'};
+      if(v<=2.5)return{c:'vo',s:'so',lbl:'Adequado',bar:70,cor:'#2C5E3F'};
+      return{c:'vi',s:'si',lbl:'Acima',bar:85,cor:'#1A4A7A'};
+    },
+    interp(v,trend){
+      if(v<1.8)return`Deficiência — impacto em síntese proteica, contração muscular e sono.${trend?'\nTendência: '+trend:''}`;
+      if(v<2.1)return`Esportivo: ótimo é 2,3–2,5. Está no terço inferior.${trend?'\nTendência: '+trend:''}`;
+      return`Adequado.${trend?'\nTendência: '+trend:''}`;
+    }},
+  zinco:{l:'Zinco',u:'µg/dL',
+    status(v){
+      if(v<70)return{c:'vw',s:'sw',lbl:'Abaixo do mínimo',bar:22,cor:'#7A4A00'};
+      if(v<80)return{c:'vm',s:'sm',lbl:'Limítrofe',bar:45,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Bom',bar:72,cor:'#2C5E3F'};
+    },
+    interp(v){return v<70?`Abaixo do mínimo — impacto em síntese proteica, imunidade e testosterona.`:v<80?`Limítrofe — monitorar.`:`Bom. Síntese proteica e imunidade OK.`}},
+  vitaminaB12:{l:'Vitamina B12',u:'pg/mL',
+    status(v){
+      if(v<300)return{c:'vc',s:'sc',lbl:'Deficiência',bar:18,cor:'#8B1A1A'};
+      if(v<500)return{c:'vm',s:'sm',lbl:'Adequado — abaixo do ideal atlético',bar:48,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Bom',bar:72,cor:'#2C5E3F'};
+    },
+    interp(v){return v<300?`Deficiência — impacto em eritropoiese e função neurológica.`:v<500?`Adequado mas abaixo do ideal atlético.`:`Bom. Síntese de hemácias suportada.`}},
+  vitaminaB6:{l:'Vitamina B6',u:'µg/L',
+    status(v){
+      if(v>100)return{c:'vi',s:'si',lbl:'Elevado — contexto esportivo',bar:75,cor:'#1A4A7A'};
+      if(v<20)return{c:'vc',s:'sc',lbl:'Deficiência',bar:12,cor:'#8B1A1A'};
+      if(v<50)return{c:'vo',s:'so',lbl:'Adequado',bar:55,cor:'#2C5E3F'};
+      return{c:'vo',s:'so',lbl:'Bom',bar:70,cor:'#2C5E3F'};
+    },
+    interp(v){
+      if(v>100)return`Lab diz "acima do intervalo" (ref: 12,6–45,2 µg/L). Em medicina esportiva, B6 elevado pós-treino é fisiológico — exercício libera PLP do músculo. Não tóxico (toxicidade começa >200 cronicamente). Garantir ingestão alimentar para reposição.`;
+      if(v<20)return`Deficiência — comprometimento de síntese de hemoglobina e metabolismo proteico.`;
+      return`Adequado.`;
+    }},
+  cpk:{l:'CPK',u:'U/L',
+    status(v){
+      if(v>500)return{c:'vc',s:'sc',lbl:'Dano muscular elevado',bar:85,cor:'#8B1A1A'};
+      if(v>200)return{c:'vm',s:'sm',lbl:'Moderado',bar:55,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Sem sinal de overtraining',bar:25,cor:'#2C5E3F'};
+    },
+    interp(v){return v>500?`Elevado — marcador de dano muscular. Avaliar volume de treino e recuperação.`:v>200?`Moderado — treino recente pode elevar. Monitorar tendência.`:`Baixo — sem sinal de overtraining muscular.`}},
+  pcr:{l:'PCR ultra-sensível',u:'mg/L',
+    status(v){
+      if(v>3)return{c:'vc',s:'sc',lbl:'Inflamação sistêmica',bar:82,cor:'#8B1A1A'};
+      if(v>1)return{c:'vm',s:'sm',lbl:'Levemente elevado',bar:50,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Excelente — baixo risco',bar:12,cor:'#2C5E3F'};
+    },
+    interp(v){return v>3?`Inflamação sistêmica — investigar causa (infecção, sobrecarga, lesão).`:v>1?`Levemente elevado — atenção ao volume de treino.`:`Inflamação sistêmica praticamente zero. Sem sinal de overtraining.`}},
+  calcio:{l:'Cálcio',u:'mg/dL',
+    status(v){
+      if(v<8.5)return{c:'vw',s:'sw',lbl:'Hipocalcemia',bar:18,cor:'#7A4A00'};
+      if(v>10.5)return{c:'vw',s:'sw',lbl:'Hipercalcemia',bar:88,cor:'#7A4A00'};
+      return{c:'vo',s:'so',lbl:'Bom',bar:65,cor:'#2C5E3F'};
+    },
+    interp(v,trend){return v<8.5?`Hipocalcemia — investigar vitamina D e PTH.`:v>10.5?`Hipercalcemia — avaliar PTH e vitamina D.`:`PHV ativo — cálcio suportado.${trend?'\nTendência: '+trend:''}`}},
+  fosforo:{l:'Fósforo',u:'mg/dL',
+    status(v){
+      if(v<3.5)return{c:'vw',s:'sw',lbl:'Hipofosfatemia',bar:18,cor:'#7A4A00'};
+      if(v>5.5)return{c:'vw',s:'sw',lbl:'Hiperfosfatemia',bar:88,cor:'#7A4A00'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:60,cor:'#2C5E3F'};
+    },
+    interp(v){return v<3.5?`Hipofosfatemia — impacto em metabolismo energético.`:v>5.5?`Hiperfosfatemia — avaliar função renal.`:`Adequado.`}},
+  fosfataseAlcalina:{l:'Fosfatase Alcalina',u:'U/L',
+    status(v){
+      if(v>400)return{c:'vw',s:'sw',lbl:'Turnover ósseo muito ativo',bar:75,cor:'#7A4A00'};
+      if(v>200)return{c:'vi',s:'si',lbl:'Normal para PHV ativo',bar:55,cor:'#1A4A7A'};
+      return{c:'vo',s:'so',lbl:'Dentro da referência',bar:35,cor:'#2C5E3F'};
+    },
+    interp(v,trend){
+      if(v>200)return`Ref pediátrica: 202–618 U/L. Alta FA em adolescente = turnover ósseo ativo (crescimento). Protocolo de lesão Circa-PHV deve estar ativo.${trend?'\nTendência: '+trend:''}`;
+      return`Dentro da referência.${trend?'\nTendência: '+trend:''}`;
+    }},
+  igf1:{l:'IGF-1',u:'ng/mL',
+    status(v){
+      if(v<180)return{c:'vw',s:'sw',lbl:'Abaixo do ideal',bar:25,cor:'#7A4A00'};
+      if(v<350)return{c:'vo',s:'so',lbl:'Adequado',bar:60,cor:'#2C5E3F'};
+      return{c:'vi',s:'si',lbl:'Elevado — esperado em Circa-PHV',bar:78,cor:'#1A4A7A'};
+    },
+    interp(v){return v<180?`Eixo GH/IGF-1 subótimo — avaliar sono, nutrição e carga de treino.`:v>500?`Elevado — esperado em Circa-PHV. Monitorar.`:`Adequado — eixo GH/IGF-1 ativo.`}},
+  testosterona:{l:'Testosterona total',u:'ng/dL',
+    status(v){
+      if(v<300)return{c:'vw',s:'sw',lbl:'Abaixo do ideal',bar:28,cor:'#7A4A00'};
+      if(v<500)return{c:'vo',s:'so',lbl:'Adequado',bar:60,cor:'#2C5E3F'};
+      return{c:'vo',s:'so',lbl:'Bom — puberdade avançada',bar:78,cor:'#2C5E3F'};
+    },
+    interp(v,trend){return`Faixa para a idade. No topo da faixa etária — puberdade avançada. Janela anabólica importante.${trend?'\nTendência: '+trend:''}`}},
+  fsh:{l:'FSH',u:'mUI/mL',
+    status(v){
+      if(v>3)return{c:'vi',s:'si',lbl:'Puberdade ativa',bar:60,cor:'#1A4A7A'};
+      return{c:'vn',s:'sn',lbl:'Faixa pré-puberal',bar:30,cor:'#5A5248'};
+    },
+    interp(v,trend){return v>3?`Acima dos pré-púberes (0,4–3,0). Na faixa adulta (1,4–18,1). Puberdade ativa.${trend?'\nTendência: '+trend:''}`:
+    `Dentro da faixa pré-puberal.${trend?'\nTendência: '+trend:''}`}},
+  lh:{l:'LH',u:'mUI/mL',
+    status(v){
+      if(v>2)return{c:'vi',s:'si',lbl:'Eixo gonadotrófico ativo',bar:65,cor:'#1A4A7A'};
+      return{c:'vn',s:'sn',lbl:'Faixa pré-puberal',bar:25,cor:'#5A5248'};
+    },
+    interp(v,trend){return v>2?`Muito acima dos pré-púberes (<0,3). Eixo gonadotrófico ativo — puberdade em curso.${trend?'\nTendência: '+trend:''}`:
+    `Dentro da faixa pré-puberal.${trend?'\nTendência: '+trend:''}`}},
+  vitaminaC:{l:'Vitamina C',u:'mg/dL',
+    status(v){
+      if(v<0.8)return{c:'vw',s:'sw',lbl:'Baixo-normal atlético',bar:25,cor:'#7A4A00'};
+      if(v<1.2)return{c:'vm',s:'sm',lbl:'Adequado — monitorar',bar:50,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:70,cor:'#2C5E3F'};
+    },
+    interp(v){return v<0.8?`Abaixo do mínimo atlético. Atletas têm maior demanda oxidativa. Meta: >0,8 mg/dL.`:`Adequado.`}},
+  transferrina:{l:'Transferrina',u:'mg/dL',
+    status(v){
+      if(v<200)return{c:'vw',s:'sw',lbl:'Baixa',bar:22,cor:'#7A4A00'};
+      if(v>380)return{c:'vi',s:'si',lbl:'Elevada — sinal de deficiência de ferro',bar:80,cor:'#1A4A7A'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:60,cor:'#2C5E3F'};
+    },
+    interp(v){return v<200?`Baixa — comprometimento de transporte de ferro.`:v>380?`Elevada — transferrina sobe quando ferro está baixo. Avaliar junto com ferritina.`:`Adequado.`}},
+  selenio:{l:'Selênio',u:'µg/L',
+    status(v){
+      if(v<80)return{c:'vw',s:'sw',lbl:'Deficiência',bar:22,cor:'#7A4A00'};
+      if(v<100)return{c:'vm',s:'sm',lbl:'Limítrofe',bar:45,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:70,cor:'#2C5E3F'};
+    },
+    interp(v){return v<80?`Deficiência — selênio é co-fator na conversão T4→T3. Pode agravar padrão de TSH elevado.`:v<100?`Limítrofe — considerar suplementação leve.`:`Adequado.`}},
+  vitaminaA:{l:'Vitamina A (retinol)',u:'µg/dL',
+    status(v){
+      if(v<30)return{c:'vw',s:'sw',lbl:'Deficiência',bar:18,cor:'#7A4A00'};
+      if(v<45)return{c:'vm',s:'sm',lbl:'Terço inferior',bar:42,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:68,cor:'#2C5E3F'};
+    },
+    interp(v){return v<30?`Deficiência — impacto em imunidade, visão e crescimento.`:v<45?`Adequado mas no terço inferior.`:`Adequado.`}},
+  acidoFolico:{l:'Ácido Fólico',u:'ng/mL',
+    status(v){
+      if(v<5.38)return{c:'vc',s:'sc',lbl:'Deficiência',bar:18,cor:'#8B1A1A'};
+      if(v<8)return{c:'vm',s:'sm',lbl:'Adequado — monitorar',bar:50,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:72,cor:'#2C5E3F'};
+    },
+    interp(v){return v<5.38?`Deficiência — comprometimento de eritropoiese e síntese de DNA.`:`Adequado. Suporte à eritropoiese OK.`}},
+  tgo:{l:'TGO (AST)',u:'U/L',
+    status(v){
+      if(v>40)return{c:'vc',s:'sc',lbl:'Elevado',bar:80,cor:'#8B1A1A'};
+      if(v>30)return{c:'vm',s:'sm',lbl:'Limítrofe',bar:55,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Bom',bar:30,cor:'#2C5E3F'};
+    },
+    interp(v){return v>40?`Elevado — avaliar função hepática e sobrecarga de treino.`:v>30?`Limítrofe — monitorar.`:`Bom — fígado saudável, sem overtraining hepático.`}},
+  tgp:{l:'TGP (ALT)',u:'U/L',
+    status(v){
+      if(v>40)return{c:'vc',s:'sc',lbl:'Elevado',bar:80,cor:'#8B1A1A'};
+      if(v>30)return{c:'vm',s:'sm',lbl:'Limítrofe',bar:55,cor:'#7A5200'};
+      return{c:'vo',s:'so',lbl:'Bom',bar:30,cor:'#2C5E3F'};
+    },
+    interp(v){return v>40?`Elevado — avaliar função hepática.`:v>30?`Limítrofe. Monitorar.`:`Bom.`}},
+  creatinina:{l:'Creatinina',u:'mg/dL',
+    status(v){
+      if(v<0.5)return{c:'vn',s:'sn',lbl:'Baixa para a idade',bar:20,cor:'#5A5248'};
+      if(v>1.2)return{c:'vw',s:'sw',lbl:'Acima do limite',bar:82,cor:'#7A4A00'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:58,cor:'#2C5E3F'};
+    },
+    interp(v){return v<0.5?`Baixa para a idade — avaliar massa muscular.`:v>1.2?`Acima do limite — avaliar hidratação e função renal.`:`Adequado.`}},
+  glicose:{l:'Glicose',u:'mg/dL',
+    status(v){
+      if(v<70)return{c:'vc',s:'sc',lbl:'Hipoglicemia',bar:10,cor:'#8B1A1A'};
+      if(v>100)return{c:'vw',s:'sw',lbl:'Acima do ideal',bar:78,cor:'#7A4A00'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:55,cor:'#2C5E3F'};
+    },
+    interp(v){return v<70?`Hipoglicemia — avaliar timing de refeições pré-treino.`:v>100?`Acima do ideal — avaliar resistência insulínica.`:`Adequado.`}},
+  cortisol:{l:'Cortisol',u:'µg/dL',
+    status(v){
+      if(v>25)return{c:'vw',s:'sw',lbl:'Elevado — sinal de estresse',bar:80,cor:'#7A4A00'};
+      if(v<6)return{c:'vw',s:'sw',lbl:'Baixo',bar:15,cor:'#7A4A00'};
+      return{c:'vo',s:'so',lbl:'Dentro da referência',bar:55,cor:'#2C5E3F'};
+    },
+    interp(v){return v>25?`Elevado — sinal de estresse fisiológico ou overtraining. Avaliar carga e sono.`:v<6?`Baixo — possível insuficiência adrenal relativa.`:`Dentro da referência.`}},
+  ureia:{l:'Ureia',u:'mg/dL',
+    status(v){
+      if(v>45)return{c:'vm',s:'sm',lbl:'Acima — avaliar hidratação',bar:72,cor:'#7A5200'};
+      if(v<10)return{c:'vn',s:'sn',lbl:'Baixo',bar:15,cor:'#5A5248'};
+      return{c:'vo',s:'so',lbl:'Adequado',bar:50,cor:'#2C5E3F'};
+    },
+    interp(v){return v>45?`Acima do ideal — avaliar hidratação e ingestão proteica.`:`Adequado.`}},
+};
+
+function getExamesFlat(bio){
+  if(!bio.exames||!bio.exames.length)return{_flat:{},_date:null};
+  const flat={};let latestDate=null;
+  bio.exames.forEach(e=>{
+    if(e.source==='agente_ia'||(e.name&&e.value!==undefined)){
+      const key=NOME_TO_KEY[e.name];
+      if(key&&e.value!=null){
+        const v=parseFloat(e.value);
+        if(!isNaN(v)&&(!flat[key]||new Date(e.date)>new Date(flat['_d_'+key]||0))){
+          flat[key]=v;flat['_d_'+key]=e.date;
+          if(!latestDate||new Date(e.date)>new Date(latestDate))latestDate=e.date;
+        }
+      }
+    } else {
+      const eDate=e.date;
+      Object.keys(EXAM_DEF).forEach(key=>{
+        if(e[key]!=null&&e[key]!==''){
+          const v=parseFloat(e[key]);
+          if(!isNaN(v)&&(!flat[key]||new Date(eDate)>new Date(flat['_d_'+key]||0))){
+            flat[key]=v;flat['_d_'+key]=eDate;
+            if(!latestDate||new Date(eDate)>new Date(latestDate))latestDate=eDate;
+          }
+        }
+      });
+    }
+  });
+  return{_flat:flat,_date:latestDate};
+}
+
+function getTendencia(bio,key){
+  if(!bio.exames||!bio.exames.length)return null;
+  const vals=[];
+  bio.exames.forEach(e=>{
+    let v=null,d=null;
+    if(e.source==='agente_ia'||(e.name&&e.value!==undefined)){
+      const k=NOME_TO_KEY[e.name];
+      if(k===key&&e.value!=null){v=parseFloat(e.value);d=e.date;}
+    } else if(e[key]!=null){v=parseFloat(e[key]);d=e.date;}
+    if(v!=null&&!isNaN(v)&&d)vals.push({v,d});
+  });
+  if(vals.length<2)return null;
+  vals.sort((a,b)=>new Date(a.d)-new Date(b.d));
+  return vals.map(x=>x.v).join('→');
+}
+
+function cardExame(key,v,bio){
+  const def=EXAM_DEF[key];if(!def)return'';
+  const st=def.status(parseFloat(v));
+  const trend=getTendencia(bio,key);
+  const interp=def.interp?def.interp(parseFloat(v),trend):'—';
+  const interpLines=interp.split('\n');
+  return`<div class="exame-card">
+    <div class="ex-nome">${def.l}</div>
+    <div class="ex-valor-wrap"><span class="ex-valor ${st.c}">${v}</span><span class="ex-unidade">${def.u}</span></div>
+    <div class="ex-barra-wrap"><div class="ex-barra" style="width:${st.bar}%;background:${st.cor}"></div></div>
+    <div class="ex-status ${st.s}">${st.lbl}</div>
+    ${interpLines.map((ln,i)=>i===0?`<div class="ex-interp">${ln}</div>`:`<div class="ex-tendencia">${ln}</div>`).join('')}
+  </div>`;
+}
+
+function htmlAtleta(nome,cc){
+  const bio=bioAthlete(nome);if(!bio)return'';
+  const corDot=cc==='lucas'?'var(--lucas)':'var(--miguel)';
+  const recs=bio.records?[...bio.records].sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
+  const ult=recs[0]||null;
+  const off=ult?calcPHV(ult.height,ult.weight,bio.dob):null;
+  const fase=off==null?'none':off<-1?'pre':off<=1?'circa':'pos';
+  const fL={pre:'Pré-PHV',circa:'Circa-PHV',pos:'Pós-PHV',none:'PHV s/dados'};
+  const{_flat:ex,_date:exDate}=getExamesFlat(bio);
+  const keysPresentes=Object.keys(EXAM_DEF).filter(k=>ex[k]!=null);
+  const sono=bio.sono?[...bio.sono].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,7):[];
+  const sonoMed=sono.length?(sono.reduce((s,x)=>s+parseFloat(x.hours||0),0)/sono.length).toFixed(1):null;
+
+  // ── Alertas ──
+  const criticos=[],atencao=[],informativos=[];
+  if(fase==='circa')atencao.push({t:'Circa-PHV ativo — pico de crescimento',b:'Risco de lesão 31–49% aumentado. Reduzir cargas de impacto; monitoramento ortopédico trimestral. Placas epifisárias abertas — protocolo de proteção ativo.'});
+  const ferr=ex.ferritina,vitD=ex.vitaminaD,tsh=ex.tsh,ferroV=ex.ferro;
+  if(ferr!=null){
+    if(ferr<30)criticos.push({t:`Ferritina ${ferr} ng/mL — deficiência grave`,b:`Criticamente abaixo do mínimo atlético (50 ng/mL). VO2max e sprint repeatability comprometidos. Ação imediata.${getTendencia(bio,'ferritina')?'\nTendência: '+getTendencia(bio,'ferritina'):''}`});
+    else if(ferr<50)criticos.push({t:`Ferritina ${ferr} ng/mL — deficiência atlética`,b:`Lab considera normal (ref: 7–140), medicina esportiva: abaixo de 50 já compromete recuperação. Avaliar ferro quelado.${getTendencia(bio,'ferritina')?'\nTendência: '+getTendencia(bio,'ferritina'):''}`});
+  }
+  if(ferroV!=null){
+    if(ferroV<65)criticos.push({t:`Ferro sérico ${ferroV} µg/dL — queda progressiva`,b:`Abaixo da referência do próprio lab. Com ferritina baixa = esvaziamento dos estoques. Avaliar dieta, absorção e possível sangramento oculto.${getTendencia(bio,'ferro')?'\nTendência: '+getTendencia(bio,'ferro'):''}`});
+    else if(ferroV<70)atencao.push({t:`Ferro sérico ${ferroV} µg/dL — limítrofe`,b:`Abaixo do mínimo atlético (70 µg/dL). Monitorar com ferritina.`});
+  }
+  if(tsh!=null){
+    if(tsh>4.0)criticos.push({t:`TSH ${tsh} µUI/mL — hipotireoidismo`,b:`Solicitar T4 livre, anti-TPO e anti-TG com urgência.${getTendencia(bio,'tsh')?'\nTendência: '+getTendencia(bio,'tsh'):''}`});
+    else if(tsh>3.0)atencao.push({t:`TSH ${tsh} µUI/mL — acima do ótimo atlético`,b:`Dentro da ref do lab mas acima do ótimo atlético (<2,5). Tireoide trabalhando mais para manter T4. Solicitar T4 livre, anti-TPO e anti-TG.${getTendencia(bio,'tsh')?'\nTendência: '+getTendencia(bio,'tsh'):''}`});
+  }
+  if(vitD!=null){
+    if(vitD<20)criticos.push({t:`Vitamina D ${vitD} ng/mL — deficiência grave`,b:`Suplementação urgente: colecalciferol + K2.${getTendencia(bio,'vitaminaD')?'\nTendência: '+getTendencia(bio,'vitaminaD'):''}`});
+    else if(vitD<40)atencao.push({t:`Vitamina D ${vitD} ng/mL — zona de insuficiência atlética`,b:`Nunca atingiu a zona de performance (50–80 ng/mL). Impacto em síntese proteica muscular e saúde óssea em PHV ativo. Considerar colecalciferol 2000–4000 UI/dia + K2.${getTendencia(bio,'vitaminaD')?'\nTendência: '+getTendencia(bio,'vitaminaD'):''}`});
+  }
+  if(sonoMed&&parseFloat(sonoMed)<8)atencao.push({t:`Sono médio ${sonoMed}h/noite — abaixo do recomendado`,b:'GH é liberado predominantemente durante sono profundo. Atletas em PHV precisam de 9–11h. Impacto direto em IGF-1 e recuperação muscular.'});
+  if(ex.vitaminaB6!=null&&ex.vitaminaB6>100)informativos.push({t:`Vitamina B6 ${ex.vitaminaB6} µg/L — elevado, contexto esportivo`,b:'Lab considera acima do intervalo. Em medicina esportiva é fisiológico — exercício libera PLP do músculo para o plasma. Não tóxico. Garantir ingestão alimentar para reposição.'});
+  if(ex.fosfataseAlcalina!=null&&ex.fosfataseAlcalina>200)informativos.push({t:`Fosfatase Alcalina ${ex.fosfataseAlcalina} U/L — normal para PHV ativo`,b:'Ref pediátrica: 202–618 U/L. Alta FA em adolescente = turnover ósseo ativo. Protocolo de proteção Circa-PHV deve estar ativo no motor.'});
+  if(ex.testosterona!=null&&ex.testosterona>400)informativos.push({t:`Testosterona ${ex.testosterona} ng/dL — puberdade avançada`,b:'No topo da faixa etária. Eixo gonadotrófico ativo — janela anabólica importante. Carga de treino pode ser progressiva.'});
+
+  let alHtml='';
+  if(criticos.length){
+    alHtml+=`<div class="alertas-grupo">${criticos.map(a=>`<div class="alerta alerta-crit"><div class="al-titulo">⬤ ${a.t}</div>${a.b.split('\n').map(l=>`<div>${l}</div>`).join('')}</div>`).join('')}</div>`;
+  }
+  if(atencao.length){
+    alHtml+=`<div class="alertas-grupo">${atencao.map(a=>`<div class="alerta alerta-warn"><div class="al-titulo">△ ${a.t}</div>${a.b.split('\n').map(l=>`<div>${l}</div>`).join('')}</div>`).join('')}</div>`;
+  }
+  if(informativos.length){
+    alHtml+=`<div class="alertas-grupo">${informativos.map(a=>`<div class="alerta alerta-info"><div class="al-titulo">i ${a.t}</div>${a.b}</div>`).join('')}</div>`;
+  }
+  if(!criticos.length&&!atencao.length&&!informativos.length)
+    alHtml=`<div class="alerta alerta-ok">✓ Nenhum alerta clínico identificado com os dados disponíveis.</div>`;
+
+  const hist=recs.slice(0,5).map(r=>{
+    const o=calcPHV(r.height,r.weight,bio.dob);
+    const os=o!=null?(o>0?`+${o}a`:`${o}a`):'—';
+    const oc=o==null?'':o<-1?'tc-ok':o<=1?'tc-warn':'tc-mid';
+    return`<tr><td>${fmtD(r.date)}</td><td class="tn">${r.height} cm</td><td class="tn">${r.weight} kg</td><td class="tn ${oc}">${os}</td></tr>`;
+  }).join('')||`<tr><td colspan="4" style="color:var(--fraco);font-style:italic">Sem medições</td></tr>`;
+
+  const grupos=[
+    {titulo:'Metabolismo do ferro',keys:['ferritina','ferro','hemoglobina','hematocrito','transferrina']},
+    {titulo:'Vitaminas',keys:['vitaminaD','vitaminaB12','vitaminaB6','vitaminaC','vitaminaA','acidoFolico']},
+    {titulo:'Hormônios tireoidianos',keys:['tsh','t4livre','t3total']},
+    {titulo:'Eixo gonadotrófico / puberdade',keys:['testosterona','fsh','lh']},
+    {titulo:'Minerais',keys:['magnesio','zinco','calcio','fosforo','selenio']},
+    {titulo:'Inflamação e metabolismo',keys:['pcr','cpk','tgo','tgp','fosfataseAlcalina','igf1','glicose','cortisol','creatinina','ureia']},
+  ];
+  const cobertos=grupos.flatMap(g=>g.keys);
+  const extras=keysPresentes.filter(k=>!cobertos.includes(k));
+
+  let examesHtml='';
+  if(!keysPresentes.length){
+    examesHtml=`<p style="font-size:12px;color:var(--fraco);font-style:italic">Nenhum exame registrado. Inserir via saude.html ou agente_exames.html.</p>`;
+  } else {
+    grupos.forEach(g=>{
+      const ks=g.keys.filter(k=>keysPresentes.includes(k));
+      if(!ks.length)return;
+      const is3=ks.length>=5;
+      examesHtml+=`<div class="grupo-exames">
+        <div class="grupo-titulo">${g.titulo}</div>
+        <div class="exames-grid${is3?' exames-grid-3':''}">${ks.map(k=>cardExame(k,ex[k],bio)).join('')}</div>
+      </div>`;
+    });
+    if(extras.length){
+      examesHtml+=`<div class="grupo-exames">
+        <div class="grupo-titulo">Outros exames</div>
+        <div class="exames-grid">${extras.map(k=>cardExame(k,ex[k],bio)).join('')}</div>
+      </div>`;
+    }
+  }
+
+  return`<div class="atleta-block">
+    <div class="atleta-id">
+      <div class="atleta-dot" style="background:${corDot}"></div>
+      <span class="atleta-nome ${cc}">${nome}</span>
+      <span class="atleta-meta">${bio.position||'—'} · ${idad(bio.dob)} · ${fmtD(bio.dob)}</span>
+      <span class="phv-tag phv-${fase}">${fL[fase]}${off!=null?' · '+(off>0?'+':'')+off+'a':''}</span>${raeTag(bio)}
+    </div>
+    <div class="bio-row">
+      <div class="bio-tile"><div class="bio-val">${ult?.height||'—'}<span class="bio-unit"> cm</span></div><div class="bio-lbl">Altura</div></div>
+      <div class="bio-tile"><div class="bio-val">${ult?.weight||'—'}<span class="bio-unit"> kg</span></div><div class="bio-lbl">Peso</div></div>
+      <div class="bio-tile"><div class="bio-val" style="font-size:16px">${altAlvo(bio.fatherHeight,bio.motherHeight)}</div><div class="bio-lbl">Altura alvo</div></div>
+      <div class="bio-tile"><div class="bio-val" style="font-size:15px;color:${corDot}">${fL[fase]}</div><div class="bio-lbl">Fase PHV</div></div>
+    </div>
+    <div class="sec">
+      <div class="sec-titulo">Alertas clínicos</div>
+      ${alHtml}
+    </div>
+    <div class="sec">
+      <div class="sec-titulo">Maturação biológica</div>
+      <table>
+        <thead><tr><th>Data</th><th>Altura</th><th>Peso</th><th>PHV offset</th></tr></thead>
+        <tbody>${hist}</tbody>
+      </table>
+      <p style="font-size:10px;color:var(--fraco);margin-top:7px">Equação Mirwald · Pai ${bio.fatherHeight||'—'} cm · Mãe ${bio.motherHeight||'—'} cm</p>
+    </div>
+    <div class="sec">
+      <div class="sec-titulo">Exames laboratoriais${exDate?' · '+fmtD(exDate):''}</div>
+      ${examesHtml}
+    </div>
+  </div>`;
+}
+
+function render(){
+  const doc=document.getElementById('doc');
+  const p=new URLSearchParams(window.location.search);
+  const filtro=p.get('atleta')||'ambos';
+  const lucas=filtro==='miguel'?null:bioAthlete('Lucas');
+  const miguel=filtro==='lucas'?null:bioAthlete('Miguel');
+  if(!lucas&&!miguel){
+    doc.innerHTML=`<div class="sem"><h2>Sem dados</h2><p>Abra <a href="saude.html" style="color:var(--lucas)">saude.html</a> e insira os dados do atleta.<br><span style="font-size:10px;opacity:.6">Os dados ficam salvos no navegador deste dispositivo.</span></p></div>`;
+    return;
+  }
+  const now=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  doc.innerHTML=`
+    <div class="doc-header">
+      <span class="doc-title">Projeto Atleta Elite · Relatório Médico</span>
+      <span class="doc-date">${now}</span>
+    </div>
+    ${lucas?htmlAtleta('Lucas','lucas'):''}
+    ${miguel?htmlAtleta('Miguel','miguel'):''}
+    <div class="doc-footer">
+      <div class="ft">Dados gerados automaticamente pelo sistema interno · Não substitui avaliação clínica presencial</div>
+      <div class="ftag">Confidencial</div>
+    </div>`;
+}
+render();
+</script>
+</body>
+</html>
