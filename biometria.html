@@ -750,8 +750,8 @@ async function salvarBiometria(jogador) {
   const gorduraEl = document.getElementById(p+'-gordura');
   if (gorduraEl) gordura = parseFloat(gorduraEl.value) || null;
 
-  if (!semana || !data) {
-    setMsg(p+'-msg', '⚠ Preencha Semana e Data antes de salvar.', 'err');
+  if (!data) {
+    setMsg(p+'-msg', '⚠ Preencha a Data antes de salvar.', 'err');
     return;
   }
   if (!altura || !peso) {
