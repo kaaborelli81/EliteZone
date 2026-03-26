@@ -169,6 +169,13 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
 @media(max-width:600px){
   .main{padding:20px 16px 80px;}
 }
+
+/* ── BOTÃO LÁPIS ── */
+.edit-btn{background:none;border:none;cursor:pointer;font-size:13px;opacity:0.4;transition:opacity .2s;padding:2px 4px;}
+.edit-btn:hover{opacity:1;}
+.edit-input-inline{font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--ab);border-radius:3px;padding:3px 6px;background:var(--bg);color:var(--tp);width:80px;}
+.save-inline-btn{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;background:var(--adim);border:1px solid var(--ab);color:var(--acc);border-radius:2px;cursor:pointer;margin-left:4px;}
+.save-inline-btn:hover{background:var(--acc);color:#fff;}
 </style>
 </head>
 <body>
@@ -207,14 +214,14 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="snap-card lucas-card">
         <div class="snap-bg-num">H</div>
         <div class="snap-label">Altura</div>
-        <div class="snap-val">163<span class="snap-unit">cm</span></div>
-        <div class="snap-delta up">↑ +1.5cm · S20→S24</div>
+        <div class="snap-val">168.8<span class="snap-unit">cm</span></div>
+        <div class="snap-delta up">↑ +2.5cm · Jan→Mar/26</div>
       </div>
       <div class="snap-card lucas-card">
         <div class="snap-bg-num">P</div>
         <div class="snap-label">Peso</div>
-        <div class="snap-val">54.2<span class="snap-unit">kg</span></div>
-        <div class="snap-delta up">↑ +0.8kg · S20→S24</div>
+        <div class="snap-val">57.5<span class="snap-unit">kg</span></div>
+        <div class="snap-delta up">↑ +2.7kg · Jan→Mar/26</div>
       </div>
     </div>
 
@@ -299,40 +306,53 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
             <tr><th>Semana</th><th>Altura</th><th>Peso</th><th>IMC</th><th>Δ Altura</th></tr>
           </thead>
           <tbody id="tb-lucas-bio">
-            <tr>
-              <td>S20</td>
-              <td class="num">161.5 cm</td>
-              <td class="num">53.4 kg</td>
-              <td class="num">20.5</td>
-              <td class="delta-up">↑ +1.0cm</td>
+            <tr id="lrow-0">
+              <td>07/03/2026</td>
+              <td class="num" id="l-alt-0">168.8 cm</td>
+              <td class="num" id="l-pes-0">57.5 kg</td>
+              <td class="num">20.2</td>
+              <td class="delta-up">↑ +2.5cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('lucas',0)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S16</td>
-              <td class="num">160.5 cm</td>
-              <td class="num">52.8 kg</td>
-              <td class="num">20.5</td>
-              <td class="delta-up">↑ +1.2cm</td>
+            <tr id="lrow-1">
+              <td>20/01/2026</td>
+              <td class="num" id="l-alt-1">166.3 cm</td>
+              <td class="num" id="l-pes-1">54.8 kg</td>
+              <td class="num">19.8</td>
+              <td class="delta-up">↑ +2.0cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('lucas',1)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S12</td>
-              <td class="num">159.3 cm</td>
-              <td class="num">52.0 kg</td>
-              <td class="num">20.5</td>
-              <td class="delta-up">↑ +0.8cm</td>
+            <tr id="lrow-2">
+              <td>04/07/2025</td>
+              <td class="num" id="l-alt-2">164.3 cm</td>
+              <td class="num" id="l-pes-2">51.0 kg</td>
+              <td class="num">18.9</td>
+              <td class="delta-up">↑ +4.3cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('lucas',2)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S8</td>
-              <td class="num">158.5 cm</td>
-              <td class="num">51.3 kg</td>
-              <td class="num">20.4</td>
-              <td class="delta-eq">—</td>
+            <tr id="lrow-3">
+              <td>14/02/2025</td>
+              <td class="num" id="l-alt-3">160.0 cm</td>
+              <td class="num" id="l-pes-3">—</td>
+              <td class="num">—</td>
+              <td class="delta-up">↑ +8.0cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('lucas',3)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S4 (início)</td>
-              <td class="num">158.0 cm</td>
-              <td class="num">51.0 kg</td>
-              <td class="num">20.4</td>
+            <tr id="lrow-4">
+              <td>24/11/2023</td>
+              <td class="num" id="l-alt-4">152.0 cm</td>
+              <td class="num" id="l-pes-4">—</td>
+              <td class="num">—</td>
+              <td class="delta-up">↑ +18.0cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('lucas',4)" title="Editar">✏️</button></td>
+            </tr>
+            <tr id="lrow-5">
+              <td>29/04/2021</td>
+              <td class="num" id="l-alt-5">134.0 cm</td>
+              <td class="num" id="l-pes-5">—</td>
+              <td class="num">—</td>
               <td class="delta-eq">Base</td>
+              <td><button class="edit-btn" onclick="editarLinha('lucas',5)" title="Editar">✏️</button></td>
             </tr>
           </tbody>
         </table>
@@ -431,14 +451,14 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="snap-card miguel-card">
         <div class="snap-bg-num">H</div>
         <div class="snap-label">Altura</div>
-        <div class="snap-val">157<span class="snap-unit">cm</span></div>
-        <div class="snap-delta up">↑ +1.5cm · S20→S24</div>
+        <div class="snap-val">160.5<span class="snap-unit">cm</span></div>
+        <div class="snap-delta up">↑ +2.3cm · Jan→Mar/26</div>
       </div>
       <div class="snap-card miguel-card">
         <div class="snap-bg-num">P</div>
         <div class="snap-label">Peso</div>
         <div class="snap-val">48.5<span class="snap-unit">kg</span></div>
-        <div class="snap-delta up">↑ +1.0kg · S20→S24</div>
+        <div class="snap-delta up">↑ +1.0kg · Jan→Mar/26</div>
       </div>
     </div>
 
@@ -528,47 +548,53 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
             <tr><th>Semana</th><th>Altura</th><th>Peso</th><th>Enverg.</th><th>Δ Altura</th></tr>
           </thead>
           <tbody id="tb-miguel-bio">
-            <tr>
-              <td>S24</td>
-              <td class="num">157.0 cm</td>
-              <td class="num">48.5 kg</td>
-              <td class="num">161 cm</td>
-              <td class="delta-up">↑ +1.5cm</td>
+            <tr id="mrow-0">
+              <td>07/03/2026</td>
+              <td class="num" id="m-alt-0">160.5 cm</td>
+              <td class="num" id="m-pes-0">48.5 kg</td>
+              <td class="num">—</td>
+              <td class="delta-up">↑ +2.3cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('miguel',0)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S20</td>
-              <td class="num">155.5 cm</td>
-              <td class="num">47.5 kg</td>
-              <td class="num">159 cm</td>
-              <td class="delta-up">↑ +1.2cm</td>
+            <tr id="mrow-1">
+              <td>20/01/2026</td>
+              <td class="num" id="m-alt-1">158.2 cm</td>
+              <td class="num" id="m-pes-1">47.5 kg</td>
+              <td class="num">—</td>
+              <td class="delta-up">↑ +4.2cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('miguel',1)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S16</td>
-              <td class="num">154.3 cm</td>
-              <td class="num">46.8 kg</td>
-              <td class="num">158 cm</td>
-              <td class="delta-up">↑ +1.0cm</td>
+            <tr id="mrow-2">
+              <td>04/07/2025</td>
+              <td class="num" id="m-alt-2">154.0 cm</td>
+              <td class="num" id="m-pes-2">45.4 kg</td>
+              <td class="num">—</td>
+              <td class="delta-up">↑ +3.3cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('miguel',2)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S12</td>
-              <td class="num">153.3 cm</td>
-              <td class="num">46.0 kg</td>
-              <td class="num">157 cm</td>
-              <td class="delta-up">↑ +0.8cm</td>
+            <tr id="mrow-3">
+              <td>14/02/2025</td>
+              <td class="num" id="m-alt-3">150.7 cm</td>
+              <td class="num" id="m-pes-3">—</td>
+              <td class="num">—</td>
+              <td class="delta-up">↑ +3.7cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('miguel',3)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S8</td>
-              <td class="num">152.5 cm</td>
-              <td class="num">45.4 kg</td>
-              <td class="num">156 cm</td>
-              <td class="delta-eq">—</td>
+            <tr id="mrow-4">
+              <td>24/11/2023</td>
+              <td class="num" id="m-alt-4">147.0 cm</td>
+              <td class="num" id="m-pes-4">—</td>
+              <td class="num">—</td>
+              <td class="delta-up">↑ +16.0cm</td>
+              <td><button class="edit-btn" onclick="editarLinha('miguel',4)" title="Editar">✏️</button></td>
             </tr>
-            <tr>
-              <td>S4 (início)</td>
-              <td class="num">152.0 cm</td>
-              <td class="num">45.0 kg</td>
-              <td class="num">155 cm</td>
+            <tr id="mrow-5">
+              <td>29/04/2021</td>
+              <td class="num" id="m-alt-5">131.0 cm</td>
+              <td class="num" id="m-pes-5">—</td>
+              <td class="num">—</td>
               <td class="delta-eq">Base</td>
+              <td><button class="edit-btn" onclick="editarLinha('miguel',5)" title="Editar">✏️</button></td>
             </tr>
           </tbody>
         </table>
@@ -837,6 +863,38 @@ async function carregarHistoricoBiometria(jogador) {
   } catch(e) {
     // silencioso — dados estáticos permanecem como fallback
   }
+}
+
+// ─── EDITAR LINHA DO HISTÓRICO ───────────────────────────────────────────────
+function editarLinha(jogador, idx) {
+  const prefixo = jogador === 'lucas' ? 'l' : 'm';
+  const altId = `${prefixo}-alt-${idx}`;
+  const pesId = `${prefixo}-pes-${idx}`;
+  const altEl = document.getElementById(altId);
+  const pesEl = document.getElementById(pesId);
+  if (!altEl || !pesEl) return;
+
+  // Já está em modo de edição? Cancelar
+  if (altEl.querySelector('input')) return;
+
+  const altAtual = parseFloat(altEl.textContent) || '';
+  const pesAtual = parseFloat(pesEl.textContent) || '';
+
+  altEl.innerHTML = `<input class="edit-input-inline" id="ei-alt-${idx}" type="number" step="0.1" value="${altAtual}" style="width:70px">`;
+  pesEl.innerHTML = `<input class="edit-input-inline" id="ei-pes-${idx}" type="number" step="0.1" value="${pesAtual}" style="width:60px">
+    <button class="save-inline-btn" onclick="salvarEdicao('${jogador}',${idx})">✓</button>`;
+}
+
+function salvarEdicao(jogador, idx) {
+  const prefixo = jogador === 'lucas' ? 'l' : 'm';
+  const novaAlt = parseFloat(document.getElementById(`ei-alt-${idx}`)?.value);
+  const novaPes = parseFloat(document.getElementById(`ei-pes-${idx}`)?.value);
+  const altEl = document.getElementById(`${prefixo}-alt-${idx}`);
+  const pesEl = document.getElementById(`${prefixo}-pes-${idx}`);
+  if (!altEl || !pesEl) return;
+  if (!isNaN(novaAlt)) altEl.innerHTML = novaAlt.toFixed(1) + ' cm';
+  if (!isNaN(novaPes)) pesEl.innerHTML = novaPes.toFixed(1) + ' kg';
+  else pesEl.innerHTML = '—';
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
