@@ -3,853 +3,1205 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Painel de Saúde — Lucas & Miguel</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<title>Saúde & Bem-estar — Lucas & Miguel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#F2F0EB;
-  --surface:#FFFFFF;
-  --surface2:#F8F7F4;
-  --surface3:#EEECEA;
-  --border:#E0DDD8;
-  --border2:#D0CCC6;
-  --text:#1A1714;
-  --text2:#5A544D;
-  --text3:#9A9490;
-  --lucas:#2563EB;
-  --lucas-dim:rgba(37,99,235,0.08);
-  --lucas-border:rgba(37,99,235,0.2);
-  --miguel:#059669;
-  --miguel-dim:rgba(5,150,105,0.08);
-  --miguel-border:rgba(5,150,105,0.2);
-  --ok:#16A34A;
-  --ok-bg:#F0FDF4;
-  --ok-border:#BBF7D0;
-  --warn:#D97706;
-  --warn-bg:#FFFBEB;
-  --warn-border:#FDE68A;
-  --alert:#DC2626;
-  --alert-bg:#FEF2F2;
-  --alert-border:#FECACA;
-  --info:#2563EB;
-  --info-bg:#EFF6FF;
-  --info-border:#BFDBFE;
-  --gold:#B45309;
-  --gold-bg:#FFFBEB;
-  --med:#7C3AED;
-  --med-bg:rgba(124,58,237,0.06);
-  --med-border:rgba(124,58,237,0.2);
-  --radius:12px;
-  --radius-sm:8px;
+:root {
+  --bg:#F5F0E8; --card:#FFFFFF; --card2:#EDE8DF;
+  --b:rgba(0,0,0,0.08); --tp:#1A1A1A; --ts:#5C5C5C; --td:#9E9E9E;
+  --lucas:#2C4A6E; --ldim:rgba(44,74,110,0.10); --lb:rgba(44,74,110,0.28);
+  --miguel:#2C5E3F; --mdim:rgba(44,94,63,0.10); --mb:rgba(44,94,63,0.28);
+  --acc:#2C4A6E; --adim:rgba(44,74,110,0.10); --ab:rgba(44,74,110,0.28);
+  --ok:#4CAF50; --warn:#ff9800; --danger:#f44336;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden;}
+body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-weight:400;min-height:100vh;}
 
-/* TOP BAR */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(242,240,235,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px;}
-.back{background:var(--surface);border:1px solid var(--border2);color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.5px;padding:6px 12px;border-radius:6px;cursor:pointer;text-decoration:none;transition:all .15s;}
-.back:hover{border-color:var(--text3);color:var(--text);}
-.top-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
-.top-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);padding:3px 8px;border:1px solid var(--border);border-radius:4px;margin-left:auto;background:var(--surface);}
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(245,240,232,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--b);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.back{background:none;border:1px solid var(--ab);color:var(--acc);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;padding:6px 10px;border-radius:2px;cursor:pointer;text-decoration:none;text-transform:uppercase;transition:all .2s;}
+.back:hover{background:var(--adim);}
+.top-title{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;letter-spacing:.5px;}
+.top-badge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--td);text-transform:uppercase;}
 
-/* ACCESS TABS */
-.access-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:0;position:sticky;top:56px;z-index:40;overflow-x:auto;}
-.acc-tab{padding:14px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;}
-.acc-tab.on{color:var(--lucas);border-bottom-color:var(--lucas);}
-.acc-tab:hover:not(.on){color:var(--text2);}
-.acc-tab.med-tab.on{color:var(--med);border-bottom-color:var(--med);}
+/* ── PLAYER TABS ── */
+.player-tabs{display:flex;border-bottom:1px solid var(--b);background:var(--card);position:sticky;top:56px;z-index:40;}
+.ptab{flex:1;background:none;border:none;cursor:pointer;padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--td);border-bottom:3px solid transparent;position:relative;bottom:-1px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.ptab.lucas.on{color:var(--lucas);border-bottom-color:var(--lucas);}
+.ptab.miguel.on{color:var(--miguel);border-bottom-color:var(--miguel);}
+.ptab:not(.on):hover{color:var(--ts);}
+.ptab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ptab.lucas .ptab-dot{background:var(--lucas);}
+.ptab.miguel .ptab-dot{background:var(--miguel);}
 
-/* ATHLETE SELECTOR */
-.ath-sel{display:flex;gap:8px;padding:20px 20px 0;max-width:900px;margin:0 auto;}
-.ath-btn{padding:8px 20px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:var(--surface2);color:var(--text3);transition:all .15s;}
-.ath-btn.lucas.on{background:var(--lucas-dim);border-color:var(--lucas-border);color:var(--lucas);}
-.ath-btn.miguel.on{background:var(--miguel-dim);border-color:var(--miguel-border);color:var(--miguel);}
-.ath-btn:not(.on):hover{color:var(--text2);}
+/* ── SECTION TABS ── */
+.section-nav{display:flex;gap:0;border-bottom:1px solid var(--b);background:var(--card2);overflow-x:auto;padding:0 20px;position:sticky;top:113px;z-index:39;}
+.section-nav::-webkit-scrollbar{height:3px;}
+.section-nav::-webkit-scrollbar-thumb{background:var(--b);}
+.snav-btn{background:none;border:none;cursor:pointer;padding:11px 18px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);border-bottom:2px solid transparent;position:relative;bottom:-1px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.snav-btn.on{color:var(--acc);border-bottom-color:var(--acc);}
+.snav-btn:hover:not(.on){color:var(--ts);}
 
-.wrap{padding:0 20px 60px;max-width:900px;margin:0 auto;}
-.panel{display:none;}.panel.active{display:block;}
+/* ── MAIN ── */
+.main{max-width:720px;margin:0 auto;padding:28px 20px 80px;}
 
-/* ATHLETE HEADER */
-.ath-hd{background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 var(--radius) var(--radius) var(--radius);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-.ath-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;flex-shrink:0;}
-.lucas .ath-av{background:var(--lucas-dim);border:2px solid var(--lucas-border);color:var(--lucas);}
-.miguel .ath-av{background:var(--miguel-dim);border:2px solid var(--miguel-border);color:var(--miguel);}
-.ath-nm{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
-.lucas .ath-nm{color:var(--lucas);}
-.miguel .ath-nm{color:var(--miguel);}
-.ath-pos{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-top:2px;letter-spacing:0.5px;}
-.phv-badge{margin-left:auto;padding:10px 16px;border-radius:var(--radius-sm);font-family:'JetBrains Mono',monospace;font-size:9px;text-align:center;border:1px solid var(--border);}
-.phv-badge .pbl{color:var(--text3);font-size:8px;margin-bottom:3px;letter-spacing:0.5px;}
-.phv-badge .pbv{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;}
-.phv-pre{background:var(--ok-bg);border-color:var(--ok-border)!important;}.phv-pre .pbv{color:var(--ok);}
-.phv-circa{background:var(--warn-bg);border-color:var(--warn-border)!important;}.phv-circa .pbv{color:var(--warn);}
-.phv-post{background:var(--alert-bg);border-color:var(--alert-border)!important;}.phv-post .pbv{color:var(--alert);}
-.phv-unk{background:var(--surface2);}.phv-unk .pbv{color:var(--text3);font-size:11px;}
+/* ── PLAYER SECTION ── */
+.player-section{display:none;}
+.player-section.active{display:block;}
 
-/* STATUS DOTS ROW — novo */
-.status-row{display:flex;align-items:center;gap:6px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;flex-wrap:wrap;}
-.status-row-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;}
-.sdot{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:default;transition:all .15s;}
-.sdot:hover{filter:brightness(0.95);}
-.sdot-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.sdot-ok{background:var(--ok-bg);color:var(--ok);}
-.sdot-ok .sdot-dot{background:var(--ok);}
-.sdot-warn{background:var(--warn-bg);color:var(--warn);}
-.sdot-warn .sdot-dot{background:var(--warn);}
-.sdot-alert{background:var(--alert-bg);color:var(--alert);}
-.sdot-alert .sdot-dot{background:var(--alert);}
-.sdot-info{background:var(--info-bg);color:var(--info);}
-.sdot-info .sdot-dot{background:var(--info);}
-.sdot-neutral{background:var(--surface2);color:var(--text3);}
-.sdot-neutral .sdot-dot{background:var(--text3);}
+/* ── CONTENT SECTION ── */
+.content-section{display:none;}
+.content-section.active{display:block;}
 
-/* SEC WRAP */
-.sec-wrap{display:none;}.sec-wrap.active{display:block;}
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--b);}
+.page-header-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:6px;}
+.page-header-title{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;letter-spacing:-.3px;margin-bottom:4px;}
+.page-header-sub{font-size:13px;color:var(--ts);}
+.player-color-bar{height:3px;border-radius:2px;margin-bottom:16px;width:60px;}
+.lucas-bar{background:var(--lucas);}
+.miguel-bar{background:var(--miguel);}
 
-/* TILES */
-.tiles4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
-@media(max-width:560px){.tiles4{grid-template-columns:repeat(2,1fr);}}
-.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center;}
-.tv{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1;}
-.tu{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400;color:var(--text3);margin-left:2px;}
-.tl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;text-transform:uppercase;color:var(--text3);margin-top:5px;}
-.td2{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;margin-top:2px;}
-.td-ok{color:var(--ok);}
-.td-warn{color:var(--warn);}
+/* ── CARD GERAL ── */
+.card{background:var(--card);border:1px solid var(--b);border-radius:6px;margin-bottom:12px;}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;letter-spacing:.5px;}
+.card-meta{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:.5px;}
+.card-body{padding:16px;}
 
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;}
-.ct{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;}
+/* ── STATUS GRID ── */
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+@media(max-width:480px){.status-grid{grid-template-columns:repeat(2,1fr);}}
+.status-item{background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:12px 10px;text-align:center;}
+.status-icon{font-size:22px;margin-bottom:4px;}
+.status-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;}
+.status-val{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;line-height:1;color:var(--tp);}
+.status-val.ok{color:var(--ok);}
+.status-val.warn{color:var(--warn);}
+.status-val.danger{color:var(--danger);}
+.status-delta{font-family:'JetBrains Mono',monospace;font-size:8px;margin-top:3px;color:var(--td);}
+.status-delta.up{color:var(--ok);}
+.status-delta.dn{color:var(--danger);}
 
-/* CHART */
-.chart-wrap{position:relative;width:100%;height:200px;}
+/* ── ALERT BAR ── */
+.alert{padding:10px 14px;border-radius:4px;font-size:12px;display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;line-height:1.5;}
+.alert.warn{background:rgba(255,152,0,.07);border:1px solid rgba(255,152,0,.25);color:#e08000;}
+.alert.ok{background:rgba(76,175,80,.07);border:1px solid rgba(76,175,80,.25);color:#3a8f3a;}
+.alert.info{background:var(--ldim);border:1px solid var(--lb);color:var(--lucas);}
+.alert-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
 
-/* FORM */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
-@media(max-width:540px){.g2,.g3{grid-template-columns:1fr;}}
-.f{display:flex;flex-direction:column;gap:5px;}
-.f label{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--text2);}
-.f input,.f select,.f textarea{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color .15s;width:100%;}
-.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--lucas);box-shadow:0 0 0 3px var(--lucas-dim);}
-.f input::placeholder,.f textarea::placeholder{color:var(--text3);}
-.f textarea{resize:vertical;min-height:50px;}
-.f select option{background:var(--surface);}
-.sbtn{width:100%;background:var(--lucas);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.3px;padding:10px;border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:4px;transition:all .15s;}
-.sbtn:hover{opacity:.9;}
-.sbtn.mig{background:var(--miguel);}
+/* ── PROGRESSO BAR ── */
+.prog-item{margin-bottom:12px;}
+.prog-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+.prog-name{font-size:12px;color:var(--ts);}
+.prog-val{font-family:'DM Serif Display',serif;font-size:14px;font-weight:400;color:var(--acc);}
+.prog-bg{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.lucas-fill{background:var(--lucas);}
+.miguel-fill{background:var(--miguel);}
 
-/* TABLE */
-.ht{width:100%;border-collapse:collapse;font-size:12px;}
-.ht th{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--text3);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
-.ht td{padding:10px 10px;border-bottom:1px solid var(--border);color:var(--text2);}
-.ht tr:last-child td{border-bottom:none;}
-.ht tr:hover td{background:var(--surface2);}
-.ht td.vl{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--text);}
-.ht td.dp{font-size:11px;font-weight:500;color:var(--ok);}
-.ht td.dn{font-size:11px;font-weight:500;color:var(--alert);}
-.ht td.dz{font-size:11px;color:var(--text3);}
-.del{background:none;border:1px solid var(--alert-border);color:var(--alert);font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .15s;}
-.del:hover{background:var(--alert-bg);}
+/* ── LISTA ── */
+.lista-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--b);}
+.lista-item:last-child{border-bottom:none;}
+.lista-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.lucas-dot{background:var(--lucas);}
+.miguel-dot{background:var(--miguel);}
+.lista-content{flex:1;}
+.lista-title{font-size:13px;font-weight:500;color:var(--tp);margin-bottom:2px;}
+.lista-sub{font-size:11px;color:var(--td);font-family:'JetBrains Mono',monospace;letter-spacing:.3px;}
 
-/* ── BLOOD EXAM CARDS — novo design com barra ── */
-.exam-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px;}
-@media(max-width:540px){.exam-grid{grid-template-columns:1fr;}}
-.exam-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:box-shadow .15s;}
-.exam-tile:hover{box-shadow:0 2px 12px rgba(0,0,0,0.06);}
-.exam-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.exam-name{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
-.exam-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.exam-val-row{display:flex;align-items:baseline;gap:4px;margin-bottom:6px;}
-.exam-val{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;line-height:1;}
-.exam-unit{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text3);}
-.exam-bar-wrap{height:4px;background:var(--surface3);border-radius:2px;margin-bottom:8px;overflow:hidden;}
-.exam-bar{height:100%;border-radius:2px;transition:width .4s ease;}
-.exam-status{font-size:12px;font-weight:500;margin-bottom:4px;}
-.exam-note{font-size:11px;color:var(--text3);line-height:1.4;}
-.exam-trend{font-size:11px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace;}
-/* status colors */
-.exam-ok .exam-dot{background:var(--ok);}
-.exam-ok .exam-val{color:var(--ok);}
-.exam-ok .exam-bar{background:var(--ok);}
-.exam-ok .exam-status{color:var(--ok);}
-.exam-ok{border-color:var(--ok-border);}
-.exam-warn .exam-dot{background:var(--warn);}
-.exam-warn .exam-val{color:var(--warn);}
-.exam-warn .exam-bar{background:var(--warn);}
-.exam-warn .exam-status{color:var(--warn);}
-.exam-warn{border-color:var(--warn-border);}
-.exam-alert .exam-dot{background:var(--alert);}
-.exam-alert .exam-val{color:var(--alert);}
-.exam-alert .exam-bar{background:var(--alert);}
-.exam-alert .exam-status{color:var(--alert);}
-.exam-alert{border-color:var(--alert-border);}
-.exam-info .exam-dot{background:var(--info);}
-.exam-info .exam-val{color:var(--info);}
-.exam-info .exam-bar{background:var(--info);}
-.exam-info .exam-status{color:var(--info);}
-.exam-info{border-color:var(--info-border);}
+/* ── TABELA SIMPLES ── */
+.simple-table{width:100%;border-collapse:collapse;}
+.simple-table th{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);padding:8px 10px;text-align:left;border-bottom:2px solid var(--b);font-weight:400;}
+.simple-table td{padding:9px 10px;font-size:12px;color:var(--ts);border-bottom:1px solid var(--b);}
+.simple-table tr:last-child td{border-bottom:none;}
+.simple-table td:first-child{font-weight:500;color:var(--tp);}
+.simple-table td.num{font-family:'DM Serif Display',serif;font-size:14px;color:var(--acc);font-weight:400;}
 
-/* SLEEP */
-.sleep-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px;}
-.sleep-day{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 4px;text-align:center;}
-.sleep-day .sd-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text3);margin-bottom:4px;}
-.sleep-day .sd-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;}
-.sleep-day.ok{background:var(--ok-bg);border-color:var(--ok-border);}.sleep-day.ok .sd-val{color:var(--ok);}
-.sleep-day.warn{background:var(--warn-bg);border-color:var(--warn-border);}.sleep-day.warn .sd-val{color:var(--warn);}
-.sleep-day.bad{background:var(--alert-bg);border-color:var(--alert-border);}.sleep-day.bad .sd-val{color:var(--alert);}
-.sleep-day.empty .sd-val{color:var(--text3);}
+/* ── CARGA SEMANAL ── */
+.carga-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.carga-dia{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);width:32px;flex-shrink:0;}
+.carga-bg{flex:1;height:20px;background:var(--card2);border-radius:3px;overflow:hidden;}
+.carga-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(245,240,232,0.9);transition:width .5s ease;}
+.carga-num{font-family:'DM Serif Display',serif;font-size:12px;color:var(--td);width:28px;text-align:right;flex-shrink:0;}
 
-/* ALERT BANNER */
-.alert-banner{padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:14px;font-size:13px;line-height:1.5;}
-.al-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;text-transform:uppercase;opacity:.8;margin-bottom:4px;}
-.aw{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn);}
-.ao{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok);}
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;}
+.badge-ok{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.3);color:#3a8f3a;}
+.badge-warn{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3);color:#e08000;}
+.badge-info{background:var(--ldim);border:1px solid var(--lb);color:var(--lucas);}
+.badge-miguel{background:var(--mdim);border:1px solid var(--mb);color:var(--miguel);}
 
-/* PARENTS */
-.p-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-@media(max-width:440px){.p-row{grid-template-columns:1fr;}}
-.p-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;}
-.p-lbl{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--text3);margin-bottom:4px;}
-.p-val{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--text);}
+/* ── BLOCO DESTAQUE ── */
+.highlight-block{background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:14px 16px;margin-bottom:12px;}
+.highlight-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin-bottom:8px;}
+.highlight-text{font-size:13px;color:var(--ts);line-height:1.6;}
+.highlight-text strong{color:var(--tp);font-weight:600;}
 
-/* MED NOTE */
-.note-list{display:flex;flex-direction:column;gap:8px;}
-.note-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
-.note-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:4px;}
-.note-type{font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.3px;text-transform:uppercase;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:6px;}
-.nt-consulta{background:var(--med-bg);color:var(--med);border:1px solid var(--med-border);}
-.nt-exame{background:var(--info-bg);color:var(--info);border:1px solid var(--info-border);}
-.nt-fisio{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border);}
-.nt-obs{background:var(--surface3);color:var(--text2);border:1px solid var(--border);}
-.note-text{font-size:13px;color:var(--text2);line-height:1.5;}
-.sec-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin:18px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+/* ── FORMULÁRIO REGISTRO ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:480px){.form-row{grid-template-columns:1fr;}}
+.form-field{display:flex;flex-direction:column;gap:4px;}
+.form-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--td);}
+.form-input{background:var(--bg);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 10px;outline:none;transition:border .2s;width:100%;}
+.form-input:focus{border-color:var(--ab);}
+.form-select{background:var(--bg);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 10px;outline:none;width:100%;}
+.form-textarea{background:var(--bg);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'DM Sans',sans-serif;font-size:12px;padding:8px 10px;outline:none;resize:vertical;width:100%;min-height:64px;}
+.form-textarea:focus{border-color:var(--ab);}
+.form-btn{width:100%;padding:11px;background:var(--adim);border:1px solid var(--ab);color:var(--acc);font-family:'DM Serif Display',serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;margin-top:8px;transition:all .2s;}
+.form-btn:hover{background:var(--acc);color:#FFF;}
 
-/* PHV PHASES */
-.phv-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-@media(max-width:540px){.phv-phases{grid-template-columns:1fr;}}
-.ph{padding:12px 14px;border-radius:var(--radius-sm);}
-.ph-nm{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;margin-bottom:4px;}
-.ph-txt{font-size:12px;color:var(--text2);line-height:1.5;}
-.ph-pre{background:var(--ok-bg);border:1px solid var(--ok-border);}.ph-pre .ph-nm{color:var(--ok);}
-.ph-circ{background:var(--warn-bg);border:1px solid var(--warn-border);}.ph-circ .ph-nm{color:var(--warn);}
-.ph-post{background:var(--alert-bg);border:1px solid var(--alert-border);}.ph-post .ph-nm{color:var(--alert);}
+/* ── SECTION DIVIDER ── */
+.section-divider{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.section-divider::after{content:'';flex:1;height:1px;background:var(--b);}
 
-.empty-st{text-align:center;padding:28px;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10px;}
+/* ── RISCO LESÃO ── */
+.risco-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+@media(max-width:480px){.risco-grid{grid-template-columns:1fr;}}
+.risco-item{background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:12px 14px;}
+.risco-zona{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--td);margin-bottom:4px;}
+.risco-nome{font-size:13px;font-weight:500;color:var(--tp);margin-bottom:8px;}
+.risco-nivel{display:flex;align-items:center;gap:6px;}
+.risco-pip{width:10px;height:10px;border-radius:50%;border:1px solid var(--b);}
+.risco-pip.ativo{border-color:transparent;}
+.risco-pip.low.ativo{background:#4CAF50;}
+.risco-pip.med.ativo{background:#ff9800;}
+.risco-pip.high.ativo{background:#f44336;}
+.risco-txt{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);}
+
+/* ── SONO ── */
+.sono-chart{display:flex;gap:4px;align-items:flex-end;height:64px;margin-bottom:6px;}
+.sono-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;position:relative;}
+.sono-bar-fill{height:100%;border-radius:3px 3px 0 0;transition:height .5s ease;}
+.sono-bar-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--td);text-align:center;margin-top:3px;}
+.lucas-bar-fill{background:var(--lucas);}
+.miguel-bar-fill{background:var(--miguel);}
+
+/* ── NUTRIÇÃO ── */
+.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+@media(max-width:480px){.macro-grid{grid-template-columns:repeat(2,1fr);}}
+.macro-item{background:var(--card2);border:1px solid var(--b);border-radius:4px;padding:10px 8px;text-align:center;}
+.macro-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.macro-val{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:var(--acc);line-height:1;}
+.macro-unit{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:40px 20px;}
+.empty-icon{font-size:28px;opacity:.3;margin-bottom:10px;}
+.empty-title{font-family:'DM Serif Display',serif;font-size:16px;color:var(--td);margin-bottom:4px;}
+.empty-sub{font-size:11px;color:var(--td);line-height:1.5;}
+
+/* ── FORM MSG ── */
+.form-msg{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.5px;padding:6px 10px;border-radius:3px;margin-bottom:6px;display:none;}
+.form-msg.ok{display:block;background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.3);color:#3a8f3a;}
+.form-msg.err{display:block;background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);color:#c62828;}
+.form-btn:disabled{opacity:.6;cursor:not-allowed;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .main{padding:20px 16px 80px;}
+}
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
   <a href="painel_motor.html" class="back">← Painel</a>
-  <span class="top-title">Saúde</span>
-  <span class="top-badge" id="top-badge">// painel clínico</span>
+  <span class="top-title">Saúde & Bem-estar</span>
+  <span class="top-badge">2025–26</span>
 </div>
 
-<div class="access-bar">
-  <button class="acc-tab on" onclick="setSection('crescimento')">Crescimento</button>
-  <button class="acc-tab" onclick="setSection('exames')">Exames</button>
-  <button class="acc-tab" onclick="setSection('sono')">Sono</button>
-  <button class="acc-tab med-tab" onclick="setSection('medico')">Médico</button>
+<!-- PLAYER TABS -->
+<div class="player-tabs">
+  <button class="ptab lucas on" onclick="switchPlayer('lucas')">
+    <span class="ptab-dot"></span>Lucas
+  </button>
+  <button class="ptab miguel" onclick="switchPlayer('miguel')">
+    <span class="ptab-dot"></span>Miguel
+  </button>
 </div>
 
-<div class="ath-sel" id="ath-sel"></div>
-<div class="wrap">
-  <div id="panels"></div>
-</div>
+<!-- SECTION NAV -->
+<nav class="section-nav" id="section-nav">
+  <button class="snav-btn on" onclick="switchSection('visao-geral')" data-sec="visao-geral">Visão Geral</button>
+  <button class="snav-btn" onclick="switchSection('lesoes')" data-sec="lesoes">Lesões & Riscos</button>
+  <button class="snav-btn" onclick="switchSection('carga')" data-sec="carga">Carga de Treino</button>
+  <button class="snav-btn" onclick="switchSection('sono')" data-sec="sono">Sono</button>
+  <button class="snav-btn" onclick="switchSection('nutricao')" data-sec="nutricao">Nutrição</button>
+  <button class="snav-btn" onclick="switchSection('registro')" data-sec="registro">Registrar</button>
+</nav>
 
-<script>
-const KEY='biometria_v2';
-function load(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
-function save(s){localStorage.setItem(KEY,JSON.stringify(s));}
-function defaults(){
-  return{athletes:[
-    {id:'lucas',name:'Lucas',dob:'2012-05-12',position:'Meio / Ponta esquerda · Fut7 & Futsal',color:'lucas',fatherHeight:null,motherHeight:null,records:[],exames:[],sono:[],notas:[]},
-    {id:'miguel',name:'Miguel',dob:'2013-09-13',position:'Goleiro · Fut7 & Futsal',color:'miguel',fatherHeight:null,motherHeight:null,records:[],exames:[],sono:[],notas:[]}
-  ],activeId:'lucas',section:'crescimento'};
-}
+<!-- MAIN CONTENT -->
+<div class="main">
 
-let state=load()||defaults();
-state.athletes.forEach(a=>{
-  if(!a.exames)a.exames=[];
-  if(!a.sono)a.sono=[];
-  if(!a.notas)a.notas=[];
-});
+  <!-- ══ LUCAS ══ -->
+  <div class="player-section active" id="ps-lucas">
 
-function phvOffset(h,w,dob){
-  if(!h||!w||!dob)return null;
-  const age=(new Date()-new Date(dob))/(365.25*24*3600*1000);
-  if(age<8)return null;
-  return parseFloat((-9.236+(0.0002708*(h*w))+(-0.001663*(age*h))+(0.007216*(age*w))+(0.02292*(w/h*100))).toFixed(2));
-}
-function phvPhase(o){if(o===null)return'unk';if(o<-1)return'pre';if(o<=1)return'circa';return'post';}
-function targetH(f,m){return f&&m?((parseFloat(f)+parseFloat(m)+13)/2).toFixed(1):null;}
-function ageYrs(dob){return((new Date()-new Date(dob))/(365.25*24*3600*1000)).toFixed(1);}
-function fmtD(iso){if(!iso)return'—';return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});}
-
-// ── REFERÊNCIAS DE PERFORMANCE ATLÉTICA (não de laboratório clínico)
-const EXAM_REFS={
-  'Ferritina':     {unit:'ng/mL', low:30,  high:120, opt:[50,100],  perf_min:50,  note:'Deficiência atlética <50. Lab diz "normal" acima de 12.', trend_key:'ferritina'},
-  'Vitamina D':    {unit:'ng/mL', low:30,  high:100, opt:[50,80],   perf_min:50,  note:'Zona atlética: 50–80. Lab aceita >20.', trend_key:'vitamina_d'},
-  'Ferro':         {unit:'µg/dL', low:65,  high:175, opt:[80,150],  perf_min:80,  note:'Queda progressiva compromete VO2max e sprint.', trend_key:'ferro'},
-  'Hemoglobina':   {unit:'g/dL',  low:12.5,high:16,  opt:[13.5,15.5],perf_min:13.5,note:'Transporte de oxigênio ao músculo.', trend_key:'hemoglobina'},
-  'Hematócrito':   {unit:'%',     low:38,  high:50,  opt:[40,46],   perf_min:40,  note:'', trend_key:'hematocrito'},
-  'Vitamina B6':   {unit:'µg/L',  low:20,  high:200, opt:[40,100],  perf_min:40,  note:'Elevado pós-exercício é fisiológico (liberação muscular).', trend_key:'b6'},
-  'Vitamina B12':  {unit:'pg/mL', low:300, high:950, opt:[400,800], perf_min:400, note:'Síntese de hemácias e função neurológica.', trend_key:'b12'},
-  'Vitamina C':    {unit:'mg/dL', low:0.4, high:2.1, opt:[0.8,2.0], perf_min:0.8, note:'Antioxidante. Síntese de colágeno em tendões.', trend_key:'vitc'},
-  'Zinco':         {unit:'µg/dL', low:70,  high:120, opt:[80,110],  perf_min:80,  note:'Síntese proteica e imunidade.', trend_key:'zinco'},
-  'Magnésio':      {unit:'mg/dL', low:1.9, high:2.6, opt:[2.2,2.5], perf_min:2.2, note:'Cofator de 300+ enzimas. Necessário para ativar vitamina D.', trend_key:'magnesio'},
-  'TSH':           {unit:'µUI/mL',low:0.5, high:2.5, opt:[0.8,2.0], perf_min:0.8, note:'Esportivo: ideal <2.5. Subindo progressivamente.', trend_key:'tsh'},
-  'Testosterona':  {unit:'ng/dL', low:200, high:900, opt:[350,800], perf_min:350, note:'Indicador puberal e anabólico.', trend_key:'testosterona'},
-  'PCR':           {unit:'mg/dL', low:0,   high:0.1, opt:[0,0.05],  perf_min:0,   note:'Inflamação sistêmica. Quanto menor melhor.', trend_key:'pcr'},
-  'Ácido Fólico':  {unit:'ng/mL', low:5.4, high:20,  opt:[8,15],    perf_min:8,   note:'Síntese de hemácias junto com B12.', trend_key:'folato'},
-  'Cálcio':        {unit:'mg/dL', low:9.0, high:10.5,opt:[9.2,10.2],perf_min:9.2, note:'Fundamental para PHV e mineralização óssea.', trend_key:'calcio'},
-  'Selênio':       {unit:'µg/L',  low:60,  high:150, opt:[80,120],  perf_min:80,  note:'Cofator da deiodinase — conversão T4→T3.', trend_key:'selenio'},
-  'IGF-1':         {unit:'ng/mL', low:150, high:600, opt:[250,500], perf_min:250, note:'Mediador do GH. Essencial para crescimento e desenvolvimento.', trend_key:'igf1'},
-  'Outro':         {unit:'',      low:null,high:null, opt:null,      perf_min:null,note:'', trend_key:null}
-};
-
-// Importância para alertas visuais
-const EXAM_PRIORITY={
-  'Ferritina':'critical','Ferro':'critical','Vitamina D':'high','TSH':'high',
-  'Vitamina B6':'info','Hemoglobina':'high','Magnésio':'medium','Vitamina C':'medium',
-  'Testosterona':'info','PCR':'info','IGF-1':'critical'
-};
-
-function examStatus(name,val){
-  const r=EXAM_REFS[name];
-  if(!r||r.opt===null||val===null||val===undefined)return'exam-info';
-  // Para PCR, menor é melhor
-  if(name==='PCR'){
-    if(val<=r.opt[1])return'exam-ok';
-    if(val<=r.high)return'exam-warn';
-    return'exam-alert';
-  }
-  if(val<r.low)return'exam-alert';
-  if(val>r.high&&name!=='Vitamina B6')return'exam-warn';
-  if(name==='Vitamina B6')return'exam-info'; // elevado pós-exercício é fisiológico
-  if(r.perf_min&&val<r.perf_min)return'exam-warn'; // abaixo do mínimo atlético
-  if(val>=r.opt[0]&&val<=r.opt[1])return'exam-ok';
-  return'exam-warn';
-}
-
-function examBarPct(name,val){
-  const r=EXAM_REFS[name];
-  if(!r||!r.opt||val===null)return 0;
-  if(name==='PCR')return Math.max(0,Math.min(100,100-(val/r.high*100)));
-  const max=r.high||r.opt[1]*1.2;
-  return Math.max(4,Math.min(100,Math.round(val/max*100)));
-}
-
-function examStatusLabel(name,val,cls){
-  const r=EXAM_REFS[name];
-  if(!r||r.opt===null)return cls==='exam-info'?'ℹ Contexto esportivo':'—';
-  if(name==='Vitamina B6'&&cls==='exam-info')return'ℹ Elevado — contexto esportivo';
-  if(cls==='exam-ok')return'✓ Zona de performance';
-  if(cls==='exam-warn'){
-    if(r.perf_min&&val<r.perf_min)return'⚠ Abaixo do mínimo atlético';
-    return'⚠ Atenção';
-  }
-  if(cls==='exam-alert')return'⚠ Deficiência atlética';
-  return'—';
-}
-
-const charts={};
-
-function setAthlete(id){state.activeId=id;save(state);renderAll();}
-function setSection(s){state.section=s;save(state);
-  document.querySelectorAll('.acc-tab').forEach((t,i)=>{
-    const sections=['crescimento','exames','sono','medico'];
-    t.classList.toggle('on',sections[i]===s);
-  });
-  document.querySelectorAll('.sec-wrap').forEach(w=>w.classList.remove('active'));
-  document.querySelectorAll('.sec-wrap.sec-'+s).forEach(w=>w.classList.add('active'));
-}
-
-function renderAll(){
-  renderAthleteSelector();
-  renderPanels();
-  renderCharts();
-  document.getElementById('top-badge').textContent='// '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-}
-
-function renderAthleteSelector(){
-  const el=document.getElementById('ath-sel');
-  el.innerHTML=state.athletes.map(a=>`
-    <button class="ath-btn ${a.color} ${a.id===state.activeId?'on':''}" onclick="setAthlete('${a.id}')">${a.name}</button>
-  `).join('');
-}
-
-function renderPanels(){
-  const container=document.getElementById('panels');
-  container.innerHTML=state.athletes.map(a=>renderPanel(a)).join('');
-  document.querySelectorAll('.sec-wrap').forEach(w=>w.classList.remove('active'));
-  document.querySelectorAll('.sec-wrap.sec-'+state.section).forEach(w=>{
-    if(w.closest('[data-id="'+state.activeId+'"]'))w.classList.add('active');
-  });
-}
-
-function renderPanel(a){
-  const recs=[...a.records].sort((x,y)=>new Date(y.date)-new Date(x.date));
-  const lat=recs[0],prev=recs[1];
-  const off=lat?phvOffset(lat.height,lat.weight,a.dob):null;
-  const phase=phvPhase(off);
-  const target=targetH(a.fatherHeight,a.motherHeight);
-  const dH=lat&&prev?(lat.height-prev.height).toFixed(1):null;
-  const dW=lat&&prev?(lat.weight-prev.weight).toFixed(1):null;
-  const phvLabels={pre:`Pré-PHV  ${off!==null?(off>0?'+':'')+off+'a':''}`,circa:`Circa-PHV  ${off!==null?(off>0?'+':'')+off+'a':''}`,post:`Pós-PHV  ${off!==null?(off>0?'+':'')+off+'a':''}`,unk:'Registre medição'};
-  const phvClass={pre:'phv-pre',circa:'phv-circa',post:'phv-post',unk:'phv-unk'};
-
-  let alertHtml='';
-  if(phase==='circa')alertHtml=`<div class="alert-banner aw"><div class="al-lbl">atenção — pico de crescimento</div>${a.name} está no pico de crescimento. Risco de lesão elevado. Reduzir carga de impacto, priorizar técnica. Medir a cada 6 semanas.</div>`;
-  else if(phase==='pre')alertHtml=`<div class="alert-banner ao"><div class="al-lbl">pré-pico</div>Janela de ouro para técnica e coordenação. Baixo risco de lesão por crescimento.</div>`;
-
-  // ── LATEST EXAMS com novo card design
-  const examsByName={};
-  (a.exames||[]).sort((x,y)=>new Date(y.date)-new Date(x.date)).forEach(e=>{
-    if(!examsByName[e.name])examsByName[e.name]=e;
-  });
-
-  // ── STATUS DOTS para o resumo de topo
-  const statusDots=Object.values(examsByName).map(e=>{
-    const cls=examStatus(e.name,e.value);
-    const dotClass={
-      'exam-ok':'sdot-ok','exam-warn':'sdot-warn',
-      'exam-alert':'sdot-alert','exam-info':'sdot-info',''  :'sdot-neutral'
-    }[cls]||'sdot-neutral';
-    const prio=EXAM_PRIORITY[e.name]||'';
-    const showDot=prio==='critical'||prio==='high'||(cls==='exam-alert')||(cls==='exam-warn');
-    if(!showDot)return'';
-    return`<span class="sdot ${dotClass}" title="${e.name}: ${e.value} ${e.unit||EXAM_REFS[e.name]?.unit||''}">
-      <span class="sdot-dot"></span>${e.name}
-    </span>`;
-  }).filter(Boolean).join('');
-
-  const statusRowHtml=statusDots?`
-    <div class="status-row">
-      <span class="status-row-label">Alertas</span>
-      ${statusDots}
-    </div>`:'';
-
-  const examTiles=Object.values(examsByName).map(e=>{
-    const cls=examStatus(e.name,e.value);
-    const ref=EXAM_REFS[e.name];
-    const pct=examBarPct(e.name,e.value);
-    const statusLabel=examStatusLabel(e.name,e.value,cls);
-    const unit=e.unit||(ref?.unit||'');
-    return`<div class="exam-tile ${cls}">
-      <div class="exam-header">
-        <div class="exam-name">${e.name}</div>
-        <div class="exam-dot"></div>
+    <!-- ── VISÃO GERAL ── -->
+    <div class="content-section active" id="sec-lucas-visao-geral">
+      <div class="page-header">
+        <div class="player-color-bar lucas-bar"></div>
+        <div class="page-header-eyebrow">Lucas · 13 anos · Meio/Ponta Esquerda</div>
+        <div class="page-header-title">Painel de Saúde</div>
+        <div class="page-header-sub">Semana atual — status integrado</div>
       </div>
-      <div class="exam-val-row">
-        <span class="exam-val">${e.value}</span>
-        <span class="exam-unit">${unit}</span>
-      </div>
-      <div class="exam-bar-wrap"><div class="exam-bar" style="width:${pct}%"></div></div>
-      <div class="exam-status">${statusLabel}</div>
-      <div class="exam-note">${ref?.note||''}</div>
-      <div class="exam-trend">${fmtD(e.date)}</div>
-    </div>`;
-  }).join('')||`<div class="empty-st">Nenhum exame registrado ainda.</div>`;
 
-  // ── SLEEP
-  const DAYS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-  const sonoMap={};
-  (a.sono||[]).forEach(s=>{sonoMap[s.date]=s.hours;});
-  const today=new Date();
-  const sleepTiles=[0,1,2,3,4,5,6].map(i=>{
-    const d=new Date(today);d.setDate(d.getDate()-(6-i));
-    const iso=d.toISOString().split('T')[0];
-    const h=sonoMap[iso];
-    const cls=h===undefined?'empty':h>=8?'ok':h>=6?'warn':'bad';
-    const dayLabel=DAYS[d.getDay()===0?6:d.getDay()-1];
-    return`<div class="sleep-day ${cls}"><div class="sd-lbl">${dayLabel}</div><div class="sd-val">${h!==undefined?h+'h':'—'}</div></div>`;
-  }).join('');
-  const sonoAvg=(a.sono||[]).length?((a.sono||[]).reduce((s,x)=>s+x.hours,0)/(a.sono||[]).length).toFixed(1):null;
-
-  const noteItems=(a.notas||[]).slice().reverse().slice(0,8).map(n=>`
-    <div class="note-item">
-      <div class="note-date">${fmtD(n.date)}</div>
-      <span class="note-type nt-${n.type}">${n.type}</span>
-      <div class="note-text">${n.text}</div>
-    </div>`).join('')||`<div class="empty-st">Nenhuma anotação médica ainda.</div>`;
-
-  return`
-  <div class="panel ${a.id===state.activeId?'active':''}" data-id="${a.id}">
-
-    <div class="ath-hd ${a.color}">
-      <div class="ath-av">${a.name.charAt(0)}</div>
-      <div>
-        <div class="ath-nm">${a.name}</div>
-        <div class="ath-pos">${a.position} · ${ageYrs(a.dob)} anos</div>
-      </div>
-      <div class="phv-badge ${phvClass[phase]}">
-        <div class="pbl">Fase PHV</div>
-        <div class="pbv">${phvLabels[phase]}</div>
-      </div>
-    </div>
-
-    ${alertHtml}
-
-    <!-- ── CRESCIMENTO ── -->
-    <div class="sec-wrap sec-crescimento">
-      <div class="tiles4">
-        <div class="tile">
-          <div class="tv">${lat?lat.height:'—'}<span class="tu">cm</span></div>
-          ${dH!==null?`<div class="td2 td-ok">+${dH}cm</div>`:''}
-          <div class="tl">Altura</div>
+      <div class="status-grid">
+        <div class="status-item">
+          <div class="status-icon">💚</div>
+          <div class="status-lbl">Status Geral</div>
+          <div class="status-val ok">OK</div>
+          <div class="status-delta">Disponível</div>
         </div>
-        <div class="tile">
-          <div class="tv">${lat?lat.weight:'—'}<span class="tu">kg</span></div>
-          ${dW!==null?`<div class="td2 ${parseFloat(dW)>0?'td-ok':'td-warn'}">${parseFloat(dW)>0?'+':''}${dW}kg</div>`:''}
-          <div class="tl">Peso</div>
+        <div class="status-item">
+          <div class="status-icon">🦵</div>
+          <div class="status-lbl">Estrutural</div>
+          <div class="status-val warn">↑</div>
+          <div class="status-delta warn">Atenção leve</div>
         </div>
-        <div class="tile">
-          <div class="tv" style="font-size:${target?'22px':'14px'};color:var(--gold)">${target?target:'—'}<span class="tu">${target?'cm':''}</span></div>
-          <div class="tl">Altura alvo</div>
+        <div class="status-item">
+          <div class="status-icon">😴</div>
+          <div class="status-lbl">Sono</div>
+          <div class="status-val">8.1h</div>
+          <div class="status-delta up">+0.3h</div>
         </div>
-        <div class="tile">
-          <div class="tv">${recs.length}</div>
-          <div class="tl">Medições</div>
+        <div class="status-item">
+          <div class="status-icon">⚡</div>
+          <div class="status-lbl">Energia</div>
+          <div class="status-val">Alta</div>
+          <div class="status-delta">Estável</div>
+        </div>
+        <div class="status-item">
+          <div class="status-icon">🥗</div>
+          <div class="status-lbl">Nutrição</div>
+          <div class="status-val ok">Boa</div>
+          <div class="status-delta">Em dia</div>
+        </div>
+        <div class="status-item">
+          <div class="status-icon">🧠</div>
+          <div class="status-lbl">Mental</div>
+          <div class="status-val">Forte</div>
+          <div class="status-delta up">↑ semana</div>
         </div>
       </div>
 
+      <div class="alert warn">
+        <span class="alert-icon">⚠️</span>
+        <span><strong>Quadríceps D leve:</strong> tensão pós-jogo detectada. Manter aquecimento prolongado e evitar sprints máximos até quarta.</span>
+      </div>
+
+      <div class="alert ok">
+        <span class="alert-icon">✓</span>
+        <span><strong>Tornozelo recuperado:</strong> entorse leve da semana passada sem sequelas. Retorno completo autorizado.</span>
+      </div>
+
+      <div class="section-divider">Disponibilidade semanal</div>
       <div class="card">
-        <div class="ct">Curva de crescimento</div>
-        <div class="chart-wrap"><canvas id="chart-${a.id}"></canvas></div>
-      </div>
-
-      <div class="card">
-        <div class="ct">Dados dos pais — altura alvo estimada</div>
-        <div class="p-row">
-          <div class="p-card"><div class="p-lbl">Pai</div><div class="p-val" id="fv-${a.id}">${a.fatherHeight?a.fatherHeight+' cm':'—'}</div></div>
-          <div class="p-card"><div class="p-lbl">Mãe</div><div class="p-val" id="mv-${a.id}">${a.motherHeight?a.motherHeight+' cm':'—'}</div></div>
-        </div>
-        ${target?`<div style="background:var(--gold-bg);border:1px solid #FDE68A;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;">
-          <div style="font-size:11px;font-weight:500;color:var(--gold);margin-bottom:4px;">Altura alvo (mid-parental height)</div>
-          <span style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--gold);">${target} cm</span>
-          <span style="font-size:12px;color:var(--text3);margin-left:8px;">±5 cm de margem</span>
-        </div>`:''}
-        <div class="g2">
-          <div class="f"><label>Altura do pai (cm)</label><input type="number" id="fi-${a.id}" value="${a.fatherHeight||''}" placeholder="Ex: 178" onchange="savePar('${a.id}')"></div>
-          <div class="f"><label>Altura da mãe (cm)</label><input type="number" id="mi-${a.id}" value="${a.motherHeight||''}" placeholder="Ex: 163" onchange="savePar('${a.id}')"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="ct">Fases PHV — o que fazer em cada uma</div>
-        <div class="phv-phases">
-          <div class="ph ph-pre"><div class="ph-nm">Pré-PHV</div><div class="ph-txt">Técnica, coordenação e fundamentos. Janela de ouro. Baixo risco de lesão por crescimento.</div></div>
-          <div class="ph ph-circ"><div class="ph-nm">Circa-PHV ⚠</div><div class="ph-txt">Pico de crescimento (±1 ano). Risco de lesão 31–49% acima. Reduzir impacto, priorizar técnica.</div></div>
-          <div class="ph ph-post"><div class="ph-nm">Pós-PHV</div><div class="ph-txt">Janela para força e potência. Músculo mais responsivo. Maior estabilidade articular.</div></div>
-        </div>
-      </div>
-
-      <div class="sec-title">Nova medição</div>
-      <div class="card">
-        <div class="g3">
-          <div class="f"><label>Data</label><input type="date" id="md-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
-          <div class="f"><label>Altura (cm)</label><input type="number" id="mh-${a.id}" placeholder="163.5" step="0.1"></div>
-          <div class="f"><label>Peso (kg)</label><input type="number" id="mw-${a.id}" placeholder="52.3" step="0.1"></div>
-        </div>
-        <div class="f" style="margin-bottom:10px;"><label>Observação</label><input type="text" id="mo-${a.id}" placeholder="Ex: Início da temporada, após resfriado..."></div>
-        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addMed('${a.id}')">Registrar medição</button>
-      </div>
-
-      <div class="sec-title">Histórico</div>
-      <div class="card">
-        <table class="ht">
-          <thead><tr><th>Data</th><th>Altura</th><th>Δ</th><th>Peso</th><th>Δ</th><th>PHV</th><th>Obs</th><th></th></tr></thead>
-          <tbody id="hist-${a.id}">
-            ${recs.length===0?`<tr><td colspan="8"><div class="empty-st">Sem medições ainda.</div></td></tr>`:
-            recs.map((r,i)=>{
-              const nx=recs[i+1];
-              const dh=nx?(r.height-nx.height).toFixed(1):null;
-              const dw=nx?(r.weight-nx.weight).toFixed(1):null;
-              const o=phvOffset(r.height,r.weight,a.dob);
-              const ph=phvPhase(o);
-              const phColors={pre:'var(--ok)',circa:'var(--warn)',post:'var(--alert)',unk:'var(--text3)'};
-              const phLabels={pre:'Pré',circa:'Circa',post:'Pós',unk:'—'};
-              return`<tr>
-                <td>${fmtD(r.date)}</td>
-                <td class="vl">${r.height}<span style="font-size:10px;color:var(--text3)">cm</span></td>
-                <td class="${dh!==null?(parseFloat(dh)>0?'dp':'dz'):'dz'}">${dh!==null?(parseFloat(dh)>0?'+':'')+dh:'—'}</td>
-                <td class="vl">${r.weight}<span style="font-size:10px;color:var(--text3)">kg</span></td>
-                <td class="${dw!==null?(parseFloat(dw)>0?'dp':'dn'):'dz'}">${dw!==null?(parseFloat(dw)>0?'+':'')+dw:'—'}</td>
-                <td style="font-size:11px;font-weight:600;color:${phColors[ph]}">${phLabels[ph]}</td>
-                <td style="font-size:12px;color:var(--text3)">${r.obs||''}</td>
-                <td><button class="del" onclick="delMed('${a.id}','${r.date}')">×</button></td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── EXAMES ── -->
-    <div class="sec-wrap sec-exames">
-
-      ${statusRowHtml}
-
-      <div class="card">
-        <div class="ct">Últimos exames — referências de performance atlética</div>
-        <div class="exam-grid">${examTiles}</div>
-      </div>
-
-      <div class="sec-title">Registrar novo exame</div>
-      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:var(--radius);margin-bottom:12px;flex-wrap:wrap;">
-        <span style="font-size:22px;">🔬</span>
-        <div style="flex:1;min-width:180px;">
-          <div style="font-size:13px;font-weight:600;color:var(--info);margin-bottom:2px;">Analisar laudo com IA</div>
-          <div style="font-size:11px;color:var(--text2);">Suba o PDF do laboratório ou JPEG do RX — a IA extrai e interpreta todos os valores com referências atléticas.</div>
-        </div>
-        <a href="agente_exames.html?atleta=${a.id}" style="padding:9px 18px;background:var(--info);color:#fff;border-radius:var(--radius-sm);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-decoration:none;white-space:nowrap;display:inline-block;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Usar Agente →</a>
-      </div>
-      <div class="card">
-        <div class="g3">
-          <div class="f"><label>Data do exame</label><input type="date" id="ed-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
-          <div class="f"><label>Exame</label>
-            <select id="en-${a.id}" onchange="updateExamUnit('${a.id}')">
-              ${Object.keys(EXAM_REFS).map(k=>`<option value="${k}">${k}</option>`).join('')}
-            </select>
+        <div class="card-body">
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-name">Treino normal</span><span class="prog-val">5/6 dias</span></div>
+            <div class="prog-bg"><div class="prog-fill lucas-fill" style="width:83%"></div></div>
           </div>
-          <div class="f"><label>Valor</label><input type="number" id="ev-${a.id}" placeholder="Ex: 45.2" step="0.1"></div>
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-name">Carga total completada</span><span class="prog-val">91%</span></div>
+            <div class="prog-bg"><div class="prog-fill lucas-fill" style="width:91%"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-name">Qualidade percebida (atleta)</span><span class="prog-val">8/10</span></div>
+            <div class="prog-bg"><div class="prog-fill lucas-fill" style="width:80%"></div></div>
+          </div>
         </div>
-        <div class="g2">
-          <div class="f"><label>Unidade</label><input type="text" id="eu-${a.id}" placeholder="ng/mL"></div>
-          <div class="f"><label>Laboratório / observação</label><input type="text" id="eo-${a.id}" placeholder="Ex: CERPE, 12/01/2026"></div>
-        </div>
-        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addExame('${a.id}')">Registrar exame</button>
+      </div>
+    </div>
+
+    <!-- ── LESÕES & RISCOS ── -->
+    <div class="content-section" id="sec-lucas-lesoes">
+      <div class="page-header">
+        <div class="player-color-bar lucas-bar"></div>
+        <div class="page-header-eyebrow">Lucas · Lesões & Prevenção</div>
+        <div class="page-header-title">Mapa de Riscos</div>
       </div>
 
-      <div class="sec-title">Histórico de exames</div>
+      <div class="section-divider">Áreas de atenção ativa</div>
+      <div class="risco-grid">
+        <div class="risco-item">
+          <div class="risco-zona">Coxa D</div>
+          <div class="risco-nome">Quadríceps — tensão</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip med ativo"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Moderado</span>
+          </div>
+        </div>
+        <div class="risco-item">
+          <div class="risco-zona">Tornozelo E</div>
+          <div class="risco-nome">Entorse — recuperado</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Baixo</span>
+          </div>
+        </div>
+        <div class="risco-item">
+          <div class="risco-zona">Joelho D</div>
+          <div class="risco-nome">Crescimento — Osgood</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip med"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Vigilância</span>
+          </div>
+        </div>
+        <div class="risco-item">
+          <div class="risco-zona">Coluna</div>
+          <div class="risco-nome">Postura — sem queixa</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Baixo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider">Histórico de ocorrências (2025)</div>
       <div class="card">
-        <table class="ht">
-          <thead><tr><th>Data</th><th>Exame</th><th>Valor</th><th>Unidade</th><th>Status</th><th>Obs</th><th></th></tr></thead>
-          <tbody id="exam-hist-${a.id}">
-            ${(a.exames||[]).length===0?`<tr><td colspan="7"><div class="empty-st">Sem exames registrados.</div></td></tr>`:
-            [...(a.exames||[])].sort((x,y)=>new Date(y.date)-new Date(x.date)).map(e=>{
-              const cls=examStatus(e.name,e.value);
-              const colors={'exam-ok':'var(--ok)','exam-warn':'var(--warn)','exam-alert':'var(--alert)','exam-info':'var(--info)',''  :'var(--text)'};
-              const lbls={'exam-ok':'✓ OK','exam-warn':'⚠ Atenção','exam-alert':'⚠ Deficiência','exam-info':'ℹ Info',''  :'—'};
-              return`<tr>
-                <td>${fmtD(e.date)}</td>
-                <td style="font-weight:500">${e.name}</td>
-                <td class="vl" style="color:${colors[cls]||'var(--text)'}">${e.value}</td>
-                <td style="font-size:11px;color:var(--text3)">${e.unit||''}</td>
-                <td style="font-size:11px;font-weight:500;color:${colors[cls]}">${lbls[cls]||'—'}</td>
-                <td style="font-size:12px;color:var(--text3)">${e.obs||''}</td>
-                <td><button class="del" onclick="delExame('${a.id}','${e.id}')">×</button></td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
+        <div class="card-body" style="padding:10px 16px;">
+          <table class="simple-table">
+            <thead>
+              <tr><th>Semana</th><th>Área</th><th>Tipo</th><th>Status</th></tr>
+            </thead>
+            <tbody id="tb-lucas-lesoes">
+              <tr>
+                <td>S24</td>
+                <td>Tornozelo E</td>
+                <td>Entorse grau I</td>
+                <td><span class="badge badge-ok">Recuperado</span></td>
+              </tr>
+              <tr>
+                <td>S22</td>
+                <td>Coxa D</td>
+                <td>Fadiga muscular</td>
+                <td><span class="badge badge-ok">Recuperado</span></td>
+              </tr>
+              <tr>
+                <td>S18</td>
+                <td>Joelho D</td>
+                <td>Dor crescimento</td>
+                <td><span class="badge badge-warn">Vigilância</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="highlight-block">
+        <div class="highlight-label">Protocolo preventivo ativo</div>
+        <div class="highlight-text">
+          <strong>Aquecimento estendido (15min)</strong> antes de todo treino com bola. Exercícios de propriocepção 3x/semana. Descarga de quadríceps após sprints. Monitoramento semanal de placa de crescimento.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CARGA ── -->
+    <div class="content-section" id="sec-lucas-carga">
+      <div class="page-header">
+        <div class="player-color-bar lucas-bar"></div>
+        <div class="page-header-eyebrow">Lucas · Carga de Treino</div>
+        <div class="page-header-title">Volume & Intensidade</div>
+      </div>
+
+      <div class="section-divider">Carga diária — semana atual (min)</div>
+      <div class="card">
+        <div class="card-body">
+          <div class="carga-row"><div class="carga-dia">SEG</div><div class="carga-bg"><div class="carga-fill lucas-fill" style="width:80%">80</div></div><div class="carga-num">80</div></div>
+          <div class="carga-row"><div class="carga-dia">TER</div><div class="carga-bg"><div class="carga-fill lucas-fill" style="width:60%">60</div></div><div class="carga-num">60</div></div>
+          <div class="carga-row"><div class="carga-dia">QUA</div><div class="carga-bg"><div class="carga-fill lucas-fill" style="width:90%">90</div></div><div class="carga-num">90</div></div>
+          <div class="carga-row"><div class="carga-dia">QUI</div><div class="carga-bg"><div class="carga-fill lucas-fill" style="width:40%">40</div></div><div class="carga-num">40</div></div>
+          <div class="carga-row"><div class="carga-dia">SEX</div><div class="carga-bg"><div class="carga-fill lucas-fill" style="width:75%">75</div></div><div class="carga-num">75</div></div>
+          <div class="carga-row"><div class="carga-dia">SÁB</div><div class="carga-bg"><div class="carga-fill lucas-fill" style="width:100%">100</div></div><div class="carga-num">100</div></div>
+          <div class="carga-row"><div class="carga-dia">DOM</div><div class="carga-bg"><div class="carga-fill" style="width:0%;background:var(--b)"></div></div><div class="carga-num" style="color:var(--td)">—</div></div>
+        </div>
+      </div>
+
+      <div class="status-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="status-item">
+          <div class="status-lbl">Total semana</div>
+          <div class="status-val">445<span style="font-size:12px;color:var(--td)"> min</span></div>
+        </div>
+        <div class="status-item">
+          <div class="status-lbl">Carga alta (%)</div>
+          <div class="status-val warn">28%</div>
+        </div>
+        <div class="status-item">
+          <div class="status-lbl">Recuperação</div>
+          <div class="status-val ok">1 dia</div>
+        </div>
+      </div>
+
+      <div class="alert info">
+        <span class="alert-icon">📊</span>
+        <span>Carga dentro do parâmetro La Fábrica para 13 anos (400–500min/sem). Proporção alta:baixa em 28:72 — ideal.</span>
       </div>
     </div>
 
     <!-- ── SONO ── -->
-    <div class="sec-wrap sec-sono">
-      <div class="card">
-        <div class="ct">Últimos 7 dias</div>
-        <div class="sleep-week">${sleepTiles}</div>
-        ${sonoAvg?`<div style="font-size:13px;color:var(--text2);">Média: <span style="color:${parseFloat(sonoAvg)>=8?'var(--ok)':parseFloat(sonoAvg)>=6?'var(--warn)':'var(--alert)'};font-weight:600;">${sonoAvg}h</span> &nbsp;·&nbsp; <span style="color:var(--text3)">Recomendado para atleta 12–14 anos: 9–10h</span></div>`:''}
+    <div class="content-section" id="sec-lucas-sono">
+      <div class="page-header">
+        <div class="player-color-bar lucas-bar"></div>
+        <div class="page-header-eyebrow">Lucas · Sono & Recuperação</div>
+        <div class="page-header-title">Qualidade do Sono</div>
       </div>
 
-      <div class="sec-title">Registrar sono</div>
-      <div class="card">
-        <div class="g2">
-          <div class="f"><label>Data</label><input type="date" id="sd-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
-          <div class="f"><label>Horas dormidas</label><input type="number" id="sh-${a.id}" placeholder="Ex: 8.5" step="0.5" min="0" max="14"></div>
+      <div class="status-grid">
+        <div class="status-item">
+          <div class="status-lbl">Média semanal</div>
+          <div class="status-val ok">8.1h</div>
         </div>
-        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addSono('${a.id}')">Registrar</button>
+        <div class="status-item">
+          <div class="status-lbl">Melhor noite</div>
+          <div class="status-val">9.0h</div>
+        </div>
+        <div class="status-item">
+          <div class="status-lbl">Pior noite</div>
+          <div class="status-val warn">6.5h</div>
+        </div>
       </div>
 
-      <div class="sec-title">Histórico de sono</div>
+      <div class="section-divider">Horas por noite — últimos 7 dias</div>
       <div class="card">
-        <table class="ht">
-          <thead><tr><th>Data</th><th>Horas</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            ${(a.sono||[]).length===0?`<tr><td colspan="4"><div class="empty-st">Sem registros de sono.</div></td></tr>`:
-            [...(a.sono||[])].sort((x,y)=>new Date(y.date)-new Date(x.date)).slice(0,30).map(s=>{
-              const st=s.hours>=9?'ok':s.hours>=6?'warn':'bad';
-              const stLbl={ok:'Adequado',warn:'Atenção',bad:'Insuficiente'};
-              const stC={ok:'var(--ok)',warn:'var(--warn)',bad:'var(--alert)'};
-              return`<tr>
-                <td>${fmtD(s.date)}</td>
-                <td class="vl">${s.hours}<span style="font-size:10px;color:var(--text3)">h</span></td>
-                <td style="font-size:12px;font-weight:500;color:${stC[st]}">${stLbl[st]}</td>
-                <td><button class="del" onclick="delSono('${a.id}','${s.date}')">×</button></td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
+        <div class="card-body">
+          <div class="sono-chart">
+            <div class="sono-bar" style="height:72%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEG<br>7.5h</div></div>
+            <div class="sono-bar" style="height:90%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">TER<br>9h</div></div>
+            <div class="sono-bar" style="height:82%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUA<br>8.5h</div></div>
+            <div class="sono-bar" style="height:64%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUI<br>6.5h</div></div>
+            <div class="sono-bar" style="height:79%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEX<br>8h</div></div>
+            <div class="sono-bar" style="height:88%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SÁB<br>9h</div></div>
+            <div class="sono-bar" style="height:82%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">DOM<br>8.5h</div></div>
+          </div>
 
-    <!-- ── MÉDICO ── -->
-    <div class="sec-wrap sec-medico">
-      <div class="card">
-        <div class="ct">Anotações médicas e consultas</div>
-        <div class="note-list">${noteItems}</div>
-      </div>
-
-      <div class="sec-title">Nova anotação</div>
-      <div class="card">
-        <div class="g2">
-          <div class="f"><label>Data</label><input type="date" id="nd-${a.id}" value="${new Date().toISOString().split('T')[0]}"></div>
-          <div class="f"><label>Tipo</label>
-            <select id="nt-${a.id}">
-              <option value="consulta">Consulta</option>
-              <option value="exame">Exame</option>
-              <option value="fisio">Fisioterapia</option>
-              <option value="obs">Observação</option>
-            </select>
+          <div class="highlight-block" style="margin-bottom:0">
+            <div class="highlight-label">Protocolo de sono</div>
+            <div class="highlight-text">
+              Meta: <strong>9h/noite</strong>. Horário ideal dormir: <strong>21h30</strong>. Sem telas 1h antes. Quarto escuro e fresco. Quinta com déficit — correlacionar com rendimento de sexta.
+            </div>
           </div>
         </div>
-        <div class="f" style="margin-bottom:10px;"><label>Anotação</label>
-          <textarea id="ntxt-${a.id}" placeholder="Ex: Endocrinologista — ferritina 25,3 ng/mL, prescreveu ferro bisglicinato 25mg dias alternados + vitamina D3 4.000 UI..."></textarea>
-        </div>
-        <button class="sbtn ${a.color==='miguel'?'mig':''}" onclick="addNota('${a.id}')">Salvar anotação</button>
-      </div>
-
-      <div style="padding:16px;background:var(--med-bg);border:1px solid var(--med-border);border-radius:var(--radius);margin-top:16px;">
-        <div style="font-size:12px;font-weight:600;color:var(--med);margin-bottom:8px;">Compartilhar com médico</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;">
-          Para compartilhar este painel com o pediatra ou nutricionista, exporte como PDF ou use o painel médico compartilhável (medico.html) disponível na aba Nutrição do Motor de Diagnóstico.
-        </div>
-        <button class="sbtn" style="background:var(--med-bg);color:var(--med);border:1px solid var(--med-border);" onclick="window.print()">Exportar PDF para médico</button>
       </div>
     </div>
 
-  </div>`;
-}
+    <!-- ── NUTRIÇÃO ── -->
+    <div class="content-section" id="sec-lucas-nutricao">
+      <div class="page-header">
+        <div class="player-color-bar lucas-bar"></div>
+        <div class="page-header-eyebrow">Lucas · Nutrição Esportiva</div>
+        <div class="page-header-title">Alimentação</div>
+      </div>
 
-// ── CHARTS
-function renderCharts(){
-  state.athletes.forEach(a=>{
-    const canvas=document.getElementById('chart-'+a.id);
-    if(!canvas)return;
-    if(charts[a.id]){charts[a.id].destroy();}
-    const recs=[...a.records].sort((x,y)=>new Date(x.date)-new Date(y.date));
-    if(!recs.length){
-      const ctx=canvas.getContext('2d');
-      ctx.fillStyle='#9A9490';ctx.font='12px DM Sans';
-      ctx.textAlign='center';ctx.fillText('Sem dados ainda',canvas.offsetWidth/2||160,100);
-      return;
+      <div class="section-divider">Metas nutricionais diárias</div>
+      <div class="macro-grid">
+        <div class="macro-item">
+          <div class="macro-lbl">Calorias</div>
+          <div class="macro-val">2400</div>
+          <div class="macro-unit">kcal</div>
+        </div>
+        <div class="macro-item">
+          <div class="macro-lbl">Proteína</div>
+          <div class="macro-val">90</div>
+          <div class="macro-unit">g</div>
+        </div>
+        <div class="macro-item">
+          <div class="macro-lbl">Carbo</div>
+          <div class="macro-val">300</div>
+          <div class="macro-unit">g</div>
+        </div>
+        <div class="macro-item">
+          <div class="macro-lbl">Hidrat.</div>
+          <div class="macro-val">2.5</div>
+          <div class="macro-unit">litros</div>
+        </div>
+      </div>
+
+      <div class="section-divider">Checklist pré/pós treino</div>
+      <div class="card">
+        <div class="card-body" style="padding:10px 16px;">
+          <div class="lista-item">
+            <div class="lista-dot lucas-dot"></div>
+            <div class="lista-content">
+              <div class="lista-title">Pré-treino (1–2h antes)</div>
+              <div class="lista-sub">Carboidrato complexo + proteína leve. Ex: arroz c/ frango, macarrão.</div>
+            </div>
+          </div>
+          <div class="lista-item">
+            <div class="lista-dot lucas-dot"></div>
+            <div class="lista-content">
+              <div class="lista-title">Durante treino (&gt;60min)</div>
+              <div class="lista-sub">200ml água a cada 20min. Gel ou banana se sessão &gt;90min.</div>
+            </div>
+          </div>
+          <div class="lista-item">
+            <div class="lista-dot lucas-dot"></div>
+            <div class="lista-content">
+              <div class="lista-title">Pós-treino (30min janela)</div>
+              <div class="lista-sub">Proteína + carboidrato rápido. Ex: iogurte c/ granola, vitamina com leite.</div>
+            </div>
+          </div>
+          <div class="lista-item">
+            <div class="lista-dot lucas-dot"></div>
+            <div class="lista-content">
+              <div class="lista-title">Suplementação</div>
+              <div class="lista-sub">Vitamina D + Ômega 3 (conforme orientação médica). Sem protocolos avançados até 16 anos.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REGISTRO ── -->
+    <div class="content-section" id="sec-lucas-registro">
+      <div class="page-header">
+        <div class="player-color-bar lucas-bar"></div>
+        <div class="page-header-eyebrow">Lucas · Registro</div>
+        <div class="page-header-title">Nova Ocorrência</div>
+        <div class="page-header-sub">Registre lesões, queixas ou marcos de saúde</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Registro de Saúde</span>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Semana</label>
+              <input type="text" id="l-semana" class="form-input" placeholder="S26">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Data</label>
+              <input type="date" id="l-data" class="form-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Tipo</label>
+              <select id="l-tipo" class="form-select">
+                <option>Lesão</option>
+                <option>Queixa</option>
+                <option>Doença</option>
+                <option>Recuperação</option>
+                <option>Marco positivo</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Área do corpo</label>
+              <select id="l-area" class="form-select">
+                <option>Tornozelo E</option>
+                <option>Tornozelo D</option>
+                <option>Joelho E</option>
+                <option>Joelho D</option>
+                <option>Coxa E</option>
+                <option>Coxa D</option>
+                <option>Coluna</option>
+                <option>Geral</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:10px;">
+            <label class="form-label">Descrição</label>
+            <textarea id="l-descricao" class="form-textarea" placeholder="Descreva o ocorrido, sintomas e contexto (treino, jogo...)"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Gravidade</label>
+              <select id="l-gravidade" class="form-select">
+                <option>Leve (treino normal)</option>
+                <option>Moderada (treino adaptado)</option>
+                <option>Grave (repouso)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Dias de restrição estimados</label>
+              <input type="number" id="l-dias" class="form-input" placeholder="0" min="0">
+            </div>
+          </div>
+          <div id="l-msg" class="form-msg"></div>
+          <button class="form-btn" id="l-btn" onclick="salvarSaude('lucas')">Salvar Registro</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ps-lucas -->
+
+  <!-- ══ MIGUEL ══ -->
+  <div class="player-section" id="ps-miguel">
+
+    <!-- ── VISÃO GERAL ── -->
+    <div class="content-section active" id="sec-miguel-visao-geral">
+      <div class="page-header">
+        <div class="player-color-bar miguel-bar"></div>
+        <div class="page-header-eyebrow">Miguel · 12 anos · Goleiro</div>
+        <div class="page-header-title">Painel de Saúde</div>
+        <div class="page-header-sub">Semana atual — status integrado</div>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-item">
+          <div class="status-icon">💚</div>
+          <div class="status-lbl">Status Geral</div>
+          <div class="status-val ok">OK</div>
+          <div class="status-delta">Disponível</div>
+        </div>
+        <div class="status-item">
+          <div class="status-icon">🖐️</div>
+          <div class="status-lbl">Punhos/Mãos</div>
+          <div class="status-val ok">Livre</div>
+          <div class="status-delta">Sem queixa</div>
+        </div>
+        <div class="status-item">
+          <div class="status-icon">😴</div>
+          <div class="status-lbl">Sono</div>
+          <div class="status-val">8.4h</div>
+          <div class="status-delta up">+0.5h</div>
+        </div>
+        <div class="status-item">
+          <div class="status-icon">⚡</div>
+          <div class="status-lbl">Energia</div>
+          <div class="status-val ok">Alta</div>
+          <div class="status-delta">Ótima</div>
+        </div>
+        <div class="status-item">
+          <div class="status-icon">🥗</div>
+          <div class="status-lbl">Nutrição</div>
+          <div class="status-val ok">Boa</div>
+          <div class="status-delta">Em dia</div>
+        </div>
+        <div class="status-item">
+          <div class="status-icon">🧠</div>
+          <div class="status-lbl">Mental</div>
+          <div class="status-val ok">Forte</div>
+          <div class="status-delta up">↑ semana</div>
+        </div>
+      </div>
+
+      <div class="alert ok">
+        <span class="alert-icon">✓</span>
+        <span><strong>Semana limpa:</strong> sem ocorrências. Crescimento de 1.5cm no último mês — acompanhar mobilidade de quadril.</span>
+      </div>
+
+      <div class="section-divider">Disponibilidade semanal</div>
+      <div class="card">
+        <div class="card-body">
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-name">Treino normal</span><span class="prog-val" style="color:var(--miguel)">6/6 dias</span></div>
+            <div class="prog-bg"><div class="prog-fill miguel-fill" style="width:100%"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-name">Carga total completada</span><span class="prog-val" style="color:var(--miguel)">96%</span></div>
+            <div class="prog-bg"><div class="prog-fill miguel-fill" style="width:96%"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-name">Qualidade percebida (atleta)</span><span class="prog-val" style="color:var(--miguel)">9/10</span></div>
+            <div class="prog-bg"><div class="prog-fill miguel-fill" style="width:90%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LESÕES & RISCOS ── -->
+    <div class="content-section" id="sec-miguel-lesoes">
+      <div class="page-header">
+        <div class="player-color-bar miguel-bar"></div>
+        <div class="page-header-eyebrow">Miguel · Lesões & Prevenção</div>
+        <div class="page-header-title">Mapa de Riscos</div>
+      </div>
+
+      <div class="alert info" style="--ldim:rgba(44,94,63,0.10);--lb:rgba(44,94,63,0.28);--lucas:var(--miguel)">
+        <span class="alert-icon">ℹ️</span>
+        <span>Perfil de goleiro: atenção especial para punhos, dedos, ombros e quadril. Quedas frequentes — checar absorção de impacto.</span>
+      </div>
+
+      <div class="section-divider">Áreas de atenção ativa</div>
+      <div class="risco-grid">
+        <div class="risco-item">
+          <div class="risco-zona">Ombro D</div>
+          <div class="risco-nome">Impacto — vigilância</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Baixo-mod.</span>
+          </div>
+        </div>
+        <div class="risco-item">
+          <div class="risco-zona">Punho E</div>
+          <div class="risco-nome">Sem queixa ativa</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Baixo</span>
+          </div>
+        </div>
+        <div class="risco-item">
+          <div class="risco-zona">Quadril</div>
+          <div class="risco-nome">Crescimento — acompanhar</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip med"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Vigilância</span>
+          </div>
+        </div>
+        <div class="risco-item">
+          <div class="risco-zona">Joelhos</div>
+          <div class="risco-nome">Crescimento — Osgood</div>
+          <div class="risco-nivel">
+            <div class="risco-pip low ativo"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <div class="risco-pip high"></div>
+            <span class="risco-txt">Baixo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-block">
+        <div class="highlight-label">Protocolo preventivo goleiro</div>
+        <div class="highlight-text">
+          <strong>Proteção de punhos</strong> obrigatória em todas as sessões de quedas. Fortalecimento de manguito rotador 3x/semana. Mobilidade de quadril diária (5min). Bandagem funcional preventiva nos dedos para jogos.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CARGA ── -->
+    <div class="content-section" id="sec-miguel-carga">
+      <div class="page-header">
+        <div class="player-color-bar miguel-bar"></div>
+        <div class="page-header-eyebrow">Miguel · Carga de Treino</div>
+        <div class="page-header-title">Volume & Intensidade</div>
+      </div>
+
+      <div class="section-divider">Carga diária — semana atual (min)</div>
+      <div class="card">
+        <div class="card-body">
+          <div class="carga-row"><div class="carga-dia">SEG</div><div class="carga-bg"><div class="carga-fill miguel-fill" style="width:70%">70</div></div><div class="carga-num">70</div></div>
+          <div class="carga-row"><div class="carga-dia">TER</div><div class="carga-bg"><div class="carga-fill miguel-fill" style="width:90%">90</div></div><div class="carga-num">90</div></div>
+          <div class="carga-row"><div class="carga-dia">QUA</div><div class="carga-bg"><div class="carga-fill miguel-fill" style="width:60%">60</div></div><div class="carga-num">60</div></div>
+          <div class="carga-row"><div class="carga-dia">QUI</div><div class="carga-bg"><div class="carga-fill miguel-fill" style="width:80%">80</div></div><div class="carga-num">80</div></div>
+          <div class="carga-row"><div class="carga-dia">SEX</div><div class="carga-bg"><div class="carga-fill miguel-fill" style="width:75%">75</div></div><div class="carga-num">75</div></div>
+          <div class="carga-row"><div class="carga-dia">SÁB</div><div class="carga-bg"><div class="carga-fill miguel-fill" style="width:95%">95</div></div><div class="carga-num">95</div></div>
+          <div class="carga-row"><div class="carga-dia">DOM</div><div class="carga-bg"><div class="carga-fill" style="width:0%;background:var(--b)"></div></div><div class="carga-num" style="color:var(--td)">—</div></div>
+        </div>
+      </div>
+
+      <div class="status-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="status-item">
+          <div class="status-lbl">Total semana</div>
+          <div class="status-val">470<span style="font-size:12px;color:var(--td)"> min</span></div>
+        </div>
+        <div class="status-item">
+          <div class="status-lbl">Carga alta (%)</div>
+          <div class="status-val ok">25%</div>
+        </div>
+        <div class="status-item">
+          <div class="status-lbl">Recuperação</div>
+          <div class="status-val ok">1 dia</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SONO ── -->
+    <div class="content-section" id="sec-miguel-sono">
+      <div class="page-header">
+        <div class="player-color-bar miguel-bar"></div>
+        <div class="page-header-eyebrow">Miguel · Sono & Recuperação</div>
+        <div class="page-header-title">Qualidade do Sono</div>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-item">
+          <div class="status-lbl">Média semanal</div>
+          <div class="status-val ok">8.4h</div>
+        </div>
+        <div class="status-item">
+          <div class="status-lbl">Melhor noite</div>
+          <div class="status-val">9.5h</div>
+        </div>
+        <div class="status-item">
+          <div class="status-lbl">Pior noite</div>
+          <div class="status-val ok">7.5h</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="sono-chart">
+            <div class="sono-bar" style="height:80%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEG<br>8h</div></div>
+            <div class="sono-bar" style="height:95%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">TER<br>9.5h</div></div>
+            <div class="sono-bar" style="height:80%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUA<br>8h</div></div>
+            <div class="sono-bar" style="height:75%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUI<br>7.5h</div></div>
+            <div class="sono-bar" style="height:85%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEX<br>8.5h</div></div>
+            <div class="sono-bar" style="height:88%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SÁB<br>9h</div></div>
+            <div class="sono-bar" style="height:82%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">DOM<br>8.5h</div></div>
+          </div>
+          <div class="highlight-block" style="margin-bottom:0">
+            <div class="highlight-label">Protocolo de sono — goleiro</div>
+            <div class="highlight-text">
+              Meta: <strong>9h/noite</strong>. Lembrete: goleiro tem mais carga cognitiva pós-jogo — 30min de relaxamento antes de dormir. Evitar análises de vídeo perto do horário de dormir.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NUTRIÇÃO ── -->
+    <div class="content-section" id="sec-miguel-nutricao">
+      <div class="page-header">
+        <div class="player-color-bar miguel-bar"></div>
+        <div class="page-header-eyebrow">Miguel · Nutrição Esportiva</div>
+        <div class="page-header-title">Alimentação</div>
+      </div>
+
+      <div class="section-divider">Metas nutricionais diárias</div>
+      <div class="macro-grid">
+        <div class="macro-item">
+          <div class="macro-lbl">Calorias</div>
+          <div class="macro-val" style="color:var(--miguel)">2200</div>
+          <div class="macro-unit">kcal</div>
+        </div>
+        <div class="macro-item">
+          <div class="macro-lbl">Proteína</div>
+          <div class="macro-val" style="color:var(--miguel)">80</div>
+          <div class="macro-unit">g</div>
+        </div>
+        <div class="macro-item">
+          <div class="macro-lbl">Carbo</div>
+          <div class="macro-val" style="color:var(--miguel)">270</div>
+          <div class="macro-unit">g</div>
+        </div>
+        <div class="macro-item">
+          <div class="macro-lbl">Hidrat.</div>
+          <div class="macro-val" style="color:var(--miguel)">2.0</div>
+          <div class="macro-unit">litros</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:10px 16px;">
+          <div class="lista-item">
+            <div class="lista-dot miguel-dot"></div>
+            <div class="lista-content">
+              <div class="lista-title">Prioridade: crescimento</div>
+              <div class="lista-sub">Cálcio e vitamina D prioritários. Leite, iogurte, queijo, folhas verdes.</div>
+            </div>
+          </div>
+          <div class="lista-item">
+            <div class="lista-dot miguel-dot"></div>
+            <div class="lista-content">
+              <div class="lista-title">Proteína para recuperação</div>
+              <div class="lista-sub">Pós-treino: 20g proteína em 30min. Ovo, frango, whey (se recomendado).</div>
+            </div>
+          </div>
+          <div class="lista-item">
+            <div class="lista-dot miguel-dot"></div>
+            <div class="lista-content">
+              <div class="lista-title">Hidratação pré-jogo</div>
+              <div class="lista-sub">500ml água 2h antes. Evitar suco de frutas concentrado no dia de jogo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REGISTRO ── -->
+    <div class="content-section" id="sec-miguel-registro">
+      <div class="page-header">
+        <div class="player-color-bar miguel-bar"></div>
+        <div class="page-header-eyebrow">Miguel · Registro</div>
+        <div class="page-header-title">Nova Ocorrência</div>
+        <div class="page-header-sub">Registre lesões, queixas ou marcos de saúde</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Registro de Saúde</span>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Semana</label>
+              <input type="text" id="m-semana" class="form-input" placeholder="S26">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Data</label>
+              <input type="date" id="m-data" class="form-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Tipo</label>
+              <select id="m-tipo" class="form-select">
+                <option>Lesão</option>
+                <option>Queixa</option>
+                <option>Doença</option>
+                <option>Recuperação</option>
+                <option>Marco positivo</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Área do corpo</label>
+              <select id="m-area" class="form-select">
+                <option>Punho D</option>
+                <option>Punho E</option>
+                <option>Dedo D</option>
+                <option>Dedo E</option>
+                <option>Ombro D</option>
+                <option>Ombro E</option>
+                <option>Joelho D</option>
+                <option>Joelho E</option>
+                <option>Quadril</option>
+                <option>Geral</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:10px;">
+            <label class="form-label">Descrição</label>
+            <textarea id="m-descricao" class="form-textarea" placeholder="Descreva o ocorrido, sintomas e contexto (treino, jogo...)"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Gravidade</label>
+              <select id="m-gravidade" class="form-select">
+                <option>Leve (treino normal)</option>
+                <option>Moderada (treino adaptado)</option>
+                <option>Grave (repouso)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Dias de restrição estimados</label>
+              <input type="number" id="m-dias" class="form-input" placeholder="0" min="0">
+            </div>
+          </div>
+          <div id="m-msg" class="form-msg"></div>
+          <button class="form-btn" id="m-btn" style="background:var(--mdim);border-color:var(--mb);color:var(--miguel);" onclick="salvarSaude('miguel')">Salvar Registro</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ps-miguel -->
+
+</div><!-- /main -->
+
+<script>
+// ─── SUPABASE CONFIG ─────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://dxqsjkvpzdvzyqfwcpro.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_hLGKARCdEPRZfEWaNhg71A_-8LKa3tO';
+
+async function sbFetch(path, opts = {}) {
+  return fetch(SUPABASE_URL + path, {
+    ...opts,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      ...(opts.headers || {})
     }
-    const cMap={lucas:'#2563EB',miguel:'#059669'};
-    const c=cMap[a.color]||'#2563EB';
-    charts[a.id]=new Chart(canvas,{
-      type:'line',
-      data:{
-        labels:recs.map(r=>fmtD(r.date)),
-        datasets:[
-          {label:'Altura (cm)',data:recs.map(r=>r.height),borderColor:c,backgroundColor:c+'18',borderWidth:2,pointBackgroundColor:c,pointRadius:4,tension:0.35,yAxisID:'y'},
-          {label:'Peso (kg)',data:recs.map(r=>r.weight),borderColor:'#D97706',backgroundColor:'#D9770618',borderWidth:1.5,pointBackgroundColor:'#D97706',pointRadius:3,tension:0.35,borderDash:[4,3],yAxisID:'y2'}
-        ]
-      },
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{
-          x:{ticks:{color:'#9A9490',font:{size:10,family:'DM Sans'}},grid:{color:'rgba(0,0,0,0.04)'}},
-          y:{position:'left',ticks:{color:c,font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},
-          y2:{position:'right',ticks:{color:'#D97706',font:{size:10}},grid:{drawOnChartArea:false}}
-        }
-      }
-    });
   });
 }
 
-// ── ACTIONS
-function savePar(id){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  const f=parseFloat(document.getElementById('fi-'+id).value);
-  const m=parseFloat(document.getElementById('mi-'+id).value);
-  if(!isNaN(f))a.fatherHeight=f;if(!isNaN(m))a.motherHeight=m;
-  save(state);renderAll();
-}
-function updateExamUnit(id){
-  const name=document.getElementById('en-'+id).value;
-  const ref=EXAM_REFS[name];
-  document.getElementById('eu-'+id).value=ref?.unit||'';
-}
-function addMed(id){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  const date=document.getElementById('md-'+id).value;
-  const height=parseFloat(document.getElementById('mh-'+id).value);
-  const weight=parseFloat(document.getElementById('mw-'+id).value);
-  const obs=document.getElementById('mo-'+id).value.trim();
-  if(!date||isNaN(height)||isNaN(weight)){alert('Preencha data, altura e peso.');return;}
-  a.records=a.records.filter(r=>r.date!==date);
-  a.records.push({date,height,weight,obs});
-  save(state);
-  document.getElementById('mh-'+id).value='';
-  document.getElementById('mw-'+id).value='';
-  document.getElementById('mo-'+id).value='';
-  renderAll();
-}
-function delMed(id,date){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  if(!confirm('Remover medição?'))return;
-  a.records=a.records.filter(r=>r.date!==date);
-  save(state);renderAll();
-}
-function addExame(id){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  const date=document.getElementById('ed-'+id).value;
-  const name=document.getElementById('en-'+id).value;
-  const value=parseFloat(document.getElementById('ev-'+id).value);
-  const unit=document.getElementById('eu-'+id).value.trim();
-  const obs=document.getElementById('eo-'+id).value.trim();
-  if(!date||!name||isNaN(value)){alert('Preencha data, nome e valor.');return;}
-  if(!a.exames)a.exames=[];
-  a.exames.push({id:Date.now().toString(),date,name,value,unit,obs});
-  save(state);
-  document.getElementById('ev-'+id).value='';document.getElementById('eo-'+id).value='';
-  renderAll();
-}
-function delExame(id,eid){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  if(!confirm('Remover exame?'))return;
-  a.exames=a.exames.filter(e=>e.id!==eid);
-  save(state);renderAll();
-}
-function addSono(id){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  const date=document.getElementById('sd-'+id).value;
-  const hours=parseFloat(document.getElementById('sh-'+id).value);
-  if(!date||isNaN(hours)){alert('Preencha data e horas.');return;}
-  if(!a.sono)a.sono=[];
-  a.sono=a.sono.filter(s=>s.date!==date);
-  a.sono.push({date,hours});
-  save(state);
-  document.getElementById('sh-'+id).value='';
-  renderAll();
-}
-function delSono(id,date){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  if(!confirm('Remover registro?'))return;
-  a.sono=a.sono.filter(s=>s.date!==date);
-  save(state);renderAll();
-}
-function addNota(id){
-  const a=state.athletes.find(x=>x.id===id);if(!a)return;
-  const date=document.getElementById('nd-'+id).value;
-  const type=document.getElementById('nt-'+id).value;
-  const text=document.getElementById('ntxt-'+id).value.trim();
-  if(!date||!text){alert('Preencha data e anotação.');return;}
-  if(!a.notas)a.notas=[];
-  a.notas.push({id:Date.now().toString(),date,type,text});
-  save(state);
-  document.getElementById('ntxt-'+id).value='';
-  renderAll();
+// ─── NAVEGAÇÃO ───────────────────────────────────────────────────────────────
+const sections = ['visao-geral','lesoes','carga','sono','nutricao','registro'];
+let currentPlayer = 'lucas';
+let currentSection = 'visao-geral';
+
+function switchPlayer(p) {
+  currentPlayer = p;
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
+  document.querySelector('.ptab.'+p).classList.add('on');
+  document.querySelectorAll('.player-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('ps-'+p).classList.add('active');
+  switchSection(currentSection);
 }
 
-// ── INIT
-renderAll();
-setSection(state.section||'crescimento');
+function switchSection(sec) {
+  currentSection = sec;
+  document.querySelectorAll('.snav-btn').forEach(b => {
+    b.classList.toggle('on', b.dataset.sec === sec);
+  });
+  const ps = document.getElementById('ps-'+currentPlayer);
+  ps.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('sec-'+currentPlayer+'-'+sec);
+  if(target) target.classList.add('active');
+}
+
+// ─── FEEDBACK UI ─────────────────────────────────────────────────────────────
+function setMsg(id, text, tipo) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'form-msg ' + tipo;
+}
+function setBtn(id, text, disabled) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.disabled = disabled;
+}
+
+// ─── SALVAR SAÚDE (lesão / queixa) ───────────────────────────────────────────
+async function salvarSaude(jogador) {
+  const p = jogador === 'lucas' ? 'l' : 'm';
+  const semana   = document.getElementById(p+'-semana').value.trim();
+  const data     = document.getElementById(p+'-data').value;
+  const tipo     = document.getElementById(p+'-tipo').value;
+  const area     = document.getElementById(p+'-area').value;
+  const descricao= document.getElementById(p+'-descricao').value.trim();
+  const gravidade= document.getElementById(p+'-gravidade').value;
+  const dias     = parseInt(document.getElementById(p+'-dias').value) || 0;
+
+  if (!semana || !data) {
+    setMsg(p+'-msg', '⚠ Preencha Semana e Data antes de salvar.', 'err');
+    return;
+  }
+
+  setBtn(p+'-btn', 'Salvando…', true);
+  setMsg(p+'-msg', '', '');
+
+  const payload = {
+    jogador,
+    semana,
+    data,
+    tipo,
+    area_corpo: area,
+    descricao,
+    gravidade,
+    dias_restricao: dias,
+    criado_em: new Date().toISOString()
+  };
+
+  try {
+    const r = await sbFetch('/rest/v1/saude_registros', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=representation' },
+      body: JSON.stringify(payload)
+    });
+    const result = await r.json();
+
+    if (!r.ok) {
+      // Tabela pode não existir ainda — tenta criar e re-salva
+      if (result?.code === '42P01') {
+        await criarTabelaSaude();
+        return salvarSaude(jogador);
+      }
+      const msg = result?.message || result?.hint || result?.details || JSON.stringify(result);
+      throw new Error(msg);
+    }
+
+    // Sucesso
+    setMsg(p+'-msg', '✓ Registro salvo com sucesso!', 'ok');
+    setBtn(p+'-btn', 'Salvo ✓', false);
+    // Limpar campos após 1.5s e restaurar botão
+    setTimeout(() => {
+      document.getElementById(p+'-semana').value = '';
+      document.getElementById(p+'-data').value = '';
+      document.getElementById(p+'-descricao').value = '';
+      document.getElementById(p+'-dias').value = '';
+      setBtn(p+'-btn', 'Salvar Registro', false);
+      setTimeout(() => setMsg(p+'-msg', '', ''), 3000);
+    }, 1500);
+
+    // Recarregar histórico na seção de lesões
+    carregarHistoricoSaude(jogador);
+
+  } catch(e) {
+    console.error('Supabase saude_registros:', e);
+    setMsg(p+'-msg', '✗ Erro: ' + e.message, 'err');
+    setBtn(p+'-btn', 'Salvar Registro', false);
+  }
+}
+
+// ─── CRIAR TABELA (fallback se não existir no Supabase) ──────────────────────
+// NOTA: Para criar as tabelas no Supabase, execute o SQL abaixo no SQL Editor:
+/*
+  CREATE TABLE IF NOT EXISTS saude_registros (
+    id            BIGSERIAL PRIMARY KEY,
+    jogador       TEXT NOT NULL CHECK (jogador IN ('lucas','miguel')),
+    semana        TEXT,
+    data          DATE,
+    tipo          TEXT,
+    area_corpo    TEXT,
+    descricao     TEXT,
+    gravidade     TEXT,
+    dias_restricao INT DEFAULT 0,
+    criado_em     TIMESTAMPTZ DEFAULT NOW()
+  );
+  ALTER TABLE saude_registros ENABLE ROW LEVEL SECURITY;
+  CREATE POLICY "anon insert" ON saude_registros FOR INSERT WITH CHECK (true);
+  CREATE POLICY "anon select" ON saude_registros FOR SELECT USING (true);
+*/
+async function criarTabelaSaude() {
+  // Sem acesso ao pg via REST — tabela deve ser criada pelo admin no dashboard
+  console.warn('Tabela saude_registros não encontrada. Crie-a via Supabase SQL Editor.');
+}
+
+// ─── CARREGAR HISTÓRICO DE SAÚDE ─────────────────────────────────────────────
+async function carregarHistoricoSaude(jogador) {
+  try {
+    const r = await sbFetch(
+      `/rest/v1/saude_registros?jogador=eq.${jogador}&order=data.desc&limit=10&select=semana,data,area_corpo,tipo,gravidade`
+    );
+    if (!r.ok) return; // silencioso se tabela não existe
+    const rows = await r.json();
+    if (!Array.isArray(rows) || rows.length === 0) return;
+
+    // Atualiza tbody da tabela de histórico do jogador
+    const tbodyId = jogador === 'lucas' ? 'tb-lucas-lesoes' : 'tb-miguel-lesoes';
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+
+    const gravClasse = g =>
+      g && g.includes('Grave') ? 'badge-danger' :
+      g && g.includes('Moderada') ? 'badge-warn' : 'badge-ok';
+    const gravLabel = g =>
+      g && g.includes('Grave') ? 'Grave' :
+      g && g.includes('Moderada') ? 'Moderado' : 'Leve';
+
+    tbody.innerHTML = rows.map(row => `
+      <tr>
+        <td>${row.semana || '—'}</td>
+        <td>${row.area_corpo || '—'}</td>
+        <td>${row.tipo || '—'}</td>
+        <td><span class="badge ${gravClasse(row.gravidade)}">${gravLabel(row.gravidade)}</span></td>
+      </tr>`).join('');
+  } catch(e) {
+    // silencioso
+  }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+switchSection('visao-geral');
+
+// Preencher data de hoje nos formulários
+const hoje = new Date().toISOString().slice(0,10);
+['l-data','m-data'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.value = hoje;
+});
+
+// Carregar históricos do Supabase ao iniciar
+carregarHistoricoSaude('lucas');
+carregarHistoricoSaude('miguel');
 </script>
 </body>
 </html>
