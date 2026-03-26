@@ -214,13 +214,13 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="snap-card lucas-card">
         <div class="snap-bg-num">H</div>
         <div class="snap-label">Altura</div>
-        <div class="snap-val">168.8<span class="snap-unit">cm</span></div>
+        <div class="snap-val"><span id="snap-alt-lucas">168.8</span><span class="snap-unit">cm</span></div>
         <div class="snap-delta up">↑ +2.5cm · Jan→Mar/26</div>
       </div>
       <div class="snap-card lucas-card">
         <div class="snap-bg-num">P</div>
         <div class="snap-label">Peso</div>
-        <div class="snap-val">57.5<span class="snap-unit">kg</span></div>
+        <div class="snap-val"><span id="snap-pes-lucas">57.5</span><span class="snap-unit">kg</span></div>
         <div class="snap-delta up">↑ +2.7kg · Jan→Mar/26</div>
       </div>
     </div>
@@ -451,13 +451,13 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="snap-card miguel-card">
         <div class="snap-bg-num">H</div>
         <div class="snap-label">Altura</div>
-        <div class="snap-val">160.5<span class="snap-unit">cm</span></div>
+        <div class="snap-val"><span id="snap-alt-miguel">160.5</span><span class="snap-unit">cm</span></div>
         <div class="snap-delta up">↑ +2.3cm · Jan→Mar/26</div>
       </div>
       <div class="snap-card miguel-card">
         <div class="snap-bg-num">P</div>
         <div class="snap-label">Peso</div>
-        <div class="snap-val">48.5<span class="snap-unit">kg</span></div>
+        <div class="snap-val"><span id="snap-pes-miguel">48.5</span><span class="snap-unit">kg</span></div>
         <div class="snap-delta up">↑ +1.0kg · Jan→Mar/26</div>
       </div>
     </div>
@@ -831,6 +831,15 @@ async function carregarHistoricoBiometria(jogador) {
     if (!tbody) return;
 
     // Calcular delta entre medições consecutivas
+    // Atualizar snapshot do topo com o dado mais recente
+    const mais_recente = rows[0];
+    if (mais_recente) {
+      const snapAlt = document.getElementById(`snap-alt-${jogador}`);
+      const snapPes = document.getElementById(`snap-pes-${jogador}`);
+      if (snapAlt && mais_recente.altura_cm) snapAlt.textContent = mais_recente.altura_cm;
+      if (snapPes && mais_recente.peso_kg) snapPes.textContent = mais_recente.peso_kg;
+    }
+
     tbody.innerHTML = rows.map((row, i) => {
       const prox = rows[i + 1];
       let delta = '—';
@@ -849,7 +858,7 @@ async function carregarHistoricoBiometria(jogador) {
         : `<td class="num">${row.envergadura_cm ? row.envergadura_cm + ' cm' : '—'}</td>`;
 
       return `<tr>
-        <td>${row.semana || '—'}</td>
+        <td>${row.semana || row.data || '—'}</td>
         <td class="num">${row.altura_cm ? row.altura_cm + ' cm' : '—'}</td>
         <td class="num">${row.peso_kg ? row.peso_kg + ' kg' : '—'}</td>
         ${col3}
