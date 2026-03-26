@@ -754,10 +754,7 @@ async function salvarBiometria(jogador) {
     setMsg(p+'-msg', '⚠ Preencha a Data antes de salvar.', 'err');
     return;
   }
-  if (!altura || !peso) {
-    setMsg(p+'-msg', '⚠ Altura e Peso são obrigatórios.', 'err');
-    return;
-  }
+
 
   setBtn(p+'-btn', 'Salvando…', true);
   setMsg(p+'-msg', '', '');
