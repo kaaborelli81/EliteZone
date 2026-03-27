@@ -1011,15 +1011,11 @@ function calcPHV(idadeAnos, altCm) {
 // ── Projeção de crescimento com desaceleração baseada em PHV ─────────────────
 function projetar(med) {
   if (med.length < 2) return [];
-  // Velocidade média de todos os pontos (mais estável que últimos 2)
+  // Velocidade média histórica total (desde primeira medição)
+  // Mais robusta — intervalos curtos não distorcem a projeção
   const x1 = med[0].idade, y1 = med[0].alt;
   const x2 = med[med.length-1].idade, y2 = med[med.length-1].alt;
-  const velTotal = (y2 - y1) / (x2 - x1);
-  // Velocidade recente (últimos 2 pontos)
-  const ultimas = med.slice(-2);
-  const velRecente = (ultimas[1].alt - ultimas[0].alt) / (ultimas[1].idade - ultimas[0].idade);
-  // Usar média ponderada: 60% histórico, 40% recente — evita distorção por intervalo curto
-  const vel = velTotal * 0.6 + velRecente * 0.4;
+  const vel = (y2 - y1) / (x2 - x1);
   const pts = [];
   let altAtual = y2, idadeAtual = x2;
   while (idadeAtual < 18.1) {
@@ -1201,13 +1197,14 @@ async function carregarGrafico(jogador) {
 
     if (med.length === 0) return;
 
-    // KHR com dados mais recentes
+    // KHR — usar última medição com PESO disponível para cálculo
     const ultimo = med[med.length-1];
-    const khr = (paisData.pai && paisData.mae && ultimo.pes)
-      ? calcKHR(ultimo.idade, ultimo.alt, ultimo.pes, paisData.pai, paisData.mae)
+    const ultimoComPeso = [...med].reverse().find(m => m.pes != null);
+    const khr = (paisData.pai && paisData.mae && ultimoComPeso)
+      ? calcKHR(ultimoComPeso.idade, ultimoComPeso.alt, ultimoComPeso.pes, paisData.pai, paisData.mae)
       : null;
 
-    // PHV — usar medição mais recente
+    // PHV — usar medição mais recente (com ou sem peso)
     const phv = calcPHV(ultimo.idade, ultimo.alt);
 
     // Atualizar badge KHR + PHV no card do gráfico
