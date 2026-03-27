@@ -703,62 +703,96 @@ async function salvarBiometria(jogador) {
   }
 }
 
-// ─── CARREGAR HISTÓRICO DE BIOMETRIA ─────────────────────────────────────────
+// ─── CARREGAR BIOMETRIA COMPLETA ─────────────────────────────────────────────
 async function carregarHistoricoBiometria(jogador) {
+  const p = jogador === 'lucas' ? 'l' : 'm';
   try {
-    // Snapshot: queries independentes para pegar último valor não-nulo de cada campo
-    const rAlt = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&altura_cm=is.not.null&order=data.desc&limit=1&select=altura_cm`);
-    if (rAlt.ok) {
-      const [altRow] = await rAlt.json();
-      const el = document.getElementById(`snap-alt-${jogador}`);
-      if (el && altRow?.altura_cm) el.textContent = altRow.altura_cm;
-    }
-    const rPes = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&peso_kg=is.not.null&order=data.desc&limit=1&select=peso_kg`);
-    if (rPes.ok) {
-      const [pesRow] = await rPes.json();
-      const el = document.getElementById(`snap-pes-${jogador}`);
-      if (el && pesRow?.peso_kg) el.textContent = pesRow.peso_kg;
-    }
-
-    // Histórico: todos os registros para a tabela
-    const r = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&order=data.desc&limit=8&select=semana,data,altura_cm,peso_kg,envergadura_cm,imc`);
+    const r = await sbFetch(
+      `/rest/v1/biometria_registros?jogador=eq.${jogador}&order=data.desc&limit=20&select=id,data,semana,altura_cm,peso_kg,calcado,envergadura_cm,gordura_pct,palmo_cm,imc`
+    );
     if (!r.ok) return;
     const rows = await r.json();
     if (!Array.isArray(rows) || rows.length === 0) return;
 
+    const ultimo = (campo) => rows.find(row => row[campo] != null)?.[campo] ?? null;
+
+    // Snapshot
+    const alt = ultimo('altura_cm');
+    const pes = ultimo('peso_kg');
+    if (alt) { const e = document.getElementById(`snap-alt-${jogador}`); if(e) e.textContent = alt; }
+    if (pes) { const e = document.getElementById(`snap-pes-${jogador}`); if(e) e.textContent = pes; }
+
+    // Última data
+    const ultimaData = rows[0]?.data ? new Date(rows[0].data + 'T12:00:00').toLocaleDateString('pt-BR') : null;
+    if (ultimaData) {
+      const h = document.getElementById(`${p}-ultima-medicao`); if(h) h.textContent = `Última medição: ${ultimaData}`;
+      const d = document.getElementById(`${p}-data-ultima`); if(d) d.textContent = ultimaData;
+    }
+
+    // IMC
+    const imc = ultimo('imc');
+    if (imc) {
+      const e = document.getElementById(`${p}-imc`); if(e) e.textContent = imc;
+      const r2 = document.getElementById(`${p}-imc-ref`);
+      if(r2) r2.textContent = imc < 18.5 ? 'Abaixo do normal' : imc <= 24.9 ? 'Normal ✓' : 'Acima do normal';
+    }
+
+    // Calçado
+    const calcado = ultimo('calcado');
+    if (calcado) { const e = document.getElementById(`${p}-calcado`); if(e) e.textContent = calcado; }
+
+    // Envergadura
+    const env = ultimo('envergadura_cm');
+    if (env) {
+      const e = document.getElementById(`${p}-envergadura`); if(e) e.textContent = env;
+      const rf = document.getElementById(`${p}-envergadura-ref`);
+      if(rf && alt) { const diff = (env - alt).toFixed(1); rf.textContent = diff >= 0 ? `+${diff}cm vs altura ✓` : `${diff}cm vs altura`; }
+    }
+
+    // Gordura e Massa Magra
+    const gord = ultimo('gordura_pct');
+    if (gord) {
+      const eg = document.getElementById(`${p}-gordura`); if(eg) eg.textContent = gord;
+      const rg = document.getElementById(`${p}-gordura-ref`);
+      if(rg) rg.textContent = gord <= 15 ? 'Ideal atleta ✓' : gord <= 20 ? 'Aceitável' : 'Acima do ideal';
+      const magra = 100 - gord;
+      const bm = document.getElementById(`${p}-bar-magra`); if(bm) bm.style.width = magra + '%';
+      const vm = document.getElementById(`${p}-val-magra`); if(vm) vm.textContent = magra + '%';
+      const bg = document.getElementById(`${p}-bar-gordura`); if(bg) bg.style.width = gord + '%';
+      const vg = document.getElementById(`${p}-val-gordura`); if(vg) vg.textContent = gord + '%';
+      if (pes) { const mm = document.getElementById(`${p}-massa-magra`); if(mm) mm.textContent = (pes * (1 - gord/100)).toFixed(1); }
+    }
+
+    // Palmo (Miguel)
+    if (jogador === 'miguel') {
+      const palmo = ultimo('palmo_cm');
+      if (palmo) { const e = document.getElementById('m-palmo'); if(e) e.textContent = palmo; }
+      if (palmo) { const b = document.getElementById('m-bar-palmo'); if(b) b.style.width = Math.min(palmo/25*100,100)+'%'; const v = document.getElementById('m-val-palmo'); if(v) v.textContent = palmo+' cm'; }
+      if (env)   { const b = document.getElementById('m-bar-env');   if(b) b.style.width = Math.min(env/200*100,100)+'%'; const v = document.getElementById('m-val-env');   if(v) v.textContent = env+' cm'; }
+    }
+
+    // Histórico — só linhas com altura
+    const comAltura = rows.filter(row => row.altura_cm);
+    if (comAltura.length === 0) return;
     const tbodyId = jogador === 'lucas' ? 'tb-lucas-bio' : 'tb-miguel-bio';
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
-
-    tbody.innerHTML = rows.map((row, i) => {
-      const prox = rows[i + 1];
-      let delta = '—';
-      let deltaClass = 'delta-eq';
-      if (prox && row.altura_cm && prox.altura_cm) {
+    tbody.innerHTML = comAltura.map((row, i) => {
+      const prox = comAltura[i+1];
+      let delta = '—', deltaClass = 'delta-eq';
+      if (prox?.altura_cm) {
         const diff = (row.altura_cm - prox.altura_cm).toFixed(1);
-        if (diff > 0) { delta = '↑ +' + diff + 'cm'; deltaClass = 'delta-up'; }
-        else if (diff < 0) { delta = '↓ ' + diff + 'cm'; deltaClass = 'delta-dn'; }
-        else { delta = '—'; }
-      } else if (i === rows.length - 1) {
-        delta = 'Base';
-      }
-
+        if (diff > 0) { delta = '↑ +'+diff+'cm'; deltaClass = 'delta-up'; }
+        else if (diff < 0) { delta = '↓ '+diff+'cm'; deltaClass = 'delta-dn'; }
+      } else if (i === comAltura.length-1) { delta = 'Base'; }
+      const dataFmt = row.data ? new Date(row.data+'T12:00:00').toLocaleDateString('pt-BR') : '—';
       const col3 = jogador === 'lucas'
         ? `<td class="num">${row.imc ?? '—'}</td>`
-        : `<td class="num">${row.envergadura_cm ? row.envergadura_cm + ' cm' : '—'}</td>`;
-
-      return `<tr>
-        <td>${row.semana || row.data || '—'}</td>
-        <td class="num">${row.altura_cm ? row.altura_cm + ' cm' : '—'}</td>
-        <td class="num">${row.peso_kg ? row.peso_kg + ' kg' : '—'}</td>
-        ${col3}
-        <td class="${deltaClass}">${delta}</td>
-      </tr>`;
+        : `<td class="num">${row.envergadura_cm ? row.envergadura_cm+' cm' : '—'}</td>`;
+      return `<tr><td>${dataFmt}</td><td class="num">${row.altura_cm} cm</td><td class="num">${row.peso_kg ? row.peso_kg+' kg' : '—'}</td>${col3}<td class="${deltaClass}">${delta}</td></tr>`;
     }).join('');
 
-  } catch(e) {
-    // silencioso — dados estáticos permanecem como fallback
-  }
+  } catch(e) { console.error('carregarHistoricoBiometria:', e); }
 }
 
 // ─── EDITAR LINHA DO HISTÓRICO ───────────────────────────────────────────────
