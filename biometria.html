@@ -1008,21 +1008,27 @@ function calcPHV(idadeAnos, altCm) {
   return { offset: Math.round(offset*10)/10, idadePHV: Math.round(idadePHV*10)/10, status, statusClass };
 }
 
-// ── Projeção de crescimento com desaceleração baseada em PHV ─────────────────
-function projetar(med) {
-  if (med.length < 2) return [];
-  // Velocidade média histórica total (desde primeira medição)
-  // Mais robusta — intervalos curtos não distorcem a projeção
-  const x1 = med[0].idade, y1 = med[0].alt;
-  const x2 = med[med.length-1].idade, y2 = med[med.length-1].alt;
-  const vel = (y2 - y1) / (x2 - x1);
+// ── Projeção ancorada na estimativa de altura adulta (KHR/Tanner) ────────────
+// A linha pontilhada parte do último ponto real e converge suavemente
+// para a altura adulta estimada aos 18 anos — não extrapola livremente
+function projetar(med, alturaAdulta) {
+  if (med.length < 1 || !alturaAdulta) return [];
+  const ultimo = med[med.length-1];
+  const idadeAtual = ultimo.idade;
+  const altAtual = ultimo.alt;
+  const idadeFinal = 18.0;
+  const anosRestantes = idadeFinal - idadeAtual;
+  if (anosRestantes <= 0) return [];
+  const crescimento = alturaAdulta - altAtual;
   const pts = [];
-  let altAtual = y2, idadeAtual = x2;
-  while (idadeAtual < 18.1) {
-    pts.push({ idade: Math.round(idadeAtual*100)/100, alt: Math.round(altAtual*10)/10 });
-    const fator = idadeAtual < 14 ? 1.0 : Math.max(0.04, 1 - (idadeAtual - 14) * 0.38);
-    altAtual += vel * fator * 0.25;
-    idadeAtual += 0.25;
+  // Curva sigmoide: crescimento mais rápido no início, desacelerando até 18a
+  for (let t = 0; t <= anosRestantes + 0.01; t += 0.25) {
+    const idade = Math.round((idadeAtual + t) * 100) / 100;
+    const prog = t / anosRestantes;
+    // Função de desaceleração: raiz quadrada (crescimento rápido → lento)
+    const alt = Math.round((altAtual + crescimento * Math.sqrt(Math.min(prog, 1))) * 10) / 10;
+    pts.push({ idade, alt });
+    if (idade >= 18) break;
   }
   return pts;
 }
@@ -1227,7 +1233,9 @@ async function carregarGrafico(jogador) {
       }
     }
 
-    const proj = projetar(med);
+    // Projeção ancorada na estimativa KHR — se não houver KHR, usa Target Height genético
+    const altAdulta = khr ? khr.pred : (paisData.pai && paisData.mae ? (paisData.pai + paisData.mae + 13) / 2 : null);
+    const proj = projetar(med, altAdulta);
     renderChart(svgId, med, cor, proj, khr);
   } catch(e) { console.error('carregarGrafico:', e); }
 }
