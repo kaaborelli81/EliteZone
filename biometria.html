@@ -368,7 +368,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
           <span>9a</span><span>10a</span><span>11a</span><span>12a</span><span>13a</span><span>14a</span><span>15a</span><span>16a</span><span>17a</span><span>18a</span>
         </div>
         <div style="margin-top:8px;padding:8px 8px 0;border-top:1px solid rgba(0,0,0,0.06);font-family:'JetBrains Mono',monospace;font-size:7px;color:#9E9E9E;line-height:1.8;">
-          <strong>REFERÊNCIAS</strong> · <strong>OMS Growth Reference 2007</strong> — percentis P10/P50/P90 para meninos 5–19 anos · <strong>Khamis &amp; Roche, Pediatrics 1994</strong> — predição de altura adulta (±3.5cm IC90%) · <strong>Moore et al., J Sports Sciences 2015</strong> — equação Moore-2 para maturity offset / PHV · Diamante ◆ = ponto de maior aceleração de crescimento observado · Gráfico atualizado a cada nova medição
+          <strong>REFERÊNCIAS</strong> · <strong>OMS Growth Reference 2007</strong> — percentis P10/P50/P90 para meninos 5–19 anos · <strong>Tanner Mid-Parental Height + % PAH (Tanner &amp; Whitehouse 1975)</strong> — predição de altura adulta por genética e trajetória · <strong>Moore et al., J Sports Sciences 2015</strong> — equação Moore-2 para maturity offset / PHV · Diamante ◆ = ponto de maior aceleração de crescimento observado · Gráfico atualizado a cada nova medição
         </div>
       </div>
     </div>
@@ -576,7 +576,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
           <span>9a</span><span>10a</span><span>11a</span><span>12a</span><span>13a</span><span>14a</span><span>15a</span><span>16a</span><span>17a</span><span>18a</span>
         </div>
         <div style="margin-top:8px;padding:8px 8px 0;border-top:1px solid rgba(0,0,0,0.06);font-family:'JetBrains Mono',monospace;font-size:7px;color:#9E9E9E;line-height:1.8;">
-          <strong>REFERÊNCIAS</strong> · <strong>OMS Growth Reference 2007</strong> — percentis P10/P50/P90 para meninos 5–19 anos · <strong>Khamis &amp; Roche, Pediatrics 1994</strong> — predição de altura adulta (±3.5cm IC90%) · <strong>Moore et al., J Sports Sciences 2015</strong> — equação Moore-2 para maturity offset / PHV · Diamante ◆ = ponto de maior aceleração de crescimento observado · Gráfico atualizado a cada nova medição
+          <strong>REFERÊNCIAS</strong> · <strong>OMS Growth Reference 2007</strong> — percentis P10/P50/P90 para meninos 5–19 anos · <strong>Tanner Mid-Parental Height + % PAH (Tanner &amp; Whitehouse 1975)</strong> — predição de altura adulta por genética e trajetória · <strong>Moore et al., J Sports Sciences 2015</strong> — equação Moore-2 para maturity offset / PHV · Diamante ◆ = ponto de maior aceleração de crescimento observado · Gráfico atualizado a cada nova medição
         </div>
       </div>
     </div>
@@ -965,25 +965,29 @@ function idadeDecimal(dataNasc, dataMed) {
   return (new Date(dataMed) - dataNasc) / (365.25 * 24 * 3600 * 1000);
 }
 
-// ── Khamis-Roche (1994) — coeficientes para meninos por idade inteira ────────
-// Predicted Adult Height = a + b*pai + c*mae + d*altura_atual + e*peso
-// Fonte: Khamis & Roche, Pediatrics 94(4):504-507, 1994
-const KHR_BOYS = {
-  9:  [78.2, 0.36, 0.35, 0.53, 0.06],
-  10: [79.5, 0.35, 0.35, 0.54, 0.06],
-  11: [81.0, 0.35, 0.34, 0.55, 0.06],
-  12: [82.5, 0.34, 0.34, 0.57, 0.06],
-  13: [84.0, 0.34, 0.33, 0.58, 0.05],
-  14: [85.5, 0.33, 0.33, 0.59, 0.05],
+// ── Predição de altura adulta — Tanner Mid-Parental Height + % PAH ───────────
+// Método: Tanner (1970) + tabela % PAH por idade (Tanner & Whitehouse 1975)
+// Usado por academias de futebol quando não há acesso à publicação KHR original
+// Target Height (meninos) = (pai_cm + mae_cm + 13) / 2  ·  SD = 8.5cm
+// % PAH por idade inteira (meninos) — fonte: Tanner & Whitehouse 1975
+const PAH_BOYS = {
+  9:77.0, 10:79.8, 11:82.7, 12:86.2, 13:90.2, 14:95.2, 15:98.2, 16:99.6, 17:100
 };
-const KHR_SE = 2.1; // Erro padrão ±2.1cm (90% CI = ±1.645 × SE ≈ ±3.5cm)
 
 function calcKHR(idadeAnos, altCm, pesKg, paiCm, maeCm) {
-  const idadeInt = Math.min(14, Math.max(9, Math.round(idadeAnos)));
-  const c = KHR_BOYS[idadeInt];
-  if (!c || !pesKg) return null;
-  const pred = c[0] + c[1]*paiCm + c[2]*maeCm + c[3]*altCm + c[4]*pesKg;
-  return { pred: Math.round(pred*10)/10, low: Math.round((pred - 3.5)*10)/10, high: Math.round((pred + 3.5)*10)/10 };
+  // Target Height genético
+  const th = (paiCm + maeCm + 13) / 2;
+  const th_ic_low  = Math.round((th - 14.0) * 10) / 10;
+  const th_ic_high = Math.round((th + 14.0) * 10) / 10;
+  // Predição por trajetória atual (% PAH)
+  const idadeInt = Math.min(17, Math.max(9, Math.round(idadeAnos)));
+  const pah = (PAH_BOYS[idadeInt] || 95) / 100;
+  const traj = Math.round(altCm / pah * 10) / 10;
+  // Estimativa combinada: 50% genética + 50% trajetória
+  const pred = Math.round((th * 0.5 + traj * 0.5) * 10) / 10;
+  const low  = Math.round((th_ic_low  * 0.5 + (traj - 5) * 0.5) * 10) / 10;
+  const high = Math.round((th_ic_high * 0.5 + (traj + 5) * 0.5) * 10) / 10;
+  return { pred, low, high, th: Math.round(th*10)/10, traj };
 }
 
 // ── Moore-2 Maturity Offset — meninos (Moore et al. 2015) ───────────────────
@@ -1202,15 +1206,17 @@ async function carregarGrafico(jogador) {
     if (badgeEl) {
       if (khr) {
         badgeEl.innerHTML = `
-          <span class="khr-label">Altura adulta estimada (KHR)</span>
+          <span class="khr-label">Altura adulta est.</span>
           <span class="khr-val" style="color:${cor}">${khr.pred}cm</span>
-          <span class="khr-label">IC 90%: ${khr.low}–${khr.high}cm</span>
+          <span class="khr-label">faixa: ${khr.low}–${khr.high}cm</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin:0 4px">·</span>
+          <span class="khr-label">Genético: ${khr.th}cm · Trajetória: ${khr.traj}cm</span>
           <span class="phv-badge ${phv.statusClass}">${phv.status} · PHV ~${phv.idadePHV}a</span>`;
       } else {
         badgeEl.innerHTML = `
           <span class="khr-label">PHV estimado</span>
           <span class="phv-badge ${phv.statusClass}">${phv.status} · PHV ~${phv.idadePHV}a</span>
-          <span class="khr-label" style="margin-left:8px">Adicione peso para ativar KHR</span>`;
+          <span class="khr-label" style="margin-left:8px">Adicione peso para estimativa de altura adulta</span>`;
       }
     }
 
