@@ -206,7 +206,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="player-color-bar lucas-bar"></div>
       <div class="page-header-eyebrow">Lucas · 13 anos · Meio/Ponta Esquerda</div>
       <div class="page-header-title">Biometria</div>
-      <div class="page-header-sub">Última medição: Semana 24 — acompanhamento de crescimento e composição</div>
+      <div class="page-header-sub" id="l-ultima-medicao">Aguardando dados...</div>
     </div>
 
     <!-- SNAPSHOT -->
@@ -214,14 +214,14 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="snap-card lucas-card">
         <div class="snap-bg-num">H</div>
         <div class="snap-label">Altura</div>
-        <div class="snap-val"><span id="snap-alt-lucas">168.8</span><span class="snap-unit">cm</span></div>
-        <div class="snap-delta up">↑ +2.5cm · Jan→Mar/26</div>
+        <div class="snap-val"><span id="snap-alt-lucas">—</span><span class="snap-unit">cm</span></div>
+        <div class="snap-delta up" id="snap-alt-lucas-delta">—</div>
       </div>
       <div class="snap-card lucas-card">
         <div class="snap-bg-num">P</div>
         <div class="snap-label">Peso</div>
-        <div class="snap-val"><span id="snap-pes-lucas">57.5</span><span class="snap-unit">kg</span></div>
-        <div class="snap-delta up">↑ +2.7kg · Jan→Mar/26</div>
+        <div class="snap-val"><span id="snap-pes-lucas">—</span><span class="snap-unit">kg</span></div>
+        <div class="snap-delta up" id="snap-pes-lucas-delta">—</div>
       </div>
     </div>
 
@@ -230,44 +230,44 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="metric-item">
         <div class="metric-icon">📏</div>
         <div class="metric-lbl">Envergadura</div>
-        <div class="metric-val">165</div>
+        <div class="metric-val" id="l-envergadura">—</div>
         <div class="metric-unit">cm</div>
-        <div class="metric-ref above">+2cm altura ✓</div>
+        <div class="metric-ref" id="l-envergadura-ref">Não medido</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">⚡</div>
         <div class="metric-lbl">IMC</div>
-        <div class="metric-val">20.4</div>
+        <div class="metric-val" id="l-imc">—</div>
         <div class="metric-unit">kg/m²</div>
-        <div class="metric-ref above">Normal ✓</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-icon">🦵</div>
-        <div class="metric-lbl">Comp. Perna D</div>
-        <div class="metric-val">84</div>
-        <div class="metric-unit">cm</div>
-        <div class="metric-ref">Medido calcanhar–crista</div>
+        <div class="metric-ref" id="l-imc-ref">Aguardando</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">🦶</div>
         <div class="metric-lbl">Nº Calçado</div>
-        <div class="metric-val">38</div>
+        <div class="metric-val" id="l-calcado">—</div>
         <div class="metric-unit">BR</div>
-        <div class="metric-ref above">+1 desde S16 ✓</div>
+        <div class="metric-ref">Último registrado</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">💪</div>
         <div class="metric-lbl">Gordura corp.</div>
-        <div class="metric-val">12</div>
+        <div class="metric-val" id="l-gordura">—</div>
         <div class="metric-unit">%</div>
-        <div class="metric-ref above">Ideal atleta ✓</div>
+        <div class="metric-ref" id="l-gordura-ref">Não medido</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">🏃</div>
-        <div class="metric-lbl">Massa magra</div>
-        <div class="metric-val">47.7</div>
+        <div class="metric-lbl">Massa magra est.</div>
+        <div class="metric-val" id="l-massa-magra">—</div>
         <div class="metric-unit">kg</div>
-        <div class="metric-ref above">↑ tendência ✓</div>
+        <div class="metric-ref">Peso × (1 - gordura%)</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-icon">📅</div>
+        <div class="metric-lbl">Última medição</div>
+        <div class="metric-val" style="font-size:14px" id="l-data-ultima">—</div>
+        <div class="metric-unit"></div>
+        <div class="metric-ref">Data do registro</div>
       </div>
     </div>
 
@@ -277,18 +277,13 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="card-body">
         <div class="comp-row">
           <div class="comp-label">Massa magra</div>
-          <div class="comp-bg"><div class="comp-fill lucas-fill" style="width:88%"></div></div>
-          <div class="comp-val">88%</div>
+          <div class="comp-bg"><div class="comp-fill lucas-fill" id="l-bar-magra" style="width:0%"></div></div>
+          <div class="comp-val" id="l-val-magra">—</div>
         </div>
         <div class="comp-row">
           <div class="comp-label">Gordura</div>
-          <div class="comp-bg"><div class="comp-fill" style="width:12%;background:var(--td)"></div></div>
-          <div class="comp-val">12%</div>
-        </div>
-        <div class="comp-row">
-          <div class="comp-label">Hidratação est.</div>
-          <div class="comp-bg"><div class="comp-fill lucas-fill" style="width:72%"></div></div>
-          <div class="comp-val">72%</div>
+          <div class="comp-bg"><div class="comp-fill" id="l-bar-gordura" style="width:0%;background:var(--td)"></div></div>
+          <div class="comp-val" id="l-val-gordura">—</div>
         </div>
       </div>
     </div>
@@ -305,56 +300,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
           <thead>
             <tr><th>Semana</th><th>Altura</th><th>Peso</th><th>IMC</th><th>Δ Altura</th></tr>
           </thead>
-          <tbody id="tb-lucas-bio">
-            <tr id="lrow-0">
-              <td>07/03/2026</td>
-              <td class="num" id="l-alt-0">168.8 cm</td>
-              <td class="num" id="l-pes-0">57.5 kg</td>
-              <td class="num">20.2</td>
-              <td class="delta-up">↑ +2.5cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('lucas',0)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="lrow-1">
-              <td>20/01/2026</td>
-              <td class="num" id="l-alt-1">166.3 cm</td>
-              <td class="num" id="l-pes-1">54.8 kg</td>
-              <td class="num">19.8</td>
-              <td class="delta-up">↑ +2.0cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('lucas',1)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="lrow-2">
-              <td>04/07/2025</td>
-              <td class="num" id="l-alt-2">164.3 cm</td>
-              <td class="num" id="l-pes-2">51.0 kg</td>
-              <td class="num">18.9</td>
-              <td class="delta-up">↑ +4.3cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('lucas',2)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="lrow-3">
-              <td>14/02/2025</td>
-              <td class="num" id="l-alt-3">160.0 cm</td>
-              <td class="num" id="l-pes-3">—</td>
-              <td class="num">—</td>
-              <td class="delta-up">↑ +8.0cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('lucas',3)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="lrow-4">
-              <td>24/11/2023</td>
-              <td class="num" id="l-alt-4">152.0 cm</td>
-              <td class="num" id="l-pes-4">—</td>
-              <td class="num">—</td>
-              <td class="delta-up">↑ +18.0cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('lucas',4)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="lrow-5">
-              <td>29/04/2021</td>
-              <td class="num" id="l-alt-5">134.0 cm</td>
-              <td class="num" id="l-pes-5">—</td>
-              <td class="num">—</td>
-              <td class="delta-eq">Base</td>
-              <td><button class="edit-btn" onclick="editarLinha('lucas',5)" title="Editar">✏️</button></td>
-            </tr>
-          </tbody>
+          <tbody id="tb-lucas-bio"><tr><td colspan="5" style="text-align:center;color:var(--td);font-size:12px;padding:16px;">Nenhum registro encontrado</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -443,7 +389,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="player-color-bar miguel-bar"></div>
       <div class="page-header-eyebrow">Miguel · 12 anos · Goleiro</div>
       <div class="page-header-title">Biometria</div>
-      <div class="page-header-sub">Última medição: Semana 24 — crescimento e parâmetros de goleiro</div>
+      <div class="page-header-sub" id="m-ultima-medicao">Aguardando dados...</div>
     </div>
 
     <!-- SNAPSHOT -->
@@ -451,14 +397,14 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="snap-card miguel-card">
         <div class="snap-bg-num">H</div>
         <div class="snap-label">Altura</div>
-        <div class="snap-val"><span id="snap-alt-miguel">160.5</span><span class="snap-unit">cm</span></div>
-        <div class="snap-delta up">↑ +2.3cm · Jan→Mar/26</div>
+        <div class="snap-val"><span id="snap-alt-miguel">—</span><span class="snap-unit">cm</span></div>
+        <div class="snap-delta up" id="snap-alt-miguel-delta">—</div>
       </div>
       <div class="snap-card miguel-card">
         <div class="snap-bg-num">P</div>
         <div class="snap-label">Peso</div>
-        <div class="snap-val"><span id="snap-pes-miguel">48.5</span><span class="snap-unit">kg</span></div>
-        <div class="snap-delta up">↑ +1.0kg · Jan→Mar/26</div>
+        <div class="snap-val"><span id="snap-pes-miguel">—</span><span class="snap-unit">kg</span></div>
+        <div class="snap-delta up" id="snap-pes-miguel-delta">—</div>
       </div>
     </div>
 
@@ -467,44 +413,44 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="metric-item">
         <div class="metric-icon">📏</div>
         <div class="metric-lbl">Envergadura</div>
-        <div class="metric-val">161</div>
+        <div class="metric-val" id="m-envergadura">—</div>
         <div class="metric-unit">cm</div>
-        <div class="metric-ref above">+4cm altura ✓</div>
+        <div class="metric-ref" id="m-envergadura-ref">Não medido</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">⚡</div>
         <div class="metric-lbl">IMC</div>
-        <div class="metric-val">19.7</div>
+        <div class="metric-val" id="m-imc">—</div>
         <div class="metric-unit">kg/m²</div>
-        <div class="metric-ref above">Normal ✓</div>
+        <div class="metric-ref" id="m-imc-ref">Aguardando</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">🖐️</div>
         <div class="metric-lbl">Palmo (mão D)</div>
-        <div class="metric-val">19</div>
+        <div class="metric-val" id="m-palmo">—</div>
         <div class="metric-unit">cm</div>
-        <div class="metric-ref above">↑ potencial ✓</div>
+        <div class="metric-ref">Último registrado</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">🦶</div>
         <div class="metric-lbl">Nº Calçado</div>
-        <div class="metric-val">36</div>
+        <div class="metric-val" id="m-calcado">—</div>
         <div class="metric-unit">BR</div>
-        <div class="metric-ref above">+1 desde S12 ✓</div>
+        <div class="metric-ref">Último registrado</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">💪</div>
         <div class="metric-lbl">Gordura corp.</div>
-        <div class="metric-val">11</div>
+        <div class="metric-val" id="m-gordura">—</div>
         <div class="metric-unit">%</div>
-        <div class="metric-ref above">Ideal atleta ✓</div>
+        <div class="metric-ref" id="m-gordura-ref">Não medido</div>
       </div>
       <div class="metric-item">
         <div class="metric-icon">🏋️</div>
-        <div class="metric-lbl">Massa magra</div>
-        <div class="metric-val">43.2</div>
+        <div class="metric-lbl">Massa magra est.</div>
+        <div class="metric-val" id="m-massa-magra">—</div>
         <div class="metric-unit">kg</div>
-        <div class="metric-ref above">↑ tendência ✓</div>
+        <div class="metric-ref">Peso × (1 - gordura%)</div>
       </div>
     </div>
 
@@ -513,24 +459,14 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
     <div class="card">
       <div class="card-body">
         <div class="comp-row">
-          <div class="comp-label">Alcance alto</div>
-          <div class="comp-bg"><div class="comp-fill miguel-fill" style="width:82%"></div></div>
-          <div class="comp-val">218 cm</div>
-        </div>
-        <div class="comp-row">
           <div class="comp-label">Palmo mão D</div>
-          <div class="comp-bg"><div class="comp-fill miguel-fill" style="width:76%"></div></div>
-          <div class="comp-val">19 cm</div>
+          <div class="comp-bg"><div class="comp-fill miguel-fill" id="m-bar-palmo" style="width:0%"></div></div>
+          <div class="comp-val" id="m-val-palmo">—</div>
         </div>
         <div class="comp-row">
-          <div class="comp-label">Palmo mão E</div>
-          <div class="comp-bg"><div class="comp-fill miguel-fill" style="width:74%"></div></div>
-          <div class="comp-val">18.5 cm</div>
-        </div>
-        <div class="comp-row">
-          <div class="comp-label">Enverg. / Altura</div>
-          <div class="comp-bg"><div class="comp-fill miguel-fill" style="width:100%"></div></div>
-          <div class="comp-val">+2.5%</div>
+          <div class="comp-label">Envergadura</div>
+          <div class="comp-bg"><div class="comp-fill miguel-fill" id="m-bar-env" style="width:0%"></div></div>
+          <div class="comp-val" id="m-val-env">—</div>
         </div>
       </div>
     </div>
@@ -547,56 +483,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
           <thead>
             <tr><th>Semana</th><th>Altura</th><th>Peso</th><th>Enverg.</th><th>Δ Altura</th></tr>
           </thead>
-          <tbody id="tb-miguel-bio">
-            <tr id="mrow-0">
-              <td>07/03/2026</td>
-              <td class="num" id="m-alt-0">160.5 cm</td>
-              <td class="num" id="m-pes-0">48.5 kg</td>
-              <td class="num">—</td>
-              <td class="delta-up">↑ +2.3cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('miguel',0)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="mrow-1">
-              <td>20/01/2026</td>
-              <td class="num" id="m-alt-1">158.2 cm</td>
-              <td class="num" id="m-pes-1">47.5 kg</td>
-              <td class="num">—</td>
-              <td class="delta-up">↑ +4.2cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('miguel',1)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="mrow-2">
-              <td>04/07/2025</td>
-              <td class="num" id="m-alt-2">154.0 cm</td>
-              <td class="num" id="m-pes-2">45.4 kg</td>
-              <td class="num">—</td>
-              <td class="delta-up">↑ +3.3cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('miguel',2)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="mrow-3">
-              <td>14/02/2025</td>
-              <td class="num" id="m-alt-3">150.7 cm</td>
-              <td class="num" id="m-pes-3">—</td>
-              <td class="num">—</td>
-              <td class="delta-up">↑ +3.7cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('miguel',3)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="mrow-4">
-              <td>24/11/2023</td>
-              <td class="num" id="m-alt-4">147.0 cm</td>
-              <td class="num" id="m-pes-4">—</td>
-              <td class="num">—</td>
-              <td class="delta-up">↑ +16.0cm</td>
-              <td><button class="edit-btn" onclick="editarLinha('miguel',4)" title="Editar">✏️</button></td>
-            </tr>
-            <tr id="mrow-5">
-              <td>29/04/2021</td>
-              <td class="num" id="m-alt-5">131.0 cm</td>
-              <td class="num" id="m-pes-5">—</td>
-              <td class="num">—</td>
-              <td class="delta-eq">Base</td>
-              <td><button class="edit-btn" onclick="editarLinha('miguel',5)" title="Editar">✏️</button></td>
-            </tr>
-          </tbody>
+          <tbody id="tb-miguel-bio"><tr><td colspan="5" style="text-align:center;color:var(--td);font-size:12px;padding:16px;">Nenhum registro encontrado</td></tr></tbody>
         </table>
       </div>
     </div>
