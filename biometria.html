@@ -819,9 +819,22 @@ async function salvarBiometria(jogador) {
 // ─── CARREGAR HISTÓRICO DE BIOMETRIA ─────────────────────────────────────────
 async function carregarHistoricoBiometria(jogador) {
   try {
-    const r = await sbFetch(
-      `/rest/v1/biometria_registros?jogador=eq.${jogador}&order=data.desc&limit=8&select=semana,data,altura_cm,peso_kg,envergadura_cm,imc`
-    );
+    // Snapshot: queries independentes para pegar último valor não-nulo de cada campo
+    const rAlt = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&altura_cm=not.is.null&order=data.desc&limit=1&select=altura_cm`);
+    if (rAlt.ok) {
+      const [altRow] = await rAlt.json();
+      const el = document.getElementById(`snap-alt-${jogador}`);
+      if (el && altRow?.altura_cm) el.textContent = altRow.altura_cm;
+    }
+    const rPes = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&peso_kg=not.is.null&order=data.desc&limit=1&select=peso_kg`);
+    if (rPes.ok) {
+      const [pesRow] = await rPes.json();
+      const el = document.getElementById(`snap-pes-${jogador}`);
+      if (el && pesRow?.peso_kg) el.textContent = pesRow.peso_kg;
+    }
+
+    // Histórico: todos os registros para a tabela
+    const r = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&order=data.desc&limit=8&select=semana,data,altura_cm,peso_kg,envergadura_cm,imc`);
     if (!r.ok) return;
     const rows = await r.json();
     if (!Array.isArray(rows) || rows.length === 0) return;
@@ -829,15 +842,6 @@ async function carregarHistoricoBiometria(jogador) {
     const tbodyId = jogador === 'lucas' ? 'tb-lucas-bio' : 'tb-miguel-bio';
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
-
-    // Calcular delta entre medições consecutivas
-    // Atualizar snapshot: busca o último valor conhecido de cada campo individualmente
-    const snapAlt = document.getElementById(`snap-alt-${jogador}`);
-    const snapPes = document.getElementById(`snap-pes-${jogador}`);
-    const ultimaAlt = rows.find(r => r.altura_cm);
-    const ultimoPes = rows.find(r => r.peso_kg);
-    if (snapAlt && ultimaAlt) snapAlt.textContent = ultimaAlt.altura_cm;
-    if (snapPes && ultimoPes) snapPes.textContent = ultimoPes.peso_kg;
 
     tbody.innerHTML = rows.map((row, i) => {
       const prox = rows[i + 1];
