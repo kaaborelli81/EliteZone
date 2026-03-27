@@ -576,7 +576,7 @@ async function carregar(){
     const req=fetch(SB_URL+'/rest/v1/avaliacoes?select=*',{
       headers:{
         'apikey':SB_KEY,
-        'Authorization':'Bearer '+SB_KEY,
+        
         'Accept':'application/json',
         'Content-Type':'application/json'
       }
@@ -987,7 +987,7 @@ async function salvar(){
   });
   await fetch(SB_URL+'/rest/v1/avaliacoes?id=eq.'+mctx._id,{
     method:'PATCH',
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    headers:{'apikey':SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
     body:JSON.stringify({feedback:fb,avaliado_em:new Date().toISOString()})
   });
   fm();

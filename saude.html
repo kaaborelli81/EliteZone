@@ -1013,7 +1013,7 @@ async function sbFetch(path, opts = {}) {
     ...opts,
     headers: {
       'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      
       'Content-Type': 'application/json',
       ...(opts.headers || {})
     }
