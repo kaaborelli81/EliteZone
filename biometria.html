@@ -983,10 +983,15 @@ function calcKHR(idadeAnos, altCm, pesKg, paiCm, maeCm) {
   const idadeInt = Math.min(17, Math.max(9, Math.round(idadeAnos)));
   const pah = (PAH_BOYS[idadeInt] || 95) / 100;
   const traj = Math.round(altCm / pah * 10) / 10;
-  // Estimativa combinada: 50% genética + 50% trajetória
-  const pred = Math.round((th * 0.5 + traj * 0.5) * 10) / 10;
-  const low  = Math.round((th_ic_low  * 0.5 + (traj - 5) * 0.5) * 10) / 10;
-  const high = Math.round((th_ic_high * 0.5 + (traj + 5) * 0.5) * 10) / 10;
+  // Peso genético maior em idades menores (mais variância na trajetória)
+  // < 12a: 70% genético / 30% trajetória
+  // 12–13a: 60% / 40%
+  // > 13a: 50% / 50%
+  const wGen = idadeAnos < 12 ? 0.7 : idadeAnos < 13 ? 0.6 : 0.5;
+  const wTraj = 1 - wGen;
+  const pred = Math.round((th * wGen + traj * wTraj) * 10) / 10;
+  const low  = Math.round((th_ic_low  * wGen + (traj - 5) * wTraj) * 10) / 10;
+  const high = Math.round((th_ic_high * wGen + (traj + 5) * wTraj) * 10) / 10;
   return { pred, low, high, th: Math.round(th*10)/10, traj };
 }
 
