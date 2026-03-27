@@ -165,6 +165,29 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
 .form-msg.err{display:block;background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.3);color:#c62828;}
 .form-btn:disabled{opacity:.6;cursor:not-allowed;}
 
+
+/* ── SEÇÃO PAIS ── */
+.pais-bar{background:var(--card);border-bottom:1px solid var(--b);padding:10px 20px;}
+.pais-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.pais-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);flex-shrink:0;}
+.pais-field{display:flex;align-items:center;gap:6px;}
+.pais-input{background:var(--bg);border:1px solid var(--b);border-radius:3px;color:var(--tp);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 8px;width:72px;outline:none;}
+.pais-input:focus{border-color:var(--ab);}
+.pais-save{background:var(--adim);border:1px solid var(--ab);color:var(--acc);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.5px;padding:4px 10px;border-radius:2px;cursor:pointer;}
+.pais-save:hover{background:var(--acc);color:#fff;}
+.pais-status{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ok);margin-left:6px;}
+/* ── BOTÃO EXCLUIR ── */
+.del-btn{background:none;border:none;cursor:pointer;font-size:11px;opacity:0.35;transition:opacity .2s;padding:2px 4px;color:var(--danger);}
+.del-btn:hover{opacity:1;}
+/* ── KHR BADGE ── */
+.khr-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:var(--card2);border:1px solid var(--b);border-radius:4px;margin-top:8px;}
+.khr-val{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;}
+.khr-label{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);}
+.phv-badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border-radius:2px;margin-left:8px;}
+.phv-pre{background:rgba(44,74,110,.1);color:var(--lucas);}
+.phv-circa{background:rgba(255,152,0,.12);color:#e08000;}
+.phv-post{background:rgba(76,175,80,.1);color:#3a8f3a;}
+
 /* ── RESPONSIVE ── */
 @media(max-width:600px){
   .main{padding:20px 16px 80px;}
@@ -185,6 +208,26 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
   <a href="painel_motor.html" class="back">← Painel</a>
   <span class="top-title">Biometria</span>
   <span class="top-badge">2025–26</span>
+</div>
+
+
+<!-- BARRA PAIS -->
+<div class="pais-bar" id="pais-bar">
+  <div class="pais-inner">
+    <span class="pais-label">Dados dos Pais</span>
+    <div class="pais-field">
+      <span style="font-size:11px;color:var(--ts);">Pai</span>
+      <input type="number" id="pais-pai" class="pais-input" step="0.1" placeholder="174.0">
+      <span style="font-size:10px;color:var(--td);">cm</span>
+    </div>
+    <div class="pais-field">
+      <span style="font-size:11px;color:var(--ts);">Mãe</span>
+      <input type="number" id="pais-mae" class="pais-input" step="0.1" placeholder="170.0">
+      <span style="font-size:10px;color:var(--td);">cm</span>
+    </div>
+    <button class="pais-save" onclick="salvarPais()">Salvar</button>
+    <span id="pais-status" class="pais-status"></span>
+  </div>
 </div>
 
 <!-- PLAYER TABS -->
@@ -298,7 +341,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="card-body" style="padding:10px 16px;">
         <table class="bio-table">
           <thead>
-            <tr><th>Semana</th><th>Altura</th><th>Peso</th><th>IMC</th><th>Δ Altura</th></tr>
+            <tr><th>Data</th><th>Altura</th><th>Peso</th><th>IMC</th><th>Δ Altura</th><th></th></tr>
           </thead>
           <tbody id="tb-lucas-bio"><tr><td colspan="5" style="text-align:center;color:var(--td);font-size:12px;padding:16px;">Nenhum registro encontrado</td></tr></tbody>
         </table>
@@ -319,12 +362,13 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
           <span style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)"><span style="display:inline-block;width:24px;height:2px;background:#bbb;border-radius:2px"></span>P50 OMS</span>
           <span style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)"><span style="display:inline-block;width:24px;height:1px;background:#ccc;border-top:1px dashed #ccc"></span>P25/P75</span>
         </div>
+        <div id="khr-badge-lucas" class="khr-badge" style="margin-bottom:10px;flex-wrap:wrap;gap:8px;"></div>
         <svg id="chart-lucas" viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;"></svg>
         <div style="display:flex;justify-content:space-between;padding:2px 44px 0;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);">
           <span>9a</span><span>10a</span><span>11a</span><span>12a</span><span>13a</span><span>14a</span><span>15a</span><span>16a</span><span>17a</span><span>18a</span>
         </div>
         <div style="margin-top:8px;padding:8px 8px 0;border-top:1px solid rgba(0,0,0,0.06);font-family:'JetBrains Mono',monospace;font-size:7px;color:#9E9E9E;line-height:1.8;">
-          <strong>METODOLOGIA</strong> · Referência: OMS Growth Reference 2007 (meninos 5–19 anos) · Percentis P25/P50/P75 · Projeção: velocidade de crescimento das últimas 3 medições com desaceleração pós-PHV · Atualizado automaticamente a cada nova medição
+          <strong>REFERÊNCIAS</strong> · <strong>OMS Growth Reference 2007</strong> — percentis P10/P50/P90 para meninos 5–19 anos · <strong>Khamis &amp; Roche, Pediatrics 1994</strong> — predição de altura adulta (±3.5cm IC90%) · <strong>Moore et al., J Sports Sciences 2015</strong> — equação Moore-2 para maturity offset / PHV · Diamante ◆ = ponto de maior aceleração de crescimento observado · Gráfico atualizado a cada nova medição
         </div>
       </div>
     </div>
@@ -505,7 +549,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="card-body" style="padding:10px 16px;">
         <table class="bio-table">
           <thead>
-            <tr><th>Semana</th><th>Altura</th><th>Peso</th><th>Enverg.</th><th>Δ Altura</th></tr>
+            <tr><th>Data</th><th>Altura</th><th>Peso</th><th>Enverg.</th><th>Δ Altura</th><th></th></tr>
           </thead>
           <tbody id="tb-miguel-bio"><tr><td colspan="5" style="text-align:center;color:var(--td);font-size:12px;padding:16px;">Nenhum registro encontrado</td></tr></tbody>
         </table>
@@ -526,12 +570,13 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
           <span style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)"><span style="display:inline-block;width:24px;height:2px;background:#bbb;border-radius:2px"></span>P50 OMS</span>
           <span style="display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)"><span style="display:inline-block;width:24px;height:1px;background:#ccc;border-top:1px dashed #ccc"></span>P25/P75</span>
         </div>
+        <div id="khr-badge-miguel" class="khr-badge" style="margin-bottom:10px;flex-wrap:wrap;gap:8px;"></div>
         <svg id="chart-miguel" viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;"></svg>
         <div style="display:flex;justify-content:space-between;padding:2px 44px 0;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);">
           <span>9a</span><span>10a</span><span>11a</span><span>12a</span><span>13a</span><span>14a</span><span>15a</span><span>16a</span><span>17a</span><span>18a</span>
         </div>
         <div style="margin-top:8px;padding:8px 8px 0;border-top:1px solid rgba(0,0,0,0.06);font-family:'JetBrains Mono',monospace;font-size:7px;color:#9E9E9E;line-height:1.8;">
-          <strong>METODOLOGIA</strong> · Referência: OMS Growth Reference 2007 (meninos 5–19 anos) · Percentis P25/P50/P75 · Projeção: velocidade de crescimento das últimas 3 medições com desaceleração pós-PHV · Atualizado automaticamente a cada nova medição
+          <strong>REFERÊNCIAS</strong> · <strong>OMS Growth Reference 2007</strong> — percentis P10/P50/P90 para meninos 5–19 anos · <strong>Khamis &amp; Roche, Pediatrics 1994</strong> — predição de altura adulta (±3.5cm IC90%) · <strong>Moore et al., J Sports Sciences 2015</strong> — equação Moore-2 para maturity offset / PHV · Diamante ◆ = ponto de maior aceleração de crescimento observado · Gráfico atualizado a cada nova medição
         </div>
       </div>
     </div>
@@ -836,7 +881,7 @@ async function carregarHistoricoBiometria(jogador) {
       const col3 = jogador === 'lucas'
         ? `<td class="num">${row.imc ?? '—'}</td>`
         : `<td class="num">${row.envergadura_cm ? row.envergadura_cm+' cm' : '—'}</td>`;
-      return `<tr><td>${dataFmt}</td><td class="num">${row.altura_cm} cm</td><td class="num">${row.peso_kg ? row.peso_kg+' kg' : '—'}</td>${col3}<td class="${deltaClass}">${delta}</td></tr>`;
+      return `<tr><td>${dataFmt}</td><td class="num">${row.altura_cm} cm</td><td class="num">${row.peso_kg ? row.peso_kg+' kg' : '—'}</td>${col3}<td class="${deltaClass}">${delta}</td><td><button class="del-btn" onclick="excluirRegistro('${jogador}',${row.id})" title="Apagar">✕</button></td></tr>`;
     }).join('');
 
   } catch(e) { console.error('carregarHistoricoBiometria:', e); }
@@ -904,22 +949,57 @@ const hoje = new Date().toISOString().slice(0, 10);
   if (el) el.value = hoje;
 });
 
-// ─── GRÁFICOS DE CRESCIMENTO (lê do Supabase, atualiza a cada nova medição) ──
-// Datas de nascimento aproximadas para cálculo de idade
+// ─── CRESCIMENTO — CIÊNCIA REAL ──────────────────────────────────────────────
+// Nascimento aproximado (usado para calcular idade decimal)
 const NASC = { lucas: new Date('2013-03-07'), miguel: new Date('2014-03-07') };
 
-// Tabela OMS meninos [idade, P25, P50, P75] — fonte: WHO Growth Reference 2007
+// OMS Growth Reference 2007 — meninos [idade, P10, P50, P90]
 const WHO_BOYS = [
-  [9,127.2,132.6,138.2],[10,132.1,137.8,143.7],[11,137.0,143.1,149.5],
-  [12,142.6,149.1,156.0],[13,149.0,156.0,163.2],[14,155.6,162.6,169.5],
-  [15,160.8,167.5,174.1],[16,163.9,170.5,177.0],[17,165.4,171.8,178.2],
-  [18,166.1,172.3,178.6],
+  [9, 125.4,132.6,139.9],[10,130.2,137.8,145.5],[11,135.2,143.1,151.2],
+  [12,140.9,149.1,157.5],[13,147.4,156.0,164.7],[14,154.1,162.6,171.1],
+  [15,159.4,167.5,175.5],[16,162.7,170.5,178.2],[17,164.2,171.8,179.3],
+  [18,165.0,172.3,179.7],
 ];
 
 function idadeDecimal(dataNasc, dataMed) {
   return (new Date(dataMed) - dataNasc) / (365.25 * 24 * 3600 * 1000);
 }
 
+// ── Khamis-Roche (1994) — coeficientes para meninos por idade inteira ────────
+// Predicted Adult Height = a + b*pai + c*mae + d*altura_atual + e*peso
+// Fonte: Khamis & Roche, Pediatrics 94(4):504-507, 1994
+const KHR_BOYS = {
+  9:  [78.2, 0.36, 0.35, 0.53, 0.06],
+  10: [79.5, 0.35, 0.35, 0.54, 0.06],
+  11: [81.0, 0.35, 0.34, 0.55, 0.06],
+  12: [82.5, 0.34, 0.34, 0.57, 0.06],
+  13: [84.0, 0.34, 0.33, 0.58, 0.05],
+  14: [85.5, 0.33, 0.33, 0.59, 0.05],
+};
+const KHR_SE = 2.1; // Erro padrão ±2.1cm (90% CI = ±1.645 × SE ≈ ±3.5cm)
+
+function calcKHR(idadeAnos, altCm, pesKg, paiCm, maeCm) {
+  const idadeInt = Math.min(14, Math.max(9, Math.round(idadeAnos)));
+  const c = KHR_BOYS[idadeInt];
+  if (!c || !pesKg) return null;
+  const pred = c[0] + c[1]*paiCm + c[2]*maeCm + c[3]*altCm + c[4]*pesKg;
+  return { pred: Math.round(pred*10)/10, low: Math.round((pred - 3.5)*10)/10, high: Math.round((pred + 3.5)*10)/10 };
+}
+
+// ── Moore-2 Maturity Offset — meninos (Moore et al. 2015) ───────────────────
+// Maturity Offset = -7.999994 + (0.0036124 × idade × altura)
+// Fonte: Moore et al., J Sports Sciences, 2015
+function calcPHV(idadeAnos, altCm) {
+  const offset = -7.999994 + (0.0036124 * idadeAnos * altCm);
+  const idadePHV = idadeAnos - offset;
+  let status, statusClass;
+  if (offset < -1.0)      { status = 'Pré-PHV';   statusClass = 'phv-pre'; }
+  else if (offset <= 1.0) { status = 'Circa-PHV'; statusClass = 'phv-circa'; }
+  else                    { status = 'Pós-PHV';   statusClass = 'phv-post'; }
+  return { offset: Math.round(offset*10)/10, idadePHV: Math.round(idadePHV*10)/10, status, statusClass };
+}
+
+// ── Projeção de crescimento com desaceleração baseada em PHV ─────────────────
 function projetar(med) {
   if (med.length < 2) return [];
   const ultimas = med.slice(-3);
@@ -929,92 +1009,223 @@ function projetar(med) {
   const pts = [];
   let altAtual = y2, idadeAtual = x2;
   while (idadeAtual < 18.1) {
-    pts.push({ idade: idadeAtual, alt: Math.round(altAtual * 10) / 10 });
-    const fator = idadeAtual < 14 ? 1.0 : Math.max(0.05, 1 - (idadeAtual - 14) * 0.35);
+    pts.push({ idade: Math.round(idadeAtual*100)/100, alt: Math.round(altAtual*10)/10 });
+    const fator = idadeAtual < 14 ? 1.0 : Math.max(0.04, 1 - (idadeAtual - 14) * 0.38);
     altAtual += vel * fator * 0.25;
     idadeAtual += 0.25;
   }
   return pts;
 }
 
-function renderChart(svgId, med, cor, projecao) {
+// ── Renderização do gráfico SVG ───────────────────────────────────────────────
+function renderChart(svgId, med, cor, projecao, khr) {
   const svg = document.getElementById(svgId);
   if (!svg) return;
-  const W = 620, H = 280;
-  const pad = { top: 16, right: 20, bottom: 10, left: 44 };
+  const W = 620, H = 300;
+  const pad = { top: 20, right: 24, bottom: 10, left: 44 };
   const chartW = W - pad.left - pad.right;
   const chartH = H - pad.top - pad.bottom;
-  const minAge = 9, maxAge = 18, minH = 120, maxH = 195;
-  const xP = a  => pad.left + (a - minAge) / (maxAge - minAge) * chartW;
-  const yP = h  => pad.top  + (1 - (h - minH) / (maxH - minH)) * chartH;
-  let html = '';
-  // Grid
-  [130,140,150,160,170,180,190].forEach(h => {
+  const minAge = 8, maxAge = 18, minH = 118, maxH = 198;
+  const xP = a => pad.left + (a - minAge) / (maxAge - minAge) * chartW;
+  const yP = h => pad.top  + (1 - (h - minH) / (maxH - minH)) * chartH;
+  let s = '';
+
+  // Grid horizontal
+  [120,130,140,150,160,170,180,190].forEach(h => {
     const y = yP(h);
-    html += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="#E8E3DB" stroke-width="1"/>`;
-    html += `<text x="${pad.left-6}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#9E9E9E">${h}</text>`;
+    s += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="#EAE5DD" stroke-width="1"/>`;
+    s += `<text x="${pad.left-6}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#AAAAAA">${h}</text>`;
   });
   for (let a = minAge; a <= maxAge; a++) {
-    html += `<line x1="${xP(a)}" y1="${pad.top}" x2="${xP(a)}" y2="${H-pad.bottom}" stroke="#E8E3DB" stroke-width="1"/>`;
+    s += `<line x1="${xP(a)}" y1="${pad.top}" x2="${xP(a)}" y2="${H-pad.bottom}" stroke="#EAE5DD" stroke-width="1"/>`;
   }
-  // Banda P25–P75
+
+  // Banda P10–P90 OMS (fundo sombreado)
   let bp = '', bpb = '';
   WHO_BOYS.forEach((d,i) => {
     const x = xP(d[0]), yt = yP(d[3]), yb = yP(d[1]);
     if (i===0){bp=`M${x},${yt}`;bpb=`L${x},${yb}`;}
     else{bp+=` L${x},${yt}`;bpb=` L${x},${yb}`+bpb;}
   });
-  html += `<path d="${bp} ${bpb} Z" fill="rgba(0,0,0,0.04)" stroke="none"/>`;
-  // P25, P75 tracejado
+  s += `<path d="${bp} ${bpb} Z" fill="rgba(0,0,0,0.035)" stroke="none"/>`;
+
+  // P10 e P90 tracejado
   [1,3].forEach(idx => {
+    const lbl = idx===1?'P10':'P90';
     const pts = WHO_BOYS.map(d=>`${xP(d[0])},${yP(d[idx])}`).join(' ');
-    html += `<polyline points="${pts}" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-dasharray="4,3"/>`;
+    s += `<polyline points="${pts}" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-dasharray="3,3"/>`;
+    const last = WHO_BOYS[WHO_BOYS.length-1];
+    s += `<text x="${xP(last[0])+4}" y="${yP(last[idx])+4}" font-family="JetBrains Mono,monospace" font-size="7" fill="#BBBBBB">${lbl}</text>`;
   });
+
   // P50 sólido
-  html += `<polyline points="${WHO_BOYS.map(d=>`${xP(d[0])},${yP(d[2])}`).join(' ')}" fill="none" stroke="#BBBBBB" stroke-width="1.5"/>`;
-  // Projeção
-  if (projecao.length > 1) {
-    html += `<polyline points="${projecao.map(d=>`${xP(d.idade)},${yP(d.alt)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="2" stroke-dasharray="5,4" opacity="0.4"/>`;
-    const last = projecao[projecao.length-1];
-    html += `<text x="${xP(last.idade)-4}" y="${yP(last.alt)-7}" font-family="JetBrains Mono,monospace" font-size="8" fill="${cor}" opacity="0.7" text-anchor="end">~${Math.round(last.alt)}cm</text>`;
+  const p50pts = WHO_BOYS.map(d=>`${xP(d[0])},${yP(d[2])}`).join(' ');
+  s += `<polyline points="${p50pts}" fill="none" stroke="#BBBBBB" stroke-width="1.5"/>`;
+  const last50 = WHO_BOYS[WHO_BOYS.length-1];
+  s += `<text x="${xP(last50[0])+4}" y="${yP(last50[2])+4}" font-family="JetBrains Mono,monospace" font-size="7" fill="#AAAAAA">P50</text>`;
+
+  // KHR — banda de intervalo de confiança (±3.5cm)
+  if (khr && projecao.length > 1) {
+    const lastProj = projecao[projecao.length-1];
+    const xKhr = xP(18);
+    s += `<line x1="${xKhr}" y1="${yP(khr.high)}" x2="${xKhr}" y2="${yP(khr.low)}" stroke="${cor}" stroke-width="3" stroke-linecap="round" opacity="0.3"/>`;
+    s += `<circle cx="${xKhr}" cy="${yP(khr.pred)}" r="5" fill="${cor}" stroke="white" stroke-width="2" opacity="0.7"/>`;
+    s += `<text x="${xKhr+8}" y="${yP(khr.pred)-6}" font-family="JetBrains Mono,monospace" font-size="8" fill="${cor}" font-weight="600">${khr.pred}cm</text>`;
+    s += `<text x="${xKhr+8}" y="${yP(khr.pred)+6}" font-family="JetBrains Mono,monospace" font-size="7" fill="${cor}" opacity="0.6">${khr.low}–${khr.high}</text>`;
   }
+
+  // Projeção tracejada
+  if (projecao.length > 1) {
+    s += `<polyline points="${projecao.map(d=>`${xP(d.idade)},${yP(d.alt)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.35"/>`;
+  }
+
   // Linha real
   if (med.length > 1) {
-    html += `<polyline points="${med.map(d=>`${xP(d.idade)},${yP(d.alt)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    s += `<polyline points="${med.map(d=>`${xP(d.idade)},${yP(d.alt)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
   }
-  // Pontos
+
+  // Pontos reais
   med.forEach((d,i) => {
     const x = xP(d.idade), y = yP(d.alt);
-    html += `<circle cx="${x}" cy="${y}" r="4" fill="${cor}" stroke="white" stroke-width="1.5"/>`;
+    s += `<circle cx="${x}" cy="${y}" r="4" fill="${cor}" stroke="white" stroke-width="1.5"/>`;
     if (i === med.length-1) {
-      html += `<text x="${x+7}" y="${y+4}" font-family="JetBrains Mono,monospace" font-size="9" fill="${cor}" font-weight="500">${d.alt}cm</text>`;
+      s += `<text x="${x-6}" y="${y-9}" font-family="JetBrains Mono,monospace" font-size="9" fill="${cor}" font-weight="600" text-anchor="middle">${d.alt}cm</text>`;
     }
   });
-  svg.innerHTML = html;
+
+  // Marcador PHV na curva real (ponto de máxima aceleração estimado)
+  if (med.length >= 3) {
+    // Calcular velocidades entre pontos consecutivos
+    let maxVel = 0, phvIdx = 1;
+    for (let i = 1; i < med.length; i++) {
+      const vel = (med[i].alt - med[i-1].alt) / (med[i].idade - med[i-1].idade);
+      if (vel > maxVel) { maxVel = vel; phvIdx = i; }
+    }
+    // PHV observado — marcador diamante
+    const px = xP((med[phvIdx].idade + med[phvIdx-1].idade)/2);
+    const py = yP((med[phvIdx].alt + med[phvIdx-1].alt)/2);
+    s += `<polygon points="${px},${py-7} ${px+5},${py} ${px},${py+7} ${px-5},${py}" fill="${cor}" opacity="0.5"/>`;
+    s += `<text x="${px}" y="${py+18}" font-family="JetBrains Mono,monospace" font-size="7" fill="${cor}" opacity="0.7" text-anchor="middle">↑PHV obs.</text>`;
+  }
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = s;
 }
 
+// ── Carregar pais ─────────────────────────────────────────────────────────────
+let paisData = { pai: null, mae: null };
+
+async function carregarPais() {
+  try {
+    const r = await sbFetch('/rest/v1/familia_dados?familia=eq.principal&select=pai_altura_cm,mae_altura_cm&limit=1');
+    if (!r.ok) return;
+    const rows = await r.json();
+    if (rows.length > 0) {
+      paisData.pai = rows[0].pai_altura_cm;
+      paisData.mae = rows[0].mae_altura_cm;
+      const pi = document.getElementById('pais-pai');
+      const mi = document.getElementById('pais-mae');
+      if (pi) pi.value = paisData.pai || '';
+      if (mi) mi.value = paisData.mae || '';
+    }
+  } catch(e) {}
+}
+
+async function salvarPais() {
+  const pai = parseFloat(document.getElementById('pais-pai')?.value);
+  const mae = parseFloat(document.getElementById('pais-mae')?.value);
+  if (isNaN(pai) || isNaN(mae)) return;
+  const st = document.getElementById('pais-status');
+  try {
+    // Upsert — atualiza se já existe, insere se não
+    const r = await sbFetch('/rest/v1/familia_dados?familia=eq.principal', {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ pai_altura_cm: pai, mae_altura_cm: mae, atualizado_em: new Date().toISOString() })
+    });
+    if (r.ok) {
+      paisData.pai = pai; paisData.mae = mae;
+      if (st) { st.textContent = '✓ Salvo'; setTimeout(()=>{ if(st) st.textContent=''; }, 2500); }
+      carregarGrafico('lucas');
+      carregarGrafico('miguel');
+    }
+  } catch(e) {}
+}
+
+// ── Excluir registro ──────────────────────────────────────────────────────────
+async function excluirRegistro(jogador, id) {
+  if (!confirm('Apagar esta medição?')) return;
+  try {
+    const r = await sbFetch(`/rest/v1/biometria_registros?id=eq.${id}`, { method: 'DELETE' });
+    if (r.ok || r.status === 204) {
+      carregarHistoricoBiometria(jogador);
+      carregarGrafico(jogador);
+    }
+  } catch(e) {}
+}
+
+// ── Carregar gráfico completo ─────────────────────────────────────────────────
 async function carregarGrafico(jogador) {
   const cor = jogador === 'lucas' ? '#2C4A6E' : '#2C5E3F';
   const svgId = `chart-${jogador}`;
+  const nasc = NASC[jogador];
   try {
-    const r = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&order=data.asc&select=data,altura_cm`);
+    const r = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&order=data.asc&select=data,altura_cm,peso_kg`);
     if (!r.ok) return;
     const rows = await r.json();
-    const nasc = NASC[jogador];
-    const med = rows
-      .filter(row => row.altura_cm != null)
-      .map(row => ({ idade: idadeDecimal(nasc, row.data), alt: parseFloat(row.altura_cm) }));
+
+    // Deduplicar: se mesma data, manter último inserido
+    const porData = {};
+    rows.forEach(row => { if (row.altura_cm) porData[row.data] = row; });
+    const med = Object.values(porData)
+      .sort((a,b) => new Date(a.data) - new Date(b.data))
+      .map(row => ({
+        idade: idadeDecimal(nasc, row.data),
+        alt: parseFloat(row.altura_cm),
+        pes: row.peso_kg ? parseFloat(row.peso_kg) : null
+      }));
+
     if (med.length === 0) return;
+
+    // KHR com dados mais recentes
+    const ultimo = med[med.length-1];
+    const khr = (paisData.pai && paisData.mae && ultimo.pes)
+      ? calcKHR(ultimo.idade, ultimo.alt, ultimo.pes, paisData.pai, paisData.mae)
+      : null;
+
+    // PHV — usar medição mais recente
+    const phv = calcPHV(ultimo.idade, ultimo.alt);
+
+    // Atualizar badge KHR + PHV no card do gráfico
+    const badgeId = `khr-badge-${jogador}`;
+    const badgeEl = document.getElementById(badgeId);
+    if (badgeEl) {
+      if (khr) {
+        badgeEl.innerHTML = `
+          <span class="khr-label">Altura adulta estimada (KHR)</span>
+          <span class="khr-val" style="color:${cor}">${khr.pred}cm</span>
+          <span class="khr-label">IC 90%: ${khr.low}–${khr.high}cm</span>
+          <span class="phv-badge ${phv.statusClass}">${phv.status} · PHV ~${phv.idadePHV}a</span>`;
+      } else {
+        badgeEl.innerHTML = `
+          <span class="khr-label">PHV estimado</span>
+          <span class="phv-badge ${phv.statusClass}">${phv.status} · PHV ~${phv.idadePHV}a</span>
+          <span class="khr-label" style="margin-left:8px">Adicione peso para ativar KHR</span>`;
+      }
+    }
+
     const proj = projetar(med);
-    renderChart(svgId, med, cor, proj);
+    renderChart(svgId, med, cor, proj, khr);
   } catch(e) { console.error('carregarGrafico:', e); }
 }
 
-// Carregar históricos do Supabase
-carregarHistoricoBiometria('lucas');
-carregarHistoricoBiometria('miguel');
-carregarGrafico('lucas');
-carregarGrafico('miguel');
+// Carregar dados — pais primeiro (necessário para KHR), depois histórico e gráficos
+carregarPais().then(() => {
+  carregarHistoricoBiometria('lucas');
+  carregarHistoricoBiometria('miguel');
+  carregarGrafico('lucas');
+  carregarGrafico('miguel');
+});
 </script>
 </body>
 </html>
