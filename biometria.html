@@ -820,13 +820,13 @@ async function salvarBiometria(jogador) {
 async function carregarHistoricoBiometria(jogador) {
   try {
     // Snapshot: queries independentes para pegar último valor não-nulo de cada campo
-    const rAlt = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&altura_cm=not.is.null&order=data.desc&limit=1&select=altura_cm`);
+    const rAlt = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&altura_cm=neq.null&order=data.desc&limit=1&select=altura_cm`);
     if (rAlt.ok) {
       const [altRow] = await rAlt.json();
       const el = document.getElementById(`snap-alt-${jogador}`);
       if (el && altRow?.altura_cm) el.textContent = altRow.altura_cm;
     }
-    const rPes = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&peso_kg=not.is.null&order=data.desc&limit=1&select=peso_kg`);
+    const rPes = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&peso_kg=neq.null&order=data.desc&limit=1&select=peso_kg`);
     if (rPes.ok) {
       const [pesRow] = await rPes.json();
       const el = document.getElementById(`snap-pes-${jogador}`);
