@@ -831,14 +831,13 @@ async function carregarHistoricoBiometria(jogador) {
     if (!tbody) return;
 
     // Calcular delta entre medições consecutivas
-    // Atualizar snapshot do topo com o dado mais recente
-    const mais_recente = rows[0];
-    if (mais_recente) {
-      const snapAlt = document.getElementById(`snap-alt-${jogador}`);
-      const snapPes = document.getElementById(`snap-pes-${jogador}`);
-      if (snapAlt && mais_recente.altura_cm) snapAlt.textContent = mais_recente.altura_cm;
-      if (snapPes && mais_recente.peso_kg) snapPes.textContent = mais_recente.peso_kg;
-    }
+    // Atualizar snapshot: busca o último valor conhecido de cada campo individualmente
+    const snapAlt = document.getElementById(`snap-alt-${jogador}`);
+    const snapPes = document.getElementById(`snap-pes-${jogador}`);
+    const ultimaAlt = rows.find(r => r.altura_cm);
+    const ultimoPes = rows.find(r => r.peso_kg);
+    if (snapAlt && ultimaAlt) snapAlt.textContent = ultimaAlt.altura_cm;
+    if (snapPes && ultimoPes) snapPes.textContent = ultimoPes.peso_kg;
 
     tbody.innerHTML = rows.map((row, i) => {
       const prox = rows[i + 1];
