@@ -323,6 +323,9 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
         <div style="display:flex;justify-content:space-between;padding:2px 44px 0;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);">
           <span>9a</span><span>10a</span><span>11a</span><span>12a</span><span>13a</span><span>14a</span><span>15a</span><span>16a</span><span>17a</span><span>18a</span>
         </div>
+        <div style="margin-top:8px;padding:8px 8px 0;border-top:1px solid rgba(0,0,0,0.06);font-family:'JetBrains Mono',monospace;font-size:7px;color:#9E9E9E;line-height:1.8;">
+          <strong>METODOLOGIA</strong> · Referência: OMS Growth Reference 2007 (meninos 5–19 anos) · Percentis P25/P50/P75 · Projeção: velocidade de crescimento das últimas 3 medições com desaceleração pós-PHV · Atualizado automaticamente a cada nova medição
+        </div>
       </div>
     </div>
 
@@ -526,6 +529,9 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
         <svg id="chart-miguel" viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;"></svg>
         <div style="display:flex;justify-content:space-between;padding:2px 44px 0;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);">
           <span>9a</span><span>10a</span><span>11a</span><span>12a</span><span>13a</span><span>14a</span><span>15a</span><span>16a</span><span>17a</span><span>18a</span>
+        </div>
+        <div style="margin-top:8px;padding:8px 8px 0;border-top:1px solid rgba(0,0,0,0.06);font-family:'JetBrains Mono',monospace;font-size:7px;color:#9E9E9E;line-height:1.8;">
+          <strong>METODOLOGIA</strong> · Referência: OMS Growth Reference 2007 (meninos 5–19 anos) · Percentis P25/P50/P75 · Projeção: velocidade de crescimento das últimas 3 medições com desaceleração pós-PHV · Atualizado automaticamente a cada nova medição
         </div>
       </div>
     </div>
@@ -898,153 +904,117 @@ const hoje = new Date().toISOString().slice(0, 10);
   if (el) el.value = hoje;
 });
 
-// ─── GRÁFICOS DE CRESCIMENTO ─────────────────────────────────────────────────
-(function() {
-  // Dados OMS meninos (altura mediana P25/P50/P75) por idade inteira 9–18
-  const WHO = {
-    // [idade, P25, P50, P75]
-    pts: [
-      [9,  127.2, 132.6, 138.2],
-      [10, 132.1, 137.8, 143.7],
-      [11, 137.0, 143.1, 149.5],
-      [12, 142.6, 149.1, 156.0],
-      [13, 149.0, 156.0, 163.2],
-      [14, 155.6, 162.6, 169.5],
-      [15, 160.8, 167.5, 174.1],
-      [16, 163.9, 170.5, 177.0],
-      [17, 165.4, 171.8, 178.2],
-      [18, 166.1, 172.3, 178.6],
-    ]
-  };
+// ─── GRÁFICOS DE CRESCIMENTO (lê do Supabase, atualiza a cada nova medição) ──
+// Datas de nascimento aproximadas para cálculo de idade
+const NASC = { lucas: new Date('2013-03-07'), miguel: new Date('2014-03-07') };
 
-  // Medições reais — idade em anos decimais (calculada a partir de 2026-03-27)
-  // Lucas: nascido ~Mar 2013 (13 anos)
-  // Miguel: nascido ~Mar 2014 (12 anos)
-  const lucasMed = [
-    { idade: 8.08,  alt: 134.0 }, // 29/04/2021
-    { idade: 10.65, alt: 152.0 }, // 24/11/2023
-    { idade: 11.88, alt: 160.0 }, // 14/02/2025
-    { idade: 12.26, alt: 164.3 }, // 04/07/2025
-    { idade: 12.81, alt: 166.3 }, // 20/01/2026
-    { idade: 13.00, alt: 168.8 }, // 07/03/2026
-  ];
-  const miguelMed = [
-    { idade: 7.08,  alt: 131.0 }, // 29/04/2021
-    { idade: 9.65,  alt: 147.0 }, // 24/11/2023
-    { idade: 10.88, alt: 150.7 }, // 14/02/2025
-    { idade: 11.26, alt: 154.0 }, // 04/07/2025
-    { idade: 11.81, alt: 158.2 }, // 20/01/2026
-    { idade: 12.00, alt: 160.5 }, // 07/03/2026
-  ];
+// Tabela OMS meninos [idade, P25, P50, P75] — fonte: WHO Growth Reference 2007
+const WHO_BOYS = [
+  [9,127.2,132.6,138.2],[10,132.1,137.8,143.7],[11,137.0,143.1,149.5],
+  [12,142.6,149.1,156.0],[13,149.0,156.0,163.2],[14,155.6,162.6,169.5],
+  [15,160.8,167.5,174.1],[16,163.9,170.5,177.0],[17,165.4,171.8,178.2],
+  [18,166.1,172.3,178.6],
+];
 
-  // Projeção linear simples: regressão das últimas 3 medições até 18 anos
-  function projetar(med, cor) {
-    const n = med.length;
-    const ultimas = med.slice(-3);
-    const x1 = ultimas[0].idade, y1 = ultimas[0].alt;
-    const x2 = ultimas[ultimas.length-1].idade, y2 = ultimas[ultimas.length-1].alt;
-    // Velocidade de crescimento (cm/ano)
-    const vel = (y2 - y1) / (x2 - x1);
-    // Desacelera progressivamente: PHV diminui após 14a
-    const pts = [];
-    let altAtual = y2;
-    let idadeAtual = x2;
-    while (idadeAtual < 18.1) {
-      pts.push({ idade: idadeAtual, alt: altAtual });
-      const fator = idadeAtual < 14 ? 1.0 : Math.max(0.05, 1 - (idadeAtual - 14) * 0.35);
-      altAtual += vel * fator * 0.25; // passo de 3 meses
-      idadeAtual += 0.25;
-    }
-    return pts;
+function idadeDecimal(dataNasc, dataMed) {
+  return (new Date(dataMed) - dataNasc) / (365.25 * 24 * 3600 * 1000);
+}
+
+function projetar(med) {
+  if (med.length < 2) return [];
+  const ultimas = med.slice(-3);
+  const x1 = ultimas[0].idade, y1 = ultimas[0].alt;
+  const x2 = ultimas[ultimas.length-1].idade, y2 = ultimas[ultimas.length-1].alt;
+  const vel = (y2 - y1) / (x2 - x1);
+  const pts = [];
+  let altAtual = y2, idadeAtual = x2;
+  while (idadeAtual < 18.1) {
+    pts.push({ idade: idadeAtual, alt: Math.round(altAtual * 10) / 10 });
+    const fator = idadeAtual < 14 ? 1.0 : Math.max(0.05, 1 - (idadeAtual - 14) * 0.35);
+    altAtual += vel * fator * 0.25;
+    idadeAtual += 0.25;
   }
+  return pts;
+}
 
-  function renderChart(svgId, med, cor, projecao) {
-    const svg = document.getElementById(svgId);
-    if (!svg) return;
-
-    const W = 620, H = 280;
-    const pad = { top: 16, right: 20, bottom: 10, left: 44 };
-    const chartW = W - pad.left - pad.right;
-    const chartH = H - pad.top - pad.bottom;
-
-    const minAge = 9, maxAge = 18;
-    const minH = 120, maxH = 195;
-
-    function xPos(idade) { return pad.left + (idade - minAge) / (maxAge - minAge) * chartW; }
-    function yPos(alt)   { return pad.top + (1 - (alt - minH) / (maxH - minH)) * chartH; }
-
-    let html = '';
-
-    // Grid horizontal
-    [130,140,150,160,170,180,190].forEach(h => {
-      const y = yPos(h);
-      html += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="#E8E3DB" stroke-width="1"/>`;
-      html += `<text x="${pad.left-6}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#9E9E9E">${h}</text>`;
-    });
-
-    // Grid vertical (por idade)
-    for (let a = minAge; a <= maxAge; a++) {
-      const x = xPos(a);
-      html += `<line x1="${x}" y1="${pad.top}" x2="${x}" y2="${H-pad.bottom}" stroke="#E8E3DB" stroke-width="1"/>`;
-    }
-
-    // Faixa P25–P75 (banda)
-    let bandPath = '';
-    let bandPathBack = '';
-    WHO.pts.forEach((d, i) => {
-      const x = xPos(d[0]), yTop = yPos(d[3]), yBot = yPos(d[1]);
-      if (i === 0) { bandPath += `M${x},${yTop}`; bandPathBack = `L${x},${yBot}`; }
-      else { bandPath += ` L${x},${yTop}`; bandPathBack = ` L${x},${yBot}` + bandPathBack; }
-    });
-    html += `<path d="${bandPath} ${bandPathBack} Z" fill="rgba(0,0,0,0.04)" stroke="none"/>`;
-
-    // P25 e P75 linhas tracejadas
-    ['p25','p75'].forEach((pct, pi) => {
-      const idx = pi === 0 ? 1 : 3;
-      const pts = WHO.pts.map(d => `${xPos(d[0])},${yPos(d[idx])}`).join(' ');
-      html += `<polyline points="${pts}" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-dasharray="4,3"/>`;
-    });
-
-    // P50 linha sólida
-    const p50pts = WHO.pts.map(d => `${xPos(d[0])},${yPos(d[2])}`).join(' ');
-    html += `<polyline points="${p50pts}" fill="none" stroke="#BBBBBB" stroke-width="1.5"/>`;
-
-    // Projeção (linha tracejada na cor do atleta)
-    if (projecao.length > 1) {
-      const projPts = projecao.map(d => `${xPos(d.idade)},${yPos(d.alt)}`).join(' ');
-      html += `<polyline points="${projPts}" fill="none" stroke="${cor}" stroke-width="2" stroke-dasharray="5,4" opacity="0.45"/>`;
-      // Altura adulta estimada no final
-      const last = projecao[projecao.length-1];
-      html += `<text x="${xPos(last.idade)-2}" y="${yPos(last.alt)-6}" font-family="JetBrains Mono,monospace" font-size="8" fill="${cor}" opacity="0.7" text-anchor="end">${Math.round(last.alt)}cm</text>`;
-    }
-
-    // Linha real do atleta
-    const realPts = med.map(d => `${xPos(d.idade)},${yPos(d.alt)}`).join(' ');
-    html += `<polyline points="${realPts}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
-
-    // Pontos reais
-    med.forEach((d, i) => {
-      const x = xPos(d.idade), y = yPos(d.alt);
-      html += `<circle cx="${x}" cy="${y}" r="4" fill="${cor}" stroke="white" stroke-width="1.5"/>`;
-      // Label na última medição
-      if (i === med.length - 1) {
-        html += `<text x="${x+7}" y="${y+4}" font-family="JetBrains Mono,monospace" font-size="9" fill="${cor}" font-weight="500">${d.alt}cm</text>`;
-      }
-    });
-
-    svg.innerHTML = html;
+function renderChart(svgId, med, cor, projecao) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const W = 620, H = 280;
+  const pad = { top: 16, right: 20, bottom: 10, left: 44 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+  const minAge = 9, maxAge = 18, minH = 120, maxH = 195;
+  const xP = a  => pad.left + (a - minAge) / (maxAge - minAge) * chartW;
+  const yP = h  => pad.top  + (1 - (h - minH) / (maxH - minH)) * chartH;
+  let html = '';
+  // Grid
+  [130,140,150,160,170,180,190].forEach(h => {
+    const y = yP(h);
+    html += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="#E8E3DB" stroke-width="1"/>`;
+    html += `<text x="${pad.left-6}" y="${y+4}" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="8" fill="#9E9E9E">${h}</text>`;
+  });
+  for (let a = minAge; a <= maxAge; a++) {
+    html += `<line x1="${xP(a)}" y1="${pad.top}" x2="${xP(a)}" y2="${H-pad.bottom}" stroke="#E8E3DB" stroke-width="1"/>`;
   }
+  // Banda P25–P75
+  let bp = '', bpb = '';
+  WHO_BOYS.forEach((d,i) => {
+    const x = xP(d[0]), yt = yP(d[3]), yb = yP(d[1]);
+    if (i===0){bp=`M${x},${yt}`;bpb=`L${x},${yb}`;}
+    else{bp+=` L${x},${yt}`;bpb=` L${x},${yb}`+bpb;}
+  });
+  html += `<path d="${bp} ${bpb} Z" fill="rgba(0,0,0,0.04)" stroke="none"/>`;
+  // P25, P75 tracejado
+  [1,3].forEach(idx => {
+    const pts = WHO_BOYS.map(d=>`${xP(d[0])},${yP(d[idx])}`).join(' ');
+    html += `<polyline points="${pts}" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-dasharray="4,3"/>`;
+  });
+  // P50 sólido
+  html += `<polyline points="${WHO_BOYS.map(d=>`${xP(d[0])},${yP(d[2])}`).join(' ')}" fill="none" stroke="#BBBBBB" stroke-width="1.5"/>`;
+  // Projeção
+  if (projecao.length > 1) {
+    html += `<polyline points="${projecao.map(d=>`${xP(d.idade)},${yP(d.alt)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="2" stroke-dasharray="5,4" opacity="0.4"/>`;
+    const last = projecao[projecao.length-1];
+    html += `<text x="${xP(last.idade)-4}" y="${yP(last.alt)-7}" font-family="JetBrains Mono,monospace" font-size="8" fill="${cor}" opacity="0.7" text-anchor="end">~${Math.round(last.alt)}cm</text>`;
+  }
+  // Linha real
+  if (med.length > 1) {
+    html += `<polyline points="${med.map(d=>`${xP(d.idade)},${yP(d.alt)}`).join(' ')}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+  // Pontos
+  med.forEach((d,i) => {
+    const x = xP(d.idade), y = yP(d.alt);
+    html += `<circle cx="${x}" cy="${y}" r="4" fill="${cor}" stroke="white" stroke-width="1.5"/>`;
+    if (i === med.length-1) {
+      html += `<text x="${x+7}" y="${y+4}" font-family="JetBrains Mono,monospace" font-size="9" fill="${cor}" font-weight="500">${d.alt}cm</text>`;
+    }
+  });
+  svg.innerHTML = html;
+}
 
-  const lucasProj  = projetar(lucasMed);
-  const miguelProj = projetar(miguelMed);
-
-  renderChart('chart-lucas',  lucasMed,  '#2C4A6E', lucasProj);
-  renderChart('chart-miguel', miguelMed, '#2C5E3F', miguelProj);
-})();
+async function carregarGrafico(jogador) {
+  const cor = jogador === 'lucas' ? '#2C4A6E' : '#2C5E3F';
+  const svgId = `chart-${jogador}`;
+  try {
+    const r = await sbFetch(`/rest/v1/biometria_registros?jogador=eq.${jogador}&order=data.asc&select=data,altura_cm`);
+    if (!r.ok) return;
+    const rows = await r.json();
+    const nasc = NASC[jogador];
+    const med = rows
+      .filter(row => row.altura_cm != null)
+      .map(row => ({ idade: idadeDecimal(nasc, row.data), alt: parseFloat(row.altura_cm) }));
+    if (med.length === 0) return;
+    const proj = projetar(med);
+    renderChart(svgId, med, cor, proj);
+  } catch(e) { console.error('carregarGrafico:', e); }
+}
 
 // Carregar históricos do Supabase
 carregarHistoricoBiometria('lucas');
 carregarHistoricoBiometria('miguel');
+carregarGrafico('lucas');
+carregarGrafico('miguel');
 </script>
 </body>
 </html>
