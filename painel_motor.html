@@ -485,11 +485,7 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
     <a href="index.html" class="back">← Treinos</a>
     <span class="top-title">Painel do Pai</span>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <span class="top-sem" id="tsem"></span>
-    <a href="saude.html" class="back" title="Painel de Saúde">🩺 Saúde</a>
-    <a href="biometria.html" class="back" title="Biometria &amp; PHV">📏 Biometria</a>
-  </div>
+  <span class="top-sem" id="tsem"></span>
 </div>
 <div class="tabs">
   <button class="tab lucas on" onclick="setP('lucas')">⚡ Lucas</button>
@@ -576,7 +572,6 @@ async function carregar(){
     const req=fetch(SB_URL+'/rest/v1/avaliacoes?select=*',{
       headers:{
         'apikey':SB_KEY,
-        
         'Accept':'application/json',
         'Content-Type':'application/json'
       }

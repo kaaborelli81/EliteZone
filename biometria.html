@@ -770,6 +770,26 @@ async function salvarBiometria(jogador) {
       throw new Error(msg);
     }
 
+    // Espelhar em localStorage biometria_v2 para motor/relatório lerem
+    try {
+      const lsRaw = localStorage.getItem('biometria_v2');
+      const ls = lsRaw ? JSON.parse(lsRaw) : { athletes: { lucas: {}, miguel: {} } };
+      if (!ls.athletes) ls.athletes = { lucas: {}, miguel: {} };
+      if (!ls.athletes[jogador]) ls.athletes[jogador] = {};
+      const ath = ls.athletes[jogador];
+      if (!ath.medicoes) ath.medicoes = [];
+      ath.medicoes.push({
+        data, semana,
+        altura_cm: altura, peso_kg: peso,
+        calcado, envergadura_cm: envergadura,
+        gordura_pct: gordura, palmo_cm: palmo,
+        imc, observacoes: obs,
+        criado_em: payload.criado_em
+      });
+      if (ath.medicoes.length > 50) ath.medicoes = ath.medicoes.slice(-50);
+      localStorage.setItem('biometria_v2', JSON.stringify(ls));
+    } catch(lsErr) { console.warn('Bridge localStorage falhou (nao-critico):', lsErr); }
+
     // Sucesso — feedback e limpeza
     setMsg(p+'-msg', '✓ Medição salva com sucesso! (IMC calculado: ' + imc + ')', 'ok');
     setBtn(p+'-btn', 'Salvo ✓', false);
