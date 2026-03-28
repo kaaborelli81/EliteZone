@@ -460,40 +460,70 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
         <div class="page-header-title">Qualidade do Sono</div>
       </div>
 
-      <div class="status-grid">
+      <div class="status-grid" id="sono-stats-lucas">
         <div class="status-item">
           <div class="status-lbl">Média semanal</div>
-          <div class="status-val ok">8.1h</div>
+          <div class="status-val" id="sono-media-lucas">—</div>
         </div>
         <div class="status-item">
           <div class="status-lbl">Melhor noite</div>
-          <div class="status-val">9.0h</div>
+          <div class="status-val" id="sono-melhor-lucas">—</div>
         </div>
         <div class="status-item">
           <div class="status-lbl">Pior noite</div>
-          <div class="status-val warn">6.5h</div>
+          <div class="status-val" id="sono-pior-lucas">—</div>
         </div>
       </div>
 
-      <div class="section-divider">Horas por noite — últimos 7 dias</div>
+      <div class="section-divider">Últimos registros</div>
       <div class="card">
         <div class="card-body">
-          <div class="sono-chart">
-            <div class="sono-bar" style="height:72%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEG<br>7.5h</div></div>
-            <div class="sono-bar" style="height:90%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">TER<br>9h</div></div>
-            <div class="sono-bar" style="height:82%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUA<br>8.5h</div></div>
-            <div class="sono-bar" style="height:64%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUI<br>6.5h</div></div>
-            <div class="sono-bar" style="height:79%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEX<br>8h</div></div>
-            <div class="sono-bar" style="height:88%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SÁB<br>9h</div></div>
-            <div class="sono-bar" style="height:82%"><div class="sono-bar-fill lucas-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">DOM<br>8.5h</div></div>
+          <div class="sono-chart" id="sono-chart-lucas">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);text-align:center;width:100%;padding:16px 0;">Nenhum registro ainda. Use o formulário abaixo.</div>
           </div>
-
-          <div class="highlight-block" style="margin-bottom:0">
+          <div class="highlight-block" style="margin-bottom:0;margin-top:12px;">
             <div class="highlight-label">Protocolo de sono</div>
             <div class="highlight-text">
-              Meta: <strong>9h/noite</strong>. Horário ideal dormir: <strong>21h30</strong>. Sem telas 1h antes. Quarto escuro e fresco. Quinta com déficit — correlacionar com rendimento de sexta.
+              Meta: <strong>9h/noite</strong>. Horário ideal dormir: <strong>21h30</strong>. Sem telas 1h antes. Quarto escuro e fresco.
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="section-divider">Registrar noite de sono</div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Nova entrada de sono</span>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Data</label>
+              <input type="date" id="ls-data" class="form-input">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Horas dormidas</label>
+              <input type="number" id="ls-horas" class="form-input" placeholder="8.5" min="3" max="14" step="0.5">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Qualidade subjetiva</label>
+              <select id="ls-qualidade" class="form-select">
+                <option value="5">Ótima</option>
+                <option value="4">Boa</option>
+                <option value="3" selected>Regular</option>
+                <option value="2">Ruim</option>
+                <option value="1">Muito ruim</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Observação</label>
+              <input type="text" id="ls-obs" class="form-input" placeholder="Opcional">
+            </div>
+          </div>
+          <div id="ls-msg" class="form-msg"></div>
+          <button class="form-btn" id="ls-btn" onclick="salvarSono('lucas')" style="background:var(--ldim);border-color:var(--lb);color:var(--lucas);">Salvar Sono</button>
         </div>
       </div>
     </div>
@@ -832,35 +862,66 @@ body{background:var(--bg);color:var(--tp);font-family:'DM Sans',sans-serif;font-
       <div class="status-grid">
         <div class="status-item">
           <div class="status-lbl">Média semanal</div>
-          <div class="status-val ok">8.4h</div>
+          <div class="status-val" id="sono-media-miguel">—</div>
         </div>
         <div class="status-item">
           <div class="status-lbl">Melhor noite</div>
-          <div class="status-val">9.5h</div>
+          <div class="status-val" id="sono-melhor-miguel">—</div>
         </div>
         <div class="status-item">
           <div class="status-lbl">Pior noite</div>
-          <div class="status-val ok">7.5h</div>
+          <div class="status-val" id="sono-pior-miguel">—</div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-body">
-          <div class="sono-chart">
-            <div class="sono-bar" style="height:80%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEG<br>8h</div></div>
-            <div class="sono-bar" style="height:95%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">TER<br>9.5h</div></div>
-            <div class="sono-bar" style="height:80%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUA<br>8h</div></div>
-            <div class="sono-bar" style="height:75%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">QUI<br>7.5h</div></div>
-            <div class="sono-bar" style="height:85%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SEX<br>8.5h</div></div>
-            <div class="sono-bar" style="height:88%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">SÁB<br>9h</div></div>
-            <div class="sono-bar" style="height:82%"><div class="sono-bar-fill miguel-bar-fill" style="height:100%"></div><div class="sono-bar-lbl">DOM<br>8.5h</div></div>
+          <div class="sono-chart" id="sono-chart-miguel">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);text-align:center;width:100%;padding:16px 0;">Nenhum registro ainda. Use o formulário abaixo.</div>
           </div>
-          <div class="highlight-block" style="margin-bottom:0">
+          <div class="highlight-block" style="margin-bottom:0;margin-top:12px;">
             <div class="highlight-label">Protocolo de sono — goleiro</div>
             <div class="highlight-text">
               Meta: <strong>9h/noite</strong>. Lembrete: goleiro tem mais carga cognitiva pós-jogo — 30min de relaxamento antes de dormir. Evitar análises de vídeo perto do horário de dormir.
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="section-divider">Registrar noite de sono</div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Nova entrada de sono</span>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Data</label>
+              <input type="date" id="ms-data" class="form-input">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Horas dormidas</label>
+              <input type="number" id="ms-horas" class="form-input" placeholder="8.5" min="3" max="14" step="0.5">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label">Qualidade subjetiva</label>
+              <select id="ms-qualidade" class="form-select">
+                <option value="5">Ótima</option>
+                <option value="4">Boa</option>
+                <option value="3" selected>Regular</option>
+                <option value="2">Ruim</option>
+                <option value="1">Muito ruim</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Observação</label>
+              <input type="text" id="ms-obs" class="form-input" placeholder="Opcional">
+            </div>
+          </div>
+          <div id="ms-msg" class="form-msg"></div>
+          <button class="form-btn" id="ms-btn" onclick="salvarSono('miguel')" style="background:var(--mdim);border-color:var(--mb);color:var(--miguel);">Salvar Sono</button>
         </div>
       </div>
     </div>
@@ -1059,6 +1120,132 @@ function setBtn(id, text, disabled) {
   el.disabled = disabled;
 }
 
+// ─── SONO — localStorage key: mental_semanal ────────────────────────────────
+
+function lerSono(jogador) {
+  try {
+    const raw = localStorage.getItem('mental_semanal');
+    const data = raw ? JSON.parse(raw) : {};
+    return (data[jogador]?.sono || []);
+  } catch(e) { return []; }
+}
+
+function gravarSono(jogador, registros) {
+  try {
+    const raw = localStorage.getItem('mental_semanal');
+    const data = raw ? JSON.parse(raw) : {};
+    if (!data[jogador]) data[jogador] = {};
+    data[jogador].sono = registros;
+    localStorage.setItem('mental_semanal', JSON.stringify(data));
+  } catch(e) { console.warn('Erro ao gravar sono:', e); }
+}
+
+function renderSonoChart(jogador, registros) {
+  const chartEl = document.getElementById('sono-chart-' + jogador);
+  const mediaEl = document.getElementById('sono-media-' + jogador);
+  const melhorEl = document.getElementById('sono-melhor-' + jogador);
+  const piorEl = document.getElementById('sono-pior-' + jogador);
+  if (!chartEl) return;
+
+  if (!registros || registros.length === 0) {
+    chartEl.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--td);text-align:center;width:100%;padding:16px 0;">Nenhum registro ainda. Use o formulário abaixo.</div>';
+    if (mediaEl) mediaEl.textContent = '—';
+    if (melhorEl) melhorEl.textContent = '—';
+    if (piorEl) piorEl.textContent = '—';
+    return;
+  }
+
+  // Pegar últimos 7 registros
+  const ultimos = registros.slice(-7);
+  const horas = ultimos.map(r => parseFloat(r.horas));
+  const maxH = Math.max(...horas, 10); // escala máxima
+
+  const diasSemana = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+  const fillClass = jogador === 'lucas' ? 'lucas-bar-fill' : 'miguel-bar-fill';
+
+  chartEl.innerHTML = ultimos.map(r => {
+    const h = parseFloat(r.horas);
+    const pct = Math.round((h / maxH) * 100);
+    const d = new Date(r.data + 'T12:00:00');
+    const diaNome = diasSemana[d.getDay()];
+    const cor = h >= 8.5 ? 'var(--ok)' : h >= 7 ? '' : 'var(--danger)';
+    return `<div class="sono-bar" style="height:${pct}%" title="${r.data}${r.obs ? ' — ' + r.obs : ''}">
+      <div class="sono-bar-fill ${fillClass}" style="height:100%;${cor ? 'background:' + cor : ''}"></div>
+      <div class="sono-bar-lbl">${diaNome}<br>${h}h</div>
+    </div>`;
+  }).join('');
+
+  // Stats
+  const media = horas.reduce((a,b) => a+b, 0) / horas.length;
+  const melhor = Math.max(...horas);
+  const pior = Math.min(...horas);
+  const classeMedia = media >= 8.5 ? 'ok' : media >= 7 ? 'warn' : 'danger';
+  const classePior = pior >= 7 ? 'ok' : pior >= 6 ? 'warn' : 'danger';
+
+  if (mediaEl) { mediaEl.textContent = media.toFixed(1) + 'h'; mediaEl.className = 'status-val ' + classeMedia; }
+  if (melhorEl) { melhorEl.textContent = melhor.toFixed(1) + 'h'; }
+  if (piorEl) { piorEl.textContent = pior.toFixed(1) + 'h'; piorEl.className = 'status-val ' + classePior; }
+}
+
+function carregarSono(jogador) {
+  const registros = lerSono(jogador);
+  renderSonoChart(jogador, registros);
+}
+
+function salvarSono(jogador) {
+  const pref = jogador === 'lucas' ? 'l' : 'm';
+  const dataEl = document.getElementById(pref + 's-data');
+  const horasEl = document.getElementById(pref + 's-horas');
+  const qualEl = document.getElementById(pref + 's-qualidade');
+  const obsEl = document.getElementById(pref + 's-obs');
+  const msgEl = document.getElementById(pref + 's-msg');
+  const btnEl = document.getElementById(pref + 's-btn');
+
+  const data = dataEl?.value;
+  const horas = parseFloat(horasEl?.value);
+  const qualidade = parseInt(qualEl?.value) || 3;
+  const obs = obsEl?.value?.trim() || '';
+
+  if (!data) {
+    if (msgEl) { msgEl.textContent = '⚠ Preencha a data.'; msgEl.className = 'form-msg err'; }
+    return;
+  }
+  if (isNaN(horas) || horas < 3 || horas > 14) {
+    if (msgEl) { msgEl.textContent = '⚠ Horas inválidas (3–14).'; msgEl.className = 'form-msg err'; }
+    return;
+  }
+
+  const registros = lerSono(jogador);
+
+  // Evitar duplicata no mesmo dia
+  const idx = registros.findIndex(r => r.data === data);
+  const novo = { data, horas, qualidade, obs, criado_em: new Date().toISOString() };
+  if (idx >= 0) {
+    registros[idx] = novo; // sobrescreve
+  } else {
+    registros.push(novo);
+  }
+
+  // Manter máximo 90 registros
+  if (registros.length > 90) registros.splice(0, registros.length - 90);
+
+  // Ordenar por data
+  registros.sort((a, b) => a.data.localeCompare(b.data));
+
+  gravarSono(jogador, registros);
+  renderSonoChart(jogador, registros);
+
+  if (msgEl) { msgEl.textContent = '✓ Sono registrado!'; msgEl.className = 'form-msg ok'; }
+  if (btnEl) { btnEl.textContent = 'Salvo ✓'; }
+  if (horasEl) horasEl.value = '';
+  if (obsEl) obsEl.value = '';
+
+  setTimeout(() => {
+    if (msgEl) { msgEl.textContent = ''; msgEl.className = 'form-msg'; }
+    if (btnEl) { btnEl.textContent = 'Salvar Sono'; }
+  }, 2500);
+}
+
 // ─── SALVAR SAÚDE (lesão / queixa) ───────────────────────────────────────────
 async function salvarSaude(jogador) {
   const p = jogador === 'lucas' ? 'l' : 'm';
@@ -1107,6 +1294,17 @@ async function salvarSaude(jogador) {
       const msg = result?.message || result?.hint || result?.details || JSON.stringify(result);
       throw new Error(msg);
     }
+
+    // Sucesso — espelhar em mental_semanal localStorage para o motor ler
+    try {
+      const msRaw = localStorage.getItem('mental_semanal');
+      const ms = msRaw ? JSON.parse(msRaw) : {};
+      if (!ms[jogador]) ms[jogador] = {};
+      if (!ms[jogador].lesoes) ms[jogador].lesoes = [];
+      ms[jogador].lesoes.push(payload);
+      if (ms[jogador].lesoes.length > 50) ms[jogador].lesoes = ms[jogador].lesoes.slice(-50);
+      localStorage.setItem('mental_semanal', JSON.stringify(ms));
+    } catch(lsErr) { console.warn('Bridge mental_semanal lesao falhou (nao-critico):', lsErr); }
 
     // Sucesso
     setMsg(p+'-msg', '✓ Registro salvo com sucesso!', 'ok');
@@ -1194,7 +1392,7 @@ switchSection('visao-geral');
 
 // Preencher data de hoje nos formulários
 const hoje = new Date().toISOString().slice(0,10);
-['l-data','m-data'].forEach(id => {
+['l-data','m-data','ls-data','ms-data'].forEach(id => {
   const el = document.getElementById(id);
   if(el) el.value = hoje;
 });
@@ -1202,6 +1400,10 @@ const hoje = new Date().toISOString().slice(0,10);
 // Carregar históricos do Supabase ao iniciar
 carregarHistoricoSaude('lucas');
 carregarHistoricoSaude('miguel');
+
+// Carregar sono do localStorage
+carregarSono('lucas');
+carregarSono('miguel');
 </script>
 </body>
 </html>
