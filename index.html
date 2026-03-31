@@ -182,6 +182,9 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
     <a href="painel_motor.html?view=mental&sw=atleta" style="display:inline-flex;align-items:center;gap:8px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;padding:8px 0;transition:color 0.2s;" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-dim)'">
       🧠 olhar do atleta
     </a>
+    <a href="relatorio_medico.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;padding:8px 0;transition:color 0.2s;" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-dim)'">
+      📋 relatório médico
+    </a>
   </div>
 </div>
 
@@ -192,18 +195,21 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
       <span class="topbar-name" id="topbar-name">Lucas</span>
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
-      <span class="topbar-day" id="topbar-day">S1</span>
+      <span class="topbar-day" id="topbar-day">Segunda</span>
       <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
   </div>
   <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
   <div class="training-layout">
     <nav class="sidebar" id="sidebar">
-      <div class="sidebar-label">// sessões da semana</div>
-      <button class="day-btn" onclick="selectDay(0)"><span class="day-btn-number">S1</span><span class="day-btn-label">Sessão 1</span><span class="day-btn-dot"></span></button>
-      <button class="day-btn" onclick="selectDay(1)"><span class="day-btn-number">S2</span><span class="day-btn-label">Sessão 2</span><span class="day-btn-dot"></span></button>
-      <button class="day-btn" onclick="selectDay(2)"><span class="day-btn-number">S3</span><span class="day-btn-label">Sessão 3</span><span class="day-btn-dot"></span></button>
-      <button class="day-btn" onclick="selectDay(3)"><span class="day-btn-number">S4</span><span class="day-btn-label">Sessão 4</span><span class="day-btn-dot"></span></button>
+      <div class="sidebar-label">// dias da semana</div>
+      <button class="day-btn" onclick="selectDay(0)"><span class="day-btn-number">01</span><span class="day-btn-label">Segunda</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(1)"><span class="day-btn-number">02</span><span class="day-btn-label">Terça</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(2)"><span class="day-btn-number">03</span><span class="day-btn-label">Quarta</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(3)"><span class="day-btn-number">04</span><span class="day-btn-label">Quinta</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(4)"><span class="day-btn-number">05</span><span class="day-btn-label">Sexta</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn" onclick="selectDay(5)"><span class="day-btn-number">06</span><span class="day-btn-label">Sábado</span><span class="day-btn-dot"></span></button>
+      <button class="day-btn domingo" onclick="selectDay(6)"><span class="day-btn-number">07</span><span class="day-btn-label">Domingo</span><span class="day-btn-dot"></span></button>
     </nav>
     <main class="main-content" id="main-content"></main>
   </div>
@@ -343,6 +349,80 @@ const LUCAS=[
     finalizacao:"Alongamento: isquiotibiais + panturrilha + quadril, 30s cada",
     dica_dia:"💡 No tiro: VAI COM TUDO. 6 vezes com 100% vale mais que 10 com 70%."
   },
+  { // SEXTA — Pliometria + Toque Avançado + Proteção de Bola
+    tema:"⚡ Pliometria + Toque Avançado + Proteção",
+    foco:"Explosão, dribles nível 2 e uso do corpo em duelos (novo)",
+    aquecimento:"5 min: corrida leve + skipping + 10 rotações de tornozelo",
+    exercicios:[
+      {id:"sx1", nome:"High Knee Wall Sprint", volume:"3 séries × 15s | Descanso: 40s",
+        instrucoes:["Igual ao Low Wall Sprint, mas agora os joelhos sobem MAIS alto.","Corpo inclinado na parede (45°), joelhos sobem até a altura do quadril.","Máxima velocidade possível pelos 15 segundos inteiros."],
+        dica:"Joelhos até a altura do quadril — mais alto que o Low Wall Sprint", url:yt(V1,13), ts:"V1 → 0:13"},
+      {id:"sx2", nome:"Plyometrics Fast Switch", volume:"3 séries × 20s | Descanso: 45s",
+        instrucoes:["Em pé, levanta levemente um joelho. Troca de perna o mais rápido possível.","Não é corrida normal — são trocas RÁPIDAS com pouco movimento vertical.","Pensa que está sobre brasas: toca o chão e sai imediatamente."],
+        dica:"Quanto mais rápida a troca, melhor — pés quase não tocam o chão", url:yt(V1,41), ts:"V1 → 0:41"},
+      {id:"sx3", nome:"Condução em 8 nos cones", volume:"5 percursos completos por pé | Descanso: 20s",
+        instrucoes:["2 cones com 2m de distância. Conduz a bola em formato de 8 ao redor deles.","Toque suave — a bola nunca fica a mais de 1 passo de distância.","Faz com o pé dominante, depois repete com o outro."],
+        dica:"Bola sempre perto — 1 passo de distância no máximo", url:null, ts:null},
+      {id:"sx4", nome:"La Croqueta in Motion", volume:"3 séries × 10m | Descanso: 30s",
+        instrucoes:["Igual à La Croqueta parada, mas agora em deslocamento para frente.","A sola empurra a bola, o outro pé recebe e você avança 1 passo.","10m para frente sem parar o ritmo de toques."],
+        dica:"Finges para um lado com o ombro antes do movimento", url:yt(V2,25), ts:"V2 → 0:25"},
+      {id:"sx5", nome:"Finta + aceleração", volume:"3 séries × 6 fintas por lado | Descanso: 30s",
+        instrucoes:["Conduz a bola devagar. Faz movimento de corpo para a DIREITA (inclina ombro, olha pro lado).","Mas leva a bola para a ESQUERDA — V Cut Outside.","Depois do corte, EXPLODE com 3 passos rápidos. Repete para o outro lado."],
+        dica:"A finta vale pelo corpo todo — ombro, quadril e olhar", url:yt(V3,33), ts:"V3 → 0:33"},
+      {id:"sx6", nome:"Proteção de bola com quadril baixo — duelos", volume:"5 duelos × 30s | Descanso: 30s",
+        instrucoes:["Com bola, um parceiro tenta roubá-la. Lucas protege usando o corpo — NÃO as pernas.","Regra: quadril baixo (flexiona o joelho), ombro entre você e o adversário.","Objetivo: segurar 20s sem perder. Não foge — firma o corpo."],
+        dica:"Quadril baixo = centro de gravidade baixo = mais difícil de derrubar",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento: quadríceps + lombar + tornozelo, 30s cada",
+    dica_dia:"💡 A finta real não é o movimento — é você fazer o adversário acreditar."
+  },
+  { // SÁBADO — Circuito Completo
+    tema:"🏆 Circuito Completo",
+    foco:"Tudo junto — intensidade total e scanning em cada exercício",
+    aquecimento:"5 min: corrida leve + skipping + 5 agachamentos explosivos",
+    exercicios:[
+      {id:"sb1", nome:"Ventral Hops", volume:"3 séries × 10s cada perna | Descanso: 40s",
+        instrucoes:["Em pé numa perna só. Salta para frente e aterrissa na mesma perna.","Cada salto vai um pouco mais longe. Alterna: 10s na direita, 10s na esquerda.","Aterrissa suave — dobra o joelho ao pousar, não trava a perna."],
+        dica:"Aterrissagem suave como gato — amortece com o joelho", url:yt(V1,45), ts:"V1 → 0:45"},
+      {id:"sb2", nome:"Max Intent La Croqueta", volume:"3 séries × 20s | Descanso: 30s",
+        instrucoes:["É a La Croqueta na velocidade MÁXIMA que você consegue.","Sola empurra, pé recebe. O mais rápido possível pelos 20 segundos.","Sábado é intensidade total — sem ritmo moderado."],
+        dica:"Hoje é intensidade máxima — sem ritmo moderado", url:yt(V2,33), ts:"V2 → 0:33"},
+      {id:"sb3", nome:"Sole Rolls", volume:"3 séries × 30s | Descanso: 20s",
+        instrucoes:["Rola a sola do pé PARA FRENTE sobre a bola, depois PARA TRÁS.","Alterna os dois pés: direito rola para frente, esquerdo rola para trás.","Aumenta a velocidade a cada 10 segundos."],
+        dica:"Velocidade crescente ao longo das 3 séries", url:yt(V3,25), ts:"V3 → 0:25"},
+      {id:"sb4", nome:"Two Touches Passing (parede)", volume:"3 séries × 12 toques | Descanso: 25s",
+        instrucoes:["Chuta na parede. Quando volta, 1º toque CONTROLA a bola.","2º toque CHUTA de volta na parede. Não para entre os toques.","Sequência contínua: chuta → controla → chuta → controla."],
+        dica:"1º toque posiciona, 2º toque finaliza — sem pausa", url:yt(V4,29), ts:"V4 → 0:29"},
+      {id:"sb5", nome:"Air Ball Control (parede)", volume:"2 séries × 8 controles | Descanso: 30s",
+        instrucoes:["Chuta na parede COM FORÇA. A bola vai voltar rápido e no ar.","Tenta controlar ela ANTES de ela quicar no chão.","Usa o peito do pé, interno ou externo — o que vier natural."],
+        dica:"Posiciona o corpo antes da bola chegar — não corre atrás", url:yt(V4,25), ts:"V4 → 0:25"},
+      {id:"sb6", nome:"Circuito tático — scanning em tudo", volume:"10 min | Com parceiro",
+        instrucoes:["Mistura: passe + scanning obrigatório + desmarcação diagonal + proteção de bola.","Regra do dia: em TODO exercício com bola, fazer scanning antes de tocar.","Sábado é onde os hábitos da semana viram automáticos."],
+        dica:"Scanning antes de CADA toque — hoje não é exercício, é padrão",
+        url:null, ts:null, tatico:true},
+    ],
+    finalizacao:"Alongamento completo: pernas + costas + ombros, 45s cada",
+    dica_dia:"💡 Sábado é o dia de MEDIR. Você está melhor que semana passada?"
+  },
+  { // DOMINGO — Recuperação
+    tema:"🧘 Recuperação Ativa",
+    foco:"Manter o corpo em movimento sem desgastar",
+    aquecimento:"Não precisa — o domingo já é o aquecimento",
+    exercicios:[
+      {id:"d1", nome:"Condução livre com variações", volume:"10 minutos contínuos | Sem pausa",
+        instrucoes:["Conduz a bola pelo espaço no ritmo que quiser.","De vez em quando testa: In-Soul Rolls, Sole Rolls, L Drags — sem pressa.","Não é treino — é brincadeira. Explora o que aprendeu na semana."],
+        dica:"Domingo é exploração, não pressão", url:yt(V3,5), ts:"V3 → 0:05 — escolha"},
+      {id:"d2", nome:"Croquettes in Place (leve)", volume:"3 × 30s devagar | Descanso livre",
+        instrucoes:["A mesma Croqueta da semana, mas bem devagar.","Foca no toque perfeito — bola sempre no centro, peso equilibrado.","Não pensa em velocidade. Pensa em capricho."],
+        dica:"Foca no toque perfeito, não na velocidade", url:yt(V2,5), ts:"V2 → 0:05"},
+      {id:"d3", nome:"Alongamento completo", volume:"30–35s por grupo muscular | Sem pressa",
+        instrucoes:["Panturrilha → quadríceps → isquiotibial → quadril → lombar → ombros.","30 segundos em cada músculo. Respira fundo e solta devagar.","Não força com dor. Relaxa na expiração — o músculo cede sozinho."],
+        dica:"Respira fundo em cada posição — músculos relaxam na expiração", url:null, ts:null},
+    ],
+    finalizacao:"Beba água, descanse. Semana que vem começa mais forte.",
+    dica_dia:"💡 Seu corpo cresce no descanso. Domingo é parte do treino."
+  },
 ];
 
 const MIGUEL=[
@@ -378,10 +458,32 @@ const MIGUEL=[
       {id:"mqi4",nome:"Inside-Sole",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Com a bola parada, toca ela com a parte INTERNA do pé.","Depois coloca a SOLA em cima. Alterna os dois pés sem parar.","Ritmo crescente: começa devagar, acelera a cada 10 segundos."],dica:"Mantém o equilíbrio mesmo em ritmo rápido",url:yt(V3,29),ts:"V3 → 0:29"},
       {id:"mqi5",nome:"Sole Stepovers",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Com a bola parada, passa a perna por CIMA dela (stepover) com o pé direito.","A perna passa por cima sem tocar na bola. Depois faz o mesmo com a esquerda.","Alterna os dois pés em ritmo constante."],dica:"Goleiro que domina stepover tem confiança total nos pés",url:yt(V3,41),ts:"V3 → 0:41"},
     ],finalizacao:"Alongamento profundo: quadril + virilha + coluna, 40s cada",dica_dia:"💡 O espacate não é show — é alcançar aquela bola no canto que parecia impossível."},
+  {tema:"⚡ Pliometria + Toque Avançado",foco:"Explosão + controle fino de bola",aquecimento:"5 min: corrida leve + skipping + 10 rotações de tornozelo",
+    exercicios:[
+      {id:"msx1",nome:"High Knee Wall Sprint",volume:"3 séries × 15s | Descanso: 40s",instrucoes:["Mãos na parede (45°). Joelhos sobem até o quadril — mais alto que o Low Wall Sprint.","Velocidade máxima pelos 15 segundos.","É o sprint mais intenso da semana."],dica:"Joelhos até o quadril — mais alto que antes",url:yt(V1,13),ts:"V1 → 0:13"},
+      {id:"msx2",nome:"Croquettes in Motion",volume:"3 séries × 10m | Descanso: 30s",instrucoes:["Croqueta em deslocamento: bola vai de pé em pé enquanto você anda.","Faz 10m com o pé dominante, depois 10m com o outro.","Goleiro precisa dos dois pés para distribuir em qualquer direção."],dica:"Treina os dois pés — goleiro distribui para qualquer lado",url:yt(V2,17),ts:"V2 → 0:17"},
+      {id:"msx3",nome:"Max Intent La Croqueta",volume:"3 séries × 20s | Descanso: 30s",instrucoes:["La Croqueta na velocidade MÁXIMA possível.","Sola empurra, pé recebe. O mais rápido que conseguir por 20 segundos.","Goleiro que tem pés rápidos distribui mais rápido."],dica:"Velocidade máxima de pés — sem ritmo moderado",url:yt(V2,33),ts:"V2 → 0:33"},
+      {id:"msx4",nome:"Air Ball Control (avançado)",volume:"2 séries × 10 controles | Descanso: 30s",instrucoes:["Agora chuta MAIS FORTE e de mais longe (3m).","Controla no ar — sem deixar quicar.","Depois de controlar, imediatamente dá o passe de volta na parede (1 toque)."],dica:"Controla e já distribui — como no jogo real",url:yt(V4,25),ts:"V4 → 0:25"},
+      {id:"msx5",nome:"Two Touches Passing (parede)",volume:"3 séries × 12 toques | Descanso: 25s",instrucoes:["Chuta na parede. 1º toque CONTROLA. 2º toque CHUTA de volta.","Não para entre os dois toques. Sequência contínua.","Simula o goleiro que pega a bola e distribui rápido para o time."],dica:"1º posiciona, 2º distribui — sem pausa entre eles",url:yt(V4,29),ts:"V4 → 0:29"},
+    ],finalizacao:"Alongamento: pernas + costas + ombros, 40s cada",dica_dia:"💡 Sexta é o dia de combinar tudo. Físico + técnica = goleiro completo."},
+  {tema:"🏆 Circuito Completo (Goleiro)",foco:"Juntar tudo da semana em sequência real",aquecimento:"5 min: pulos + deslocamento lateral + passes na parede",
+    exercicios:[
+      {id:"msb1",nome:"Ventral Hops",volume:"3 séries × 10s cada | Descanso: 40s",instrucoes:["Em pé numa perna. Salta para frente, aterrissa na mesma perna.","10 segundos no pé direito, 10 no esquerdo.","Sábado = intensidade máxima em tudo."],dica:"Aterrissagem suave — amortece com o joelho",url:yt(V1,45),ts:"V1 → 0:45"},
+      {id:"msb2",nome:"Max Intent La Croqueta",volume:"3 séries × 20s | Descanso: 30s",instrucoes:["La Croqueta na velocidade MÁXIMA possível.","Sola empurra, pé recebe. O mais rápido que conseguir por 20 segundos.","Goleiro que tem pés rápidos distribui mais rápido."],dica:"Velocidade máxima de pés — sem ritmo moderado",url:yt(V2,33),ts:"V2 → 0:33"},
+      {id:"msb3",nome:"Croquettes in Motion",volume:"3 séries × 10m | Descanso: 30s",instrucoes:["Croqueta em deslocamento por 10m com o pé dominante, depois 10m com o outro.","Goleiro precisa dos dois pés para distribuir em qualquer direção."],dica:"Treina os dois pés — goleiro distribui em qualquer direção",url:yt(V2,17),ts:"V2 → 0:17"},
+      {id:"msb4",nome:"Sole Rolls",volume:"3 séries × 30s | Descanso: 20s",instrucoes:["Rola a sola do pé para frente e para trás sobre a bola.","Alterna os dois pés. Aumenta a velocidade a cada série.","Última série em velocidade máxima."],dica:"Velocidade máxima na última série",url:yt(V3,25),ts:"V3 → 0:25"},
+      {id:"msb5",nome:"Giro no chão + levantada",volume:"2 séries × 5 giros por lado | Descanso: 30s",instrucoes:["Deita de lado. Rola lateralmente até a posição de barriga para baixo.","Continua rolando e levanta EXPLOSIVO em posição de goleiro.","A levantada tem que ser o mais rápida possível — mede a evolução."],dica:"A levantada rápida é o objetivo — cronometra para ver a melhora",url:null,ts:null},
+    ],finalizacao:"Alongamento completo: pernas + quadril + ombros + pescoço, 45s",dica_dia:"💡 Sábado é onde o goleiro mede a semana. Você evoluiu?"},
+  {tema:"🧘 Recuperação Ativa",foco:"Descanso inteligente — o corpo cresce agora",aquecimento:"Não precisa",
+    exercicios:[
+      {id:"md1",nome:"Condução leve com bola",volume:"10 minutos | Sem pressão",instrucoes:["Conduz a bola devagar pelo espaço. Sem pressa, sem competição.","De vez em quando experimenta: In-Soul Rolls, Sole Rolls — o que quiser.","Domingo é brincadeira. Explora o que aprendeu na semana."],dica:"Domingo é exploração, não treino",url:yt(V3,5),ts:"V3 → 0:05 — escolha"},
+      {id:"md2",nome:"Passes leves (parede)",volume:"10 minutos | Sem pausa obrigatória",instrucoes:["Fica a 2m da parede. Passa a bola suavemente com o pé direito.","Quando volta, controla com o pé esquerdo e devolve.","Sem pressa. Foca em capricho — toque limpo e controlado."],dica:"Foca no toque perfeito — qualidade, não velocidade",url:yt(V4,5),ts:"V4 → 0:05"},
+      {id:"md3",nome:"Alongamento completo",volume:"35s por grupo | Sem pressa",instrucoes:["Pescoço → ombros → costas → quadril → pernas. 35s em cada.","Respira fundo em cada posição. Na expiração, o músculo relaxa sozinho.","Não força. Se doer, recua um pouco."],dica:"Músculo relaxa na expiração — respira fundo em cada posição",url:null,ts:null},
+    ],finalizacao:"Descansou, recuperou. Amanhã começa mais forte.",dica_dia:"💡 Goleiro descansado reage mais rápido. Domingo é parte do treino."},
 ];
 
 let currentPlayer=null,currentDay=0;
-const DAYS=["S1","S2","S3","S4"];
+const DAYS=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
 
 function selectPlayer(player){
   currentPlayer=player;currentDay=0;
