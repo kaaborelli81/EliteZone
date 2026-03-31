@@ -182,9 +182,6 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
     <a href="painel_motor.html?view=mental&sw=atleta" style="display:inline-flex;align-items:center;gap:8px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;padding:8px 0;transition:color 0.2s;" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-dim)'">
       🧠 olhar do atleta
     </a>
-    <a href="relatorio_medico.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;padding:8px 0;transition:color 0.2s;" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-dim)'">
-      📋 relatório médico
-    </a>
   </div>
 </div>
 
@@ -648,7 +645,12 @@ const SUPABASE_URL='https://dxqsjkvpzdvzyqfwcpro.supabase.co';
 const SUPABASE_KEY='sb_publishable_hLGKARCdEPRZfEWaNhg71A_-8LKa3tO';
 // YT_CLIENT_ID removido do código — módulo YouTube pendente de implementação
 // IDs das playlists criadas no YouTube
-const PLAYLISTS={lucas:'PLKpuwkMh4nD1NOfxILX3ZIAfutb8VQGia',miguel:'PLKpuwkMh4nD0Kg20rL5fSkTP-Fn8fb2Ac'};
+const PLAYLISTS={
+  lucas:'PLKpuwkMh4nD1NOfxILX3ZIAfutb8VQGia',
+  miguel:'PLKpuwkMh4nD0Kg20rL5fSkTP-Fn8fb2Ac',
+  lucas_jogos:'PLKpuwkMh4nD3YWimF5q0Ho1nzdTuiTPa4',
+  miguel_jogos:'PLKpuwkMh4nD3ka9V-QrY6VFY03bvEJbnb'
+};
 
 async function sbFetch(path,opts={}){
   return fetch(SUPABASE_URL+path,{
@@ -673,8 +675,8 @@ async function getYtToken(){
     const resp=await fetch('https://oauth2.googleapis.com/token',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        client_id:'', // YouTube OAuth — pendente de implementação
-        client_secret:'',
+        client_id:'184444339048-1fkagpi8hbmavlaqoqf2oht2sk3fqvno.apps.googleusercontent.com',
+        client_secret:'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',
         refresh_token,
         grant_type:'refresh_token'
       })
